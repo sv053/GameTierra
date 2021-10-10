@@ -1,4 +1,19 @@
 package app.model;
 
-public interface Tier {
+public class Tier {
+    private final String level;
+    private final int cashback;
+
+    public Tier(String level, int cashback) {
+        this.level = level;
+        this.cashback = cashback;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public int getCashback() {
+        return cashback;
+    }
 }
