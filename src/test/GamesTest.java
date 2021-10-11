@@ -1,3 +1,5 @@
+package test;
+
 import app.model.Game;
 import app.model.Games;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,7 @@ class GamesTest {
                 new Game(2, "gameName2", "desc2", true, 18.17),
                 new Game(3, "gameName3", "desc3", true, 115.02));
     }
+
     @Test
     void getGame() {
         Game okGame = new Game(3, "gameName3", "desc3", true, 115.02);
@@ -23,7 +26,6 @@ class GamesTest {
 
         Game falseGame1 = new Game(1, "gameName3", "desc3", true, 115.02);
         Game falseGame2 = new Game(1, "gameName1", "desc3", true, 1.02);
-        // List<Game> gamesFromGamesclass = Games.getGames();
 
         Exception exception = assertThrows(NoSuchElementException.class, () ->
                 Games.getGame(falseGame1));
@@ -39,11 +41,4 @@ class GamesTest {
         Game okGame = new Game(3, "gameName3", "desc3", true, 115.02);
         assertEquals(okGame, createGameList().stream().filter(g -> g.getGameNumber().equals(okGame.getGameNumber())).findFirst().get());
     }
-
-//    @Test
-//    void removeGame() {
-//        Game gameToRemove = new Game(3, "gameName3", "desc3", true, 115.02);
-//        if(createGameList().contains(gameToRemove))
-//            assertFalse(createGameList().remove(createGameList().stream().filter(g -> g.getGameNumber().intValue() == gameToRemove.getGameNumber()).findFirst()));
-//    }
 }

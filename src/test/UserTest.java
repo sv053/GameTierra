@@ -1,3 +1,5 @@
+package test;
+
 import app.model.Game;
 import org.junit.jupiter.api.Test;
 
@@ -5,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserTest {
     private List<Game> createUserGamesList(){
@@ -12,6 +15,7 @@ class UserTest {
                 new Game(2, "gameName2", "desc2", true, 1118.17),
                 new Game(3, "gameName3", "desc3", true, 26.02));
     }
+
     @Test
     void ifGameIsAlreadyBought() {
         Game game = new Game(2,"gameName2", "", true, 0.0d);
@@ -24,6 +28,14 @@ class UserTest {
         double balance = 0.235465465461;
         int cashbackPercent = 30;
         assertEquals(0.306105105099, balance + gamePrice * cashbackPercent * 0.01d);
+    }
+
+    @org.junit.jupiter.api.Test
+    void addCashback() {
+        int cashbackPercent = 23;
+        double gamePrice = 17.48;
+        double balance = 232.92;
+        assertTrue(((balance + gamePrice * cashbackPercent * 0.01d) <= 236.9404) && ((balance + gamePrice * cashbackPercent * 0.01d) >= 236.9403));
     }
 
     @org.junit.jupiter.api.Test
