@@ -1,5 +1,3 @@
-package test;
-
 import app.model.Game;
 import app.model.Games;
 import org.junit.jupiter.api.Test;
@@ -8,7 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GamesTest {
 
@@ -41,9 +40,10 @@ class GamesTest {
         assertEquals(okGame, createGameList().stream().filter(g -> g.getGameNumber().equals(okGame.getGameNumber())).findFirst().get());
     }
 
-    @Test
-    void removeGame() {
-        Integer numberofGameToRemove = new Game(3, "gameName3", "desc3", true, 115.02).getGameNumber();
-        createGameList().remove(createGameList().stream().filter(g -> g.getGameNumber().intValue() == numberofGameToRemove).findFirst().get());
-    }
+//    @Test
+//    void removeGame() {
+//        Game gameToRemove = new Game(3, "gameName3", "desc3", true, 115.02);
+//        if(createGameList().contains(gameToRemove))
+//            assertFalse(createGameList().remove(createGameList().stream().filter(g -> g.getGameNumber().intValue() == gameToRemove.getGameNumber()).findFirst()));
+//    }
 }
