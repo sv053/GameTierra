@@ -1,4 +1,4 @@
-package app.model;
+package main.model;
 
 public enum TierLevels {
     FREE(0),

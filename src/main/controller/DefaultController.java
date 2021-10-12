@@ -1,4 +1,4 @@
-package app.controller;
+package main.controller;
 
 public class DefaultController {
 }

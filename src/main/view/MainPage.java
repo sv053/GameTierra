@@ -1,6 +1,6 @@
-package app.view;
+package main.view;
 
-import app.model.*;
+import main.model.*;
 
 import java.util.Random;
 import java.util.Scanner;

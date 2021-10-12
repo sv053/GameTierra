@@ -1,4 +1,4 @@
-package app.model;
+package main.model;
 
 public class Tier {
     private final String level;

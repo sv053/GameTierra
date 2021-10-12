@@ -1,4 +1,4 @@
-package app.model;
+package main.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,14 +25,22 @@ public class Games {
 
     public static void createGamesList() {
         games.clear();
-        for (GameNames gameNames : GameNames.values()) {
-            games.add(new Game(Game.gameCode++, gameNames.name(), "some desc", true,
-                    RandomDouble.getAndFormatRandomDouble()));
+        for (GameNames gameName : GameNames.values()) {
+            addGame(gameName.name());
         }
     }
 
-    public boolean removeGame(Integer gameCode) {
-        return games.remove(games.stream().filter(g -> g.getGameNumber().intValue() == gameCode).findFirst().get());
+//    public boolean removeGame(Integer gameCode) {
+//        return games.remove(games.stream().filter(g -> g.getGameNumber().intValue() == gameCode).findFirst().get());
+//    }
+//
+//    public boolean addGame(Game game) {
+//        return games.add(game);
+//    }
+
+    public static boolean addGame(String gameName) {
+        return games.add(new Game(Game.gameCode++, gameName, "some desc", true,
+                RandomDouble.getAndFormatRandomDouble()));
     }
 
 }

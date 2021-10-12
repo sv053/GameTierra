@@ -1,20 +1,20 @@
 package test;
 
-import app.model.Game;
-import app.model.Games;
+import main.model.Game;
+import main.model.Games;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class GamesTest {
 
-    private List<Game> createGameList(){
-        return  Arrays.asList(new Game(1, "gameName1", "desc1", true, 12.56),
+    private List<Game> createGameList() {
+        return Arrays.asList(new Game(1, "gameName1", "desc1", true, 12.56),
                 new Game(2, "gameName2", "desc2", true, 18.17),
                 new Game(3, "gameName3", "desc3", true, 115.02));
     }
@@ -40,5 +40,13 @@ class GamesTest {
     void testGetGameByIndex() {
         Game okGame = new Game(3, "gameName3", "desc3", true, 115.02);
         assertEquals(okGame, createGameList().stream().filter(g -> g.getGameNumber().equals(okGame.getGameNumber())).findFirst().get());
+    }
+
+    @Test
+    void testAddGameByName() {
+        Game gameToAdd = new Game(4, "gameName4", "desc4", true, 7.08);
+        ArrayList<Game> gamesList = new ArrayList<>();
+        gamesList.add(gameToAdd);
+        assertTrue(gamesList.contains(gameToAdd));
     }
 }

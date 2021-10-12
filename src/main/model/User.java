@@ -1,9 +1,9 @@
-package app.model;
+package main.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class User implements UserBalance{
+public class User implements UserBalance {
     private final List<Game> userGames;
     Tier tier;
     private Double balance;

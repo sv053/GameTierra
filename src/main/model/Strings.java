@@ -1,4 +1,4 @@
-package app.model;
+package main.model;
 
 public enum Strings {
     WELCOME("\nHi! Welcome to GameTierra! \nYour subscription type is : "),

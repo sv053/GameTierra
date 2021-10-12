@@ -1,9 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="TierraDeGames" type="Application" factoryName="Application">
-        <option name="MAIN_CLASS_NAME" value="app.AppStart"/>
-        <module name="GameTierra"/>
-        <method v="2">
-            <option name="Make" enabled="true"/>
-        </method>
-    </configuration>
-</component>

@@ -1,6 +1,6 @@
 package test;
 
-import app.model.Game;
+import main.model.Game;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserTest {
-    private List<Game> createUserGamesList(){
+    private List<Game> createUserGamesList() {
         return Arrays.asList(new Game(1, "gameName1", "desc1", false, 35.11),
                 new Game(2, "gameName2", "desc2", true, 1118.17),
                 new Game(3, "gameName3", "desc3", true, 26.02));
@@ -18,7 +18,7 @@ class UserTest {
 
     @Test
     void ifGameIsAlreadyBought() {
-        Game game = new Game(2,"gameName2", "", true, 0.0d);
+        Game game = new Game(2, "gameName2", "", true, 0.0d);
         assertEquals(true, createUserGamesList().stream().anyMatch(g -> g.getName().equals(game.getName())));
     }
 
