@@ -8,8 +8,7 @@ import main.main.model.User;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class StoreTest {
 
@@ -24,7 +23,7 @@ public class StoreTest {
         user.addGameToTheUserGamesList(DataGenerator.getGames().get(1));
         user.addGameToTheUserGamesList(DataGenerator.getGames().get(4));
         store = Store.getInstance(user);
-        gameNumber = 1;// Math.abs(new Random().nextInt(DataGenerator.getGames().size()-1));
+        gameNumber = 2;// Math.abs(new Random().nextInt(DataGenerator.getGames().size()-1));
         game = DataGenerator.getGames().get(gameNumber);
 
         System.out.println(Strings.WELCOME.getMsg() + user + user.getUserGames() + Strings.SHOWCASE.getMsg() + DataGenerator.getGames());
@@ -32,11 +31,9 @@ public class StoreTest {
 
     @Test
     public void getGameByIndex() {
-        Game gameToSearch = DataGenerator.getGames().get(gameNumber);
+        assertEquals(game, store.getGameByIndex(gameNumber + 1));
 
-        assertEquals(gameToSearch, store.getGameByIndex(gameNumber + 1));
-
-        System.out.println(Strings.CHOICE_IS.getMsg() + gameToSearch);
+        System.out.println(Strings.CHOICE_IS.getMsg() + game);
     }
 
     @Test
@@ -50,7 +47,7 @@ public class StoreTest {
         String intentResult = store.buyGame(gameNumber);
         assertEquals(Strings.CONGRATS.getMsg(), intentResult);
         assertTrue(store.getUser().getBalance() < 123.15);
-        assertTrue(user.ifGameIsAlreadyBought(DataGenerator.getGames().get(gameNumber)));
+        assertFalse(user.ifGameIsAlreadyBought(DataGenerator.getGames().get(gameNumber)));
 
         System.out.println(intentResult + Strings.BALANCE_WITH_CASHBACK.getMsg() + user.getBalance());
 
