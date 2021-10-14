@@ -1,5 +1,7 @@
 package main.main.model;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,14 +35,14 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "tier=" + tier.getLevel() +
-                "cashback=" + tier.getCashback() + "%" +
-                "balance=" + balance +
+                " tier=" + tier.getLevel() +
+                ", cashback=" + tier.getCashback() + "%" +
+                ", balance=" + balance +
                 '}';
     }
 
     public Double getBalance() {
-        return balance;
+        return new BigDecimal(balance).setScale(2, RoundingMode.UP).doubleValue();
     }
 
     public boolean canPay(double price) {

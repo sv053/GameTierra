@@ -2,6 +2,7 @@ package main.test;
 
 import main.main.datagen.DataGenerator;
 import main.main.model.Tier;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -10,10 +11,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TierTest {
 
-    List<Tier> tiers;
+    private static List<Tier> tiers;
 
-    public TierTest() {
-        this.tiers = DataGenerator.getTiers();
+    @BeforeAll
+    public static void TiersListPrepare() {
+        tiers = DataGenerator.getTiers();
     }
 
     @Test

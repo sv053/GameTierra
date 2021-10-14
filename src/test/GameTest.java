@@ -2,6 +2,7 @@ package main.test;
 
 import main.main.datagen.DataGenerator;
 import main.main.model.Game;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -11,7 +12,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GameTest {
 
-    List<Game> games = DataGenerator.getGames();
+    private static List<Game> games;
+
+    @BeforeAll
+    public static void getGamesList() {
+        games = DataGenerator.getGames();
+    }
 
     @Test
     void getGameNumber() {

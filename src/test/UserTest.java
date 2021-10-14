@@ -3,17 +3,18 @@ package main.test;
 import main.main.datagen.DataGenerator;
 import main.main.model.Game;
 import main.main.model.User;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserTest {
 
-    DataGenerator dataGenerator;
-    User userToTest;
+    private static User userToTest;
 
-    private UserTest() {
-        dataGenerator = new DataGenerator();
+    @BeforeAll
+    public static void createTestUser() {
         userToTest = new User(DataGenerator.getTiers().get(4), 123.15);
         userToTest.addGameToTheUserGamesList(DataGenerator.getGames().get(1));
         userToTest.addGameToTheUserGamesList(DataGenerator.getGames().get(4));
@@ -22,11 +23,11 @@ class UserTest {
     @Test
     void ifGameIsAlreadyBought() {
         Game gameToCheck1 = DataGenerator.getGames().get(1);
-        Game gameToCheck2 = new Game(3, "SKYRIM", 87.88);
+        Game gameToCheck2 = new Game(4, "SKYRIM", 87.88);
         Game gameToCheck3 = DataGenerator.getGames().get(5);
 
         assertTrue(userToTest.ifGameIsAlreadyBought(gameToCheck1));
-        assertTrue(userToTest.ifGameIsAlreadyBought(gameToCheck2));
+        assertFalse(userToTest.ifGameIsAlreadyBought(gameToCheck2));
         assertFalse(userToTest.ifGameIsAlreadyBought(gameToCheck3));
     }
 
@@ -44,11 +45,6 @@ class UserTest {
     }
 
     @Test
-    void getBalance() {
-        assertEquals(123.15, userToTest.getBalance());
-    }
-
-    @Test
     void canPay() {
         double gamePriceHigherThanBalance = 163.53;
         double gamePriceLessThanBalance = 63.53;
@@ -60,8 +56,8 @@ class UserTest {
     void pay() {
         double gamePrice = 48.03;
         userToTest.pay(gamePrice);
-        assertTrue(userToTest.getBalance() == 171.18);
-
+        assertTrue(userToTest.getBalance() >= 75.11 && userToTest.getBalance() <= 75.13);
     }
 }
+
 

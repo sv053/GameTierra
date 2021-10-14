@@ -8,11 +8,17 @@ import java.util.List;
 public class Store {
     private final User user;
     private final List<Game> games;
+    private static Store instance;
 
-    public Store(User user) {
-        // user = DataGenerator.getRandomUser();
+    private Store(User user) {
         this.user = user;
         games = DataGenerator.getGames();
+    }
+
+    public static Store getInstance(User user) {
+        if (instance == null)
+            instance = new Store(user);
+        return instance;
     }
 
     public User getUser() {
@@ -39,5 +45,5 @@ public class Store {
             return Strings.ALREADY_BOUGHT.getMsg();
         return "";
     }
-
 }
+
