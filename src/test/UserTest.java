@@ -1,59 +1,67 @@
-package test;
+package main.test;
 
-import main.model.Game;
+import main.main.datagen.DataGenerator;
+import main.main.model.Game;
+import main.main.model.User;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class UserTest {
-    private List<Game> createUserGamesList() {
-        return Arrays.asList(new Game(1, "gameName1", "desc1", false, 35.11),
-                new Game(2, "gameName2", "desc2", true, 1118.17),
-                new Game(3, "gameName3", "desc3", true, 26.02));
+
+    DataGenerator dataGenerator;
+    User userToTest;
+
+    private UserTest() {
+        dataGenerator = new DataGenerator();
+        userToTest = new User(DataGenerator.getTiers().get(4), 123.15);
+        userToTest.addGameToTheUserGamesList(DataGenerator.getGames().get(1));
+        userToTest.addGameToTheUserGamesList(DataGenerator.getGames().get(4));
     }
 
     @Test
     void ifGameIsAlreadyBought() {
-        Game game = new Game(2, "gameName2", "", true, 0.0d);
-        assertEquals(true, createUserGamesList().stream().anyMatch(g -> g.getName().equals(game.getName())));
+        Game gameToCheck1 = DataGenerator.getGames().get(1);
+        Game gameToCheck2 = new Game(3, "SKYRIM", 87.88);
+        Game gameToCheck3 = DataGenerator.getGames().get(5);
+
+        assertTrue(userToTest.ifGameIsAlreadyBought(gameToCheck1));
+        assertTrue(userToTest.ifGameIsAlreadyBought(gameToCheck2));
+        assertFalse(userToTest.ifGameIsAlreadyBought(gameToCheck3));
     }
 
-    @org.junit.jupiter.api.Test
-    void sendCashback() {
-        double gamePrice = 0.23546546546;
-        double balance = 0.235465465461;
-        int cashbackPercent = 30;
-        assertEquals(0.306105105099, balance + gamePrice * cashbackPercent * 0.01d);
+    @Test
+    void addGameToTheUserGamesList() {
+        Game gameToCheck1 = DataGenerator.getGames().get(2);
+        assertTrue(userToTest.addGameToTheUserGamesList(gameToCheck1));
+        assertTrue(userToTest.getUserGames().contains(gameToCheck1));
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void addCashback() {
-        int cashbackPercent = 23;
-        double gamePrice = 17.48;
-        double balance = 232.92;
-        assertTrue(((balance + gamePrice * cashbackPercent * 0.01d) <= 236.9404) && ((balance + gamePrice * cashbackPercent * 0.01d) >= 236.9403));
+        double gamePrice = 63.53;
+        assertTrue(userToTest.addCashback(gamePrice) >= 142.208 && userToTest.addCashback(gamePrice) <= 142.21);
     }
 
-    @org.junit.jupiter.api.Test
-    void ifCanPay() {
-        double price = 0.23546546546;
-        double balance = 0.235465465461;
-        assertEquals(true, price <= balance);
-        balance = 0.23546546545;
-        assertEquals(false, price <= balance);
+    @Test
+    void getBalance() {
+        assertEquals(123.15, userToTest.getBalance());
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
+    void canPay() {
+        double gamePriceHigherThanBalance = 163.53;
+        double gamePriceLessThanBalance = 63.53;
+        assertTrue(userToTest.canPay(gamePriceLessThanBalance));
+        assertFalse(userToTest.canPay(gamePriceHigherThanBalance));
+    }
+
+    @Test
     void pay() {
-        double price = 0.23546546546;
-        double balance = 0.235465465461;
-        double sum = balance - price;
-        assertEquals(sum, balance -= price);
+        double gamePrice = 48.03;
+        userToTest.pay(gamePrice);
+        assertTrue(userToTest.getBalance() == 171.18);
+
     }
-
-
 }
+

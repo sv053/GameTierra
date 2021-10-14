@@ -1,10 +1,10 @@
-package main.model;
+package main.main.datagen;
 
 public enum Strings {
     WELCOME("\nHi! Welcome to GameTierra! \nYour subscription type is : "),
     INPUT_NUMBER("Please, enter a valid game number!"),
     CASHBACK_INFO(" and your cashback is "),
-    CONGRATS("Congratulations! You have bought the game!"),
+    CONGRATS("Congratulations! You have bought the game! Choose another? "),
     SHOWCASE("\nThe games you can choose are : "),
     OFFER("\nPlease, choose game by number from 1 to "),
     BALANCE("Your balance is $"),
@@ -13,7 +13,7 @@ public enum Strings {
     BUY_ANOTHER("\nChoose another? "),
     CHOICE_IS("\nYou have chosen : "),
     NOT_ENOUGH_MONEY("\nSorry, your balance is less than the game price. "),
-    ALREADY_BOUGHT("You already have this game!"),
+    ALREADY_BOUGHT("You already have this game! Choose another? "),
 
     ;
 

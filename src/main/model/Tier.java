@@ -1,4 +1,5 @@
-package main.model;
+package main.main.model;
+
 
 public class Tier {
     private final String level;
@@ -13,7 +14,8 @@ public class Tier {
         return level;
     }
 
-    public int getCashback() {
+    public Integer getCashback() {
         return cashback;
     }
 }
+

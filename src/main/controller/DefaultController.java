@@ -1,4 +1,4 @@
-package main.controller;
+package main.main.controller;
 
 public class DefaultController {
 }

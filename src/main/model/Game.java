@@ -1,4 +1,4 @@
-package main.model;
+package main.main.model;
 
 import java.util.Objects;
 
@@ -10,15 +10,11 @@ public class Game {
     }
 
     private final Integer gameNumber;
-    private String name;
-    private String gameDescription;
-    private boolean isActive;
-    private Double price;
+    private final String name;
+    private final Double price;
 
-    public Game(int number, String name, String description, boolean isActive, Double price) {
+    public Game(int number, String name, Double price) {
         this.name = name;
-        this.gameDescription = description;
-        this.isActive = isActive;
         this.price = price;
         gameNumber = number;
     }
@@ -31,32 +27,8 @@ public class Game {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return gameDescription;
-    }
-
-    public void setDescription(String description) {
-        this.gameDescription = description;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
     public Double getPrice() {
         return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
     }
 
     @Override
@@ -64,7 +36,6 @@ public class Game {
         return "Game{" +
                 "code='" + gameNumber + '\'' +
                 "name='" + name + '\'' +
-//                ", description='" + gameDescription + '\'' +
                 ", price=$" + price +
                 '}' + '\n';
     }
@@ -76,16 +47,17 @@ public class Game {
 
         Game game = (Game) o;
 
-        if (!name.equals(game.name)) return false;
-        if (!Objects.equals(gameDescription, game.gameDescription)) return false;
-        return gameNumber.equals(game.gameNumber);
+        if (!Objects.equals(gameNumber, game.gameNumber)) return false;
+        if (!Objects.equals(name, game.name)) return false;
+        return Objects.equals(price, game.price);
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + (gameDescription != null ? gameDescription.hashCode() : 0);
-        result = 31 * result + gameNumber.hashCode();
+        int result = gameNumber != null ? gameNumber.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (price != null ? price.hashCode() : 0);
         return result;
     }
 }
+

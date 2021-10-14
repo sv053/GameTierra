@@ -1,11 +1,11 @@
-package main.model;
+package main.main.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class User implements UserBalance {
+public class User {
     private final List<Game> userGames;
-    Tier tier;
+    private final Tier tier;
     private Double balance;
 
     public User(Tier tier, Double balance) {
@@ -14,32 +14,28 @@ public class User implements UserBalance {
         userGames = new ArrayList<>();
     }
 
-    public Tier getTier() {
-        return tier;
-    }
-
-    public void setTier(Tier tier) {
-        this.tier = tier;
+    public List<Game> getUserGames() {
+        return userGames;
     }
 
     public boolean ifGameIsAlreadyBought(Game game) {
         return userGames.stream().anyMatch(g -> g.getName().equals(game.getName()));
     }
 
-    public void addGameToTheUserGameList(Game game) {
-        userGames.add(game);
+    public boolean addGameToTheUserGamesList(Game game) {
+        return userGames.add(game);
     }
 
-    @Override
-    public double addCashback(int cashbackPercent, double gamePrice) {
-        return balance + gamePrice * cashbackPercent * 0.01d;
+    public double addCashback(double gamePrice) {
+        return balance + gamePrice * this.tier.getCashback() * 0.01d;
     }
 
     @Override
     public String toString() {
         return "User{" +
                 "tier=" + tier.getLevel() +
-                ", balance=" + balance +
+                "cashback=" + tier.getCashback() + "%" +
+                "balance=" + balance +
                 '}';
     }
 
@@ -47,21 +43,15 @@ public class User implements UserBalance {
         return balance;
     }
 
-    public void setBalance(double balance) {
-        this.balance = balance;
-    }
-
-    public void addMoney(double moneyToAdd) {
-        balance += moneyToAdd;
-    }
-
-    @Override
     public boolean canPay(double price) {
         return price <= balance;
     }
 
-    @Override
     public void pay(double price) {
         balance -= price;
     }
 }
+
+
+
+
