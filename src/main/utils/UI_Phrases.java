@@ -1,6 +1,6 @@
-package main.main.datagen;
+package utils;
 
-public enum Strings {
+public enum UI_Phrases {
     WELCOME("\nHi! Welcome to GameTierra! \nYour subscription type is : "),
     INPUT_NUMBER("Please, enter a valid game number!"),
     CASHBACK_INFO(" and your cashback is "),
@@ -13,18 +13,16 @@ public enum Strings {
     BUY_ANOTHER("\nChoose another? "),
     CHOICE_IS("\nYou have chosen : "),
     NOT_ENOUGH_MONEY("\nSorry, your balance is less than the game price. "),
-    ALREADY_BOUGHT("You already have this game! Choose another? "),
+    ALREADY_BOUGHT("You already have this game! Choose another? ");
 
-    ;
+    public final String phrase;
 
-    public final String Msg;
+    UI_Phrases(String message) {
 
-    Strings(String msg) {
-
-        Msg = msg;
+        phrase = message;
     }
 
-    public String getMsg() {
-        return Msg;
+    public String getPhrase() {
+        return phrase;
     }
 }

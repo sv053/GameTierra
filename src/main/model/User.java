@@ -1,4 +1,4 @@
-package main.main.model;
+package model;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -6,54 +6,62 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User {
-    private final List<Game> userGames;
+    private final List<Game> games;
     private final Tier tier;
-    private Double balance;
+    private BigDecimal balance;
 
-    public User(Tier tier, Double balance) {
+    public User(Tier tier, BigDecimal balance) {
         this.tier = tier;
         this.balance = balance;
-        userGames = new ArrayList<>();
+        games = new ArrayList<>();
     }
 
-    public List<Game> getUserGames() {
-        return userGames;
+    public Tier getTier() {
+        return tier;
     }
 
-    public boolean ifGameIsAlreadyBought(Game game) {
-        return userGames.stream().anyMatch(g -> g.getName().equals(game.getName()));
+    public BigDecimal addBalance(BigDecimal balance) {
+        return this.balance.add(balance);
     }
 
-    public boolean addGameToTheUserGamesList(Game game) {
-        return userGames.add(game);
+    public List<Game> getGames() {
+        return games;
     }
 
-    public double addCashback(double gamePrice) {
-        return balance + gamePrice * this.tier.getCashback() * 0.01d;
+    public boolean hasGame(Game game) {
+        return games.stream()
+                .map(Game::getName)
+                .anyMatch(name -> name.equals(game.getName()));
+    }
+
+    public boolean addToOwnedGames(Game game) {
+        return games.add(game);
     }
 
     @Override
     public String toString() {
         return "User{" +
                 " tier=" + tier.getLevel() +
-                ", cashback=" + tier.getCashback() + "%" +
-                ", balance=" + balance +
+                ", cashback=" + tier.getCashbackPercentage() + "%" +
+                ", balance=$" + balance +
+                ", games=\\n" + getGames() +
                 '}';
     }
 
-    public Double getBalance() {
-        return new BigDecimal(balance).setScale(2, RoundingMode.UP).doubleValue();
+    public BigDecimal getBalance() {
+        return balance.setScale(2, RoundingMode.UP);
     }
 
-    public boolean canPay(double price) {
-        return price <= balance;
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 
-    public void pay(double price) {
-        balance -= price;
+    public boolean canPay(BigDecimal price) {
+        return price.compareTo(balance) <= 0.01;
+    }
+
+    public BigDecimal pay(BigDecimal price) {
+        setBalance(getBalance().subtract(price));
+        return getBalance();
     }
 }
-
-
-
-

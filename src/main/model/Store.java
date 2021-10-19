@@ -1,49 +1,38 @@
-package main.main.model;
+package model;
 
-import main.main.datagen.DataGenerator;
-import main.main.datagen.Strings;
+import utils.SampleData;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class Store {
-    private final User user;
     private final List<Game> games;
     private static Store instance;
 
-    private Store(User user) {
-        this.user = user;
-        games = DataGenerator.getGames();
+    private Store() {
+        games = SampleData.getGames();
     }
 
-    public static Store getInstance(User user) {
+    public static Store getInstance() {
         if (instance == null)
-            instance = new Store(user);
+            instance = new Store();
         return instance;
     }
 
-    public User getUser() {
-        return user;
-    }
-
     public Game getGameByIndex(Integer gameCode) {
-        return games.stream().filter(g -> g.getGameNumber().equals(gameCode)).findFirst().get();
+        return games.get(gameCode - 1);
     }
 
-    public String buyGame(int gameNumber) {
+    public BigDecimal addCashback(BigDecimal gamePrice, User user) {
+        return gamePrice.multiply(BigDecimal.valueOf(user.getTier().getCashbackPercentage() * 0.01));
+    }
+
+    public User buyGame(int gameNumber, User user) {
         Game gameToBuy = getGameByIndex(gameNumber);
         if (user.canPay(gameToBuy.getPrice())) {
-            user.pay(gameToBuy.getPrice());
-            user.addGameToTheUserGamesList(gameToBuy);
-            user.addCashback(gameToBuy.getPrice());
-            return Strings.CONGRATS.getMsg();
+            user.setBalance(user.pay(gameToBuy.getPrice()).add(addCashback(gameToBuy.getPrice(), user)));
+            user.addToOwnedGames(gameToBuy);
         }
-        return Strings.NOT_ENOUGH_MONEY.getMsg();
-    }
-
-    public String checkIfHasGame(Game game) {
-        if (user.ifGameIsAlreadyBought(game))
-            return Strings.ALREADY_BOUGHT.getMsg();
-        return "";
+        return user;
     }
 }
-

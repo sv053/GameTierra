@@ -1,6 +1,6 @@
-package main.main.model;
+package model;
 
-import java.util.Objects;
+import java.math.BigDecimal;
 
 public class Game {
     public static int gameCode;
@@ -9,32 +9,32 @@ public class Game {
         gameCode = new Integer(1);
     }
 
-    private final Integer gameNumber;
+    private final Integer id;
     private final String name;
-    private final Double price;
+    private final BigDecimal price;
 
-    public Game(int number, String name, Double price) {
+    public Game(String name, BigDecimal price) {
+        id = gameCode++;
         this.name = name;
         this.price = price;
-        gameNumber = number;
     }
 
-    public Integer getGameNumber() {
-        return gameNumber;
+    public Integer getId() {
+        return id;
     }
 
     public String getName() {
         return name;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
     @Override
     public String toString() {
         return "Game{" +
-                "code='" + gameNumber + '\'' +
+                "code='" + id + '\'' +
                 "name='" + name + '\'' +
                 ", price=$" + price +
                 '}' + '\n';
@@ -47,17 +47,11 @@ public class Game {
 
         Game game = (Game) o;
 
-        if (!Objects.equals(gameNumber, game.gameNumber)) return false;
-        if (!Objects.equals(name, game.name)) return false;
-        return Objects.equals(price, game.price);
+        return name.equals(game.name);
     }
 
     @Override
     public int hashCode() {
-        int result = gameNumber != null ? gameNumber.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (price != null ? price.hashCode() : 0);
-        return result;
+        return name.hashCode();
     }
 }
-

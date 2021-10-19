@@ -1,21 +1,20 @@
-package main.main.model;
+package model;
 
 
 public class Tier {
     private final String level;
-    private final int cashback;
+    private final double cashbackPercentage;
 
     public Tier(String level, int cashback) {
         this.level = level;
-        this.cashback = cashback;
+        this.cashbackPercentage = cashback;
     }
 
     public String getLevel() {
         return level;
     }
 
-    public Integer getCashback() {
-        return cashback;
+    public double getCashbackPercentage() {
+        return cashbackPercentage;
     }
 }
-
