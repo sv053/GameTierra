@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import utils.SampleData;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,14 +21,16 @@ class GameTest {
 
     @Test
     void testEquals() {
-        Game gameToCompare = new Game("SKYRIM", BigDecimal.valueOf(87.88));
-        assertTrue(games.get(3).equals(gameToCompare));
+        Game game = new Game(games.get(0).getName(), games.get(0).getPrice());
+        Game gameToCompare = new Game(games.get(0).getName(), games.get(0).getPrice());
+        assertTrue(game.equals(gameToCompare));
     }
 
     @Test
     void testHashCode() {
-        Game gameToCompare = new Game("SKYRIM", BigDecimal.valueOf(87.88));
-        assertEquals(games.get(3).hashCode(), gameToCompare.hashCode());
+        Game game = new Game(games.get(0).getName(), games.get(0).getPrice());
+        Game gameToCompare = new Game(games.get(0).getName(), games.get(0).getPrice());
+        assertEquals(game.hashCode(), gameToCompare.hashCode());
     }
 }
 

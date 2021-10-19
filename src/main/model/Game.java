@@ -3,10 +3,10 @@ package model;
 import java.math.BigDecimal;
 
 public class Game {
-    public static int gameCode;
+    public static int staticId;
 
     static {
-        gameCode = new Integer(1);
+        staticId = new Integer(1);
     }
 
     private final Integer id;
@@ -14,7 +14,7 @@ public class Game {
     private final BigDecimal price;
 
     public Game(String name, BigDecimal price) {
-        id = gameCode++;
+        id = staticId++;
         this.name = name;
         this.price = price;
     }

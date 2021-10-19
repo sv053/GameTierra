@@ -23,14 +23,14 @@ public class Store {
         return games.get(gameCode - 1);
     }
 
-    public BigDecimal addCashback(BigDecimal gamePrice, User user) {
+    public BigDecimal countCashback(BigDecimal gamePrice, User user) {
         return gamePrice.multiply(BigDecimal.valueOf(user.getTier().getCashbackPercentage() * 0.01));
     }
 
     public User buyGame(int gameNumber, User user) {
         Game gameToBuy = getGameByIndex(gameNumber);
         if (user.canPay(gameToBuy.getPrice())) {
-            user.setBalance(user.pay(gameToBuy.getPrice()).add(addCashback(gameToBuy.getPrice(), user)));
+            user.setBalance(user.pay(gameToBuy.getPrice()).add(countCashback(gameToBuy.getPrice(), user)));
             user.addToOwnedGames(gameToBuy);
         }
         return user;

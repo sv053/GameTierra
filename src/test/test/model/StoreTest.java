@@ -6,7 +6,6 @@ import model.User;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import utils.SampleData;
-import utils.UI_Phrases;
 
 import java.math.BigDecimal;
 
@@ -26,15 +25,11 @@ public class StoreTest {
         user.addToOwnedGames(SampleData.getGames().get(4));
         store = Store.getInstance();
         game = SampleData.getGames().get(2);
-
-        System.out.println(UI_Phrases.WELCOME.getPhrase() + user + UI_Phrases.SHOWCASE.getPhrase() + SampleData.getGames());
     }
 
     @Test
     public void getGameByIndex() {
         assertEquals(game, store.getGameByIndex(3));
-
-        System.out.println(UI_Phrases.CHOICE_IS.getPhrase() + game);
     }
 
     @Test
@@ -43,12 +38,11 @@ public class StoreTest {
 
         assertTrue(userToCheck.getBalance().compareTo(BigDecimal.valueOf(123.15d)) <= 0);
         assertTrue(userToCheck.hasGame(game));
-        System.out.println(userToCheck);
     }
 
     @Test
     void addCashback() {
         BigDecimal gamePrice = BigDecimal.valueOf(63.53);
-        assertTrue(store.addCashback(gamePrice, user).compareTo(BigDecimal.valueOf(142.21d)) <= .31);
+        assertTrue(store.countCashback(gamePrice, user).compareTo(BigDecimal.valueOf(142.21d)) <= .31);
     }
 }

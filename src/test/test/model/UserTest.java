@@ -24,27 +24,35 @@ class UserTest {
 
     @Test
     void hasGame() {
-        Game gameToCheck1 = SampleData.getGames().get(1);
-        Game gameToCheck2 = new Game("SKYRIM", BigDecimal.valueOf(87.88d));
-        Game gameToCheck3 = SampleData.getGames().get(5);
+        Game gameToCheck = SampleData.getGames().get(1);
 
-        assertTrue(userToTest.hasGame(gameToCheck1));
-        assertFalse(userToTest.hasGame(gameToCheck2));
-        assertFalse(userToTest.hasGame(gameToCheck3));
+        assertTrue(userToTest.hasGame(gameToCheck));
+    }
+
+
+    @Test
+    void doesNotHaveGame() {
+        Game gameToCheck = SampleData.getGames().get(5);
+
+        assertFalse(userToTest.hasGame(gameToCheck));
     }
 
     @Test
     void addGame() {
-        Game gameToCheck1 = SampleData.getGames().get(2);
-        assertTrue(userToTest.addToOwnedGames(gameToCheck1));
-        assertTrue(userToTest.getGames().contains(gameToCheck1));
+        Game gameToCheck = SampleData.getGames().get(2);
+        assertTrue(userToTest.addToOwnedGames(gameToCheck));
+        assertTrue(userToTest.getGames().contains(gameToCheck));
     }
 
     @Test
     void canPay() {
-        BigDecimal gamePriceHigherThanBalance = BigDecimal.valueOf(163.53d);
         BigDecimal gamePriceLessThanBalance = BigDecimal.valueOf(63.53d);
         assertTrue(userToTest.canPay(gamePriceLessThanBalance));
+    }
+
+    @Test
+    void cannotPay() {
+        BigDecimal gamePriceHigherThanBalance = BigDecimal.valueOf(163.53d);
         assertFalse(userToTest.canPay(gamePriceHigherThanBalance));
     }
 
