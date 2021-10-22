@@ -20,10 +20,6 @@ public class User {
         return tier;
     }
 
-    public BigDecimal addBalance(BigDecimal balance) {
-        return this.balance.add(balance);
-    }
-
     public List<Game> getGames() {
         return games;
     }
@@ -52,16 +48,17 @@ public class User {
         return balance.setScale(2, RoundingMode.UP);
     }
 
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
+    public void depositBalance(BigDecimal sumToAdd) {
+        this.balance = balance.add(sumToAdd);
     }
 
     public boolean canPay(BigDecimal price) {
-        return price.compareTo(balance) <= 0.01;
+        return price.compareTo(balance) <= 0;
     }
 
-    public BigDecimal pay(BigDecimal price) {
-        setBalance(getBalance().subtract(price));
+    public BigDecimal withdrawBalance(BigDecimal price) {
+        depositBalance(getBalance().subtract(price));
         return getBalance();
     }
 }
+

@@ -19,20 +19,25 @@ public class Store {
         return instance;
     }
 
-    public Game getGameByIndex(Integer gameCode) {
-        return games.get(gameCode - 1);
+    public Game getGameById(Integer gameId) {
+
+        return games.get(gameId);
     }
 
-    public BigDecimal countCashback(BigDecimal gamePrice, User user) {
-        return gamePrice.multiply(BigDecimal.valueOf(user.getTier().getCashbackPercentage() * 0.01));
+    public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
+        double percentage = user.getTier().getCashbackPercentage();
+        BigDecimal percentageShare = BigDecimal.valueOf(percentage * 0.01d);
+        return gamePrice.multiply(percentageShare);
     }
 
     public User buyGame(int gameNumber, User user) {
-        Game gameToBuy = getGameByIndex(gameNumber);
+        Game gameToBuy = getGameById(gameNumber);
         if (user.canPay(gameToBuy.getPrice())) {
-            user.setBalance(user.pay(gameToBuy.getPrice()).add(countCashback(gameToBuy.getPrice(), user)));
+            BigDecimal cashback = calculateCashback(gameToBuy.getPrice(), user);
+            user.depositBalance(cashback);
             user.addToOwnedGames(gameToBuy);
         }
         return user;
     }
 }
+

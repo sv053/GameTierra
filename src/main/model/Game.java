@@ -3,10 +3,10 @@ package model;
 import java.math.BigDecimal;
 
 public class Game {
-    public static int staticId;
+    public static int idCounter;
 
     static {
-        staticId = new Integer(1);
+        idCounter = 0;
     }
 
     private final Integer id;
@@ -14,7 +14,7 @@ public class Game {
     private final BigDecimal price;
 
     public Game(String name, BigDecimal price) {
-        id = staticId++;
+        id = idCounter++;
         this.name = name;
         this.price = price;
     }
@@ -34,7 +34,7 @@ public class Game {
     @Override
     public String toString() {
         return "Game{" +
-                "code='" + id + '\'' +
+                "id='" + id + '\'' +
                 "name='" + name + '\'' +
                 ", price=$" + price +
                 '}' + '\n';
@@ -47,11 +47,12 @@ public class Game {
 
         Game game = (Game) o;
 
-        return name.equals(game.name);
+        return (name + price).equals(game.getName() + game.getPrice());
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return name.hashCode() + price.hashCode();
     }
 }
+

@@ -5,23 +5,24 @@ import model.Tier;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public final class SampleData {
 
-    private final static List<Game> games;
-    private final static List<Tier> tiers;
-    private static SampleData instance;
+    private static final List<Game> games;
+    private static final List<Tier> tiers;
 
     static {
-        games = Arrays.asList(new Game("THE_WITCHER", BigDecimal.valueOf(17.28d)),
-                new Game("GRAND_THEFT_AUTO", RandomBigDecimal.getAndFormatRandomBigDecimal()),
-                new Game("RED_DEAD_REDEMPTION", RandomBigDecimal.getAndFormatRandomBigDecimal()),
-                new Game("SKYRIM", BigDecimal.valueOf(87.88d)),
-                new Game("FORZA_HORIZON", RandomBigDecimal.getAndFormatRandomBigDecimal()),
-                new Game("DOOM_ETERNAL", BigDecimal.valueOf(635.48d)),
-                new Game("ASSASSIN_S_CREED", RandomBigDecimal.getAndFormatRandomBigDecimal()),
-                new Game("A_NEW_ONE", RandomBigDecimal.getAndFormatRandomBigDecimal()));
+        games = Collections.unmodifiableList(
+                Arrays.asList(new Game("THE_WITCHER", BigDecimal.valueOf(17.28d)),
+                        new Game("GRAND_THEFT_AUTO", RandomBigDecimal.getAndFormatRandomBigDecimal()),
+                        new Game("RED_DEAD_REDEMPTION", RandomBigDecimal.getAndFormatRandomBigDecimal()),
+                        new Game("SKYRIM", BigDecimal.valueOf(87.88d)),
+                        new Game("FORZA_HORIZON", RandomBigDecimal.getAndFormatRandomBigDecimal()),
+                        new Game("DOOM_ETERNAL", BigDecimal.valueOf(635.48d)),
+                        new Game("ASSASSIN_S_CREED", RandomBigDecimal.getAndFormatRandomBigDecimal()),
+                        new Game("A_NEW_ONE", RandomBigDecimal.getAndFormatRandomBigDecimal())));
 
         tiers = Arrays.asList(
                 new Tier("FREE", 0),
@@ -34,12 +35,6 @@ public final class SampleData {
     private SampleData() {
     }
 
-    public static SampleData getInstance() {
-        if (instance == null)
-            instance = new SampleData();
-        return instance;
-    }
-
     public static List<Game> getGames() {
         return games;
     }
@@ -48,3 +43,4 @@ public final class SampleData {
         return tiers;
     }
 }
+

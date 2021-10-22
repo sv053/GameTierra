@@ -14,3 +14,4 @@ public final class RandomBigDecimal {
                 .setScale(2, RoundingMode.UP);
     }
 }
+

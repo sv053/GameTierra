@@ -2,47 +2,78 @@ package test.model;
 
 import model.Game;
 import model.Store;
+import model.Tier;
 import model.User;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.SampleData;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class StoreTest {
 
     private static User user;
     private static Store store;
     private static Game game;
+    private static final int ownedGameId1 = 1;
+    private static final int ownedGameId2 = 2;
+    private static final int gameId = 5;
+    private static BigDecimal initialBalance;
 
     @BeforeAll
     public static void createUserAndStore() {
-        user = new User(SampleData.getTiers().get(4), BigDecimal.valueOf(123.15d));
-        user.addToOwnedGames(SampleData.getGames().get(1));
-        user.addToOwnedGames(SampleData.getGames().get(4));
+
+        int tierLvl = 4;
+        double account = 123.15d;
+        initialBalance = BigDecimal.valueOf(account);
+        Tier tier = SampleData.getTiers().get(tierLvl);
+        user = new User(tier, initialBalance);
+
+        user.addToOwnedGames(SampleData.getGames().get(ownedGameId1));
+        user.addToOwnedGames(SampleData.getGames().get(ownedGameId2));
         store = Store.getInstance();
-        game = SampleData.getGames().get(2);
+        game = SampleData.getGames().get(gameId);
     }
 
     @Test
-    public void getGameByIndex() {
-        assertEquals(game, store.getGameByIndex(3));
+    public void getGameById() {
+        assertEquals(game, store.getGameById(game.getId()));
     }
 
     @Test
-    void buyGame() {
+    public void buyGame() {
         User userToCheck = store.buyGame(game.getId(), user);
-
-        assertTrue(userToCheck.getBalance().compareTo(BigDecimal.valueOf(123.15d)) <= 0);
-        assertTrue(userToCheck.hasGame(game));
+        if (game.getPrice().compareTo(initialBalance) <= 0) {
+            assertTrue(userToCheck.getBalance().compareTo(initialBalance) < 0);
+            assertTrue(userToCheck.hasGame(game));
+        } else {
+            assertFalse(userToCheck.hasGame(game));
+        }
     }
 
     @Test
-    void addCashback() {
-        BigDecimal gamePrice = BigDecimal.valueOf(63.53);
-        assertTrue(store.countCashback(gamePrice, user).compareTo(BigDecimal.valueOf(142.21d)) <= .31);
+    public void addCashback() {
+        BigDecimal cashbackPercentage = BigDecimal.valueOf(user.getTier().getCashbackPercentage() * 0.01d);
+        BigDecimal cashback = game.getPrice().multiply(cashbackPercentage);
+        BigDecimal newBalance = user.getBalance().add(cashback);
+        assertTrue(store.calculateCashback(game.getPrice(), user).compareTo(newBalance) <= 0);
+    }
+
+    @BeforeEach
+    public void restoreState() {
+        if (user.getBalance().compareTo(initialBalance) != 0)
+            user.withdrawBalance(initialBalance.subtract(user.getBalance()));
+
+        List<Game> ownedGames = user.getGames();
+        if (ownedGames.size() > 2) {
+            ownedGames.clear();
+            ownedGames.add(SampleData.getGames().get(ownedGameId1));
+            ownedGames.add(SampleData.getGames().get(ownedGameId2));
+        }
     }
 }
+

@@ -1,6 +1,6 @@
 package utils;
 
-public enum UI_Phrases {
+public enum UiPhrases {
     WELCOME("\nHi! Welcome to GameTierra! \nYour subscription type is : "),
     INPUT_NUMBER("Please, enter a valid game number!"),
     CASHBACK_INFO(" and your cashback is "),
@@ -17,7 +17,7 @@ public enum UI_Phrases {
 
     public final String phrase;
 
-    UI_Phrases(String message) {
+    UiPhrases(String message) {
 
         phrase = message;
     }
@@ -26,3 +26,4 @@ public enum UI_Phrases {
         return phrase;
     }
 }
+
