@@ -32,7 +32,7 @@ class GameTest {
     @Test
     void testHashCode() {
         Game game = new Game(checkingGame.getName(), checkingGame.getPrice());
-        assertEquals(game.hashCode(), checkingGame);
+        assertEquals(game.hashCode(), checkingGame.hashCode());
     }
 }
 

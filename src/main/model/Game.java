@@ -5,10 +5,6 @@ import java.math.BigDecimal;
 public class Game {
     public static int idCounter;
 
-    static {
-        idCounter = 0;
-    }
-
     private final Integer id;
     private final String name;
     private final BigDecimal price;
@@ -47,12 +43,14 @@ public class Game {
 
         Game game = (Game) o;
 
-        return (name + price).equals(game.getName() + game.getPrice());
+        return name.equals(game.getName());
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode() + price.hashCode();
+        int result = 31;
+        result = 17 * result + (name == "" ? 0 : (name + price).hashCode());
+        return result;
     }
 }
 

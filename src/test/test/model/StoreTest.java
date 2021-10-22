@@ -11,8 +11,10 @@ import utils.SampleData;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StoreTest {
 
@@ -21,14 +23,16 @@ public class StoreTest {
     private static Game game;
     private static final int ownedGameId1 = 1;
     private static final int ownedGameId2 = 2;
-    private static final int gameId = 5;
+    private static int gameId;
     private static BigDecimal initialBalance;
 
     @BeforeAll
     public static void createUserAndStore() {
 
         int tierLvl = 4;
-        double account = 123.15d;
+        int multForRandom = 100;
+        double account = new Random().nextDouble() * multForRandom;
+        gameId = new Random().nextInt(SampleData.getGames().size() - 1);
         initialBalance = BigDecimal.valueOf(account);
         Tier tier = SampleData.getTiers().get(tierLvl);
         user = new User(tier, initialBalance);
@@ -48,10 +52,12 @@ public class StoreTest {
     public void buyGame() {
         User userToCheck = store.buyGame(game.getId(), user);
         if (game.getPrice().compareTo(initialBalance) <= 0) {
-            assertTrue(userToCheck.getBalance().compareTo(initialBalance) < 0);
+            BigDecimal cashback = store.calculateCashback(game.getPrice(), userToCheck);
+            BigDecimal bal = initialBalance.subtract(game.getPrice()).add(cashback);
+            assertEquals(userToCheck.getBalance(), bal);
             assertTrue(userToCheck.hasGame(game));
         } else {
-            assertFalse(userToCheck.hasGame(game));
+            System.out.println("The price is higher than your balance " + game.getPrice() + " : " + userToCheck.getBalance());
         }
     }
 

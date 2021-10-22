@@ -20,7 +20,6 @@ public class Store {
     }
 
     public Game getGameById(Integer gameId) {
-
         return games.get(gameId);
     }
 
