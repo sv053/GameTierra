@@ -10,7 +10,7 @@ public class Store {
     private static Store instance;
 
     private Store() {
-        games = SampleData.getGames();
+        games = SampleData.GAMES;
     }
 
     public static Store getInstance() {
@@ -20,19 +20,24 @@ public class Store {
     }
 
     public Game getGameById(Integer gameId) {
-        return games.get(gameId);
+        return games.stream()
+                .filter(g -> g.getId() == gameId)
+                .findAny()
+                .get();
     }
 
     public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
-        double percentage = user.getTier().getCashbackPercentage();
+        double percentage = user.getTier()
+                .getCashbackPercentage();
         BigDecimal percentageShare = BigDecimal.valueOf(percentage * 0.01d);
         return gamePrice.multiply(percentageShare);
     }
 
-    public User buyGame(int gameNumber, User user) {
-        Game gameToBuy = getGameById(gameNumber);
+    public User buyGame(int gameId, User user) {
+        Game gameToBuy = getGameById(gameId);
         if (user.canPay(gameToBuy.getPrice())) {
             BigDecimal cashback = calculateCashback(gameToBuy.getPrice(), user);
+            user.withdrawBalance(gameToBuy.getPrice());
             user.depositBalance(cashback);
             user.addToOwnedGames(gameToBuy);
         }

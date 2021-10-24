@@ -3,90 +3,99 @@ package test.model;
 import model.Game;
 import model.Tier;
 import model.User;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.SampleData;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserTest {
 
-    private static final int ownedGameId1 = 1;
-    private static final int ownedGameId2 = 4;
-    private static final int gameId = 5;
-    private static User user;
-    private static Game ownedGame;
-    private static Game game;
-    private static BigDecimal initialBalance;
-    private static BigDecimal dif;
-
-    @BeforeAll
-    public static void createTestUser() {
-        int tierLvl = 4;
-        double account = 123.15d;
-        dif = BigDecimal.valueOf(account * .1d);
-        initialBalance = BigDecimal.valueOf(account);
-        Tier tier = SampleData.getTiers().get(tierLvl);
-        user = new User(tier, initialBalance);
-        user.addToOwnedGames(SampleData.getGames().get(ownedGameId1));
-        user.addToOwnedGames(SampleData.getGames().get(ownedGameId2));
-        ownedGame = SampleData.getGames().get(ownedGameId2);
-        game = SampleData.getGames().get(gameId);
-    }
-
     @Test
-    public void hasGame() {
+    void hasGame() {
+        int tierLvl = 4;
+        Tier tier = SampleData.TIERS.get(tierLvl);
+        double sumOfMoney = 123.15d;
+        BigDecimal dif = BigDecimal.valueOf(sumOfMoney * .1d);
+        BigDecimal initialBalance = BigDecimal.valueOf(sumOfMoney);
+        User user = new User(tier, initialBalance);
+        int ownedGameId1 = 1;
+        int ownedGameId2 = 4;
+        user.addToOwnedGames(SampleData.GAMES.get(ownedGameId1));
+        user.addToOwnedGames(SampleData.GAMES.get(ownedGameId2));
+        Game ownedGame = SampleData.GAMES.get(ownedGameId2);
         assertTrue(user.hasGame(ownedGame));
     }
 
     @Test
-    public void doesNotHaveGame() {
-        assertFalse(user.hasGame(game));
+    void doesNotHaveGame() {
+        int tierLvl = 4;
+        Tier tier = SampleData.TIERS.get(tierLvl);
+        double sumOfMoney = 123.15d;
+        BigDecimal dif = BigDecimal.valueOf(sumOfMoney * .1d);
+        BigDecimal initialBalance = BigDecimal.valueOf(sumOfMoney);
+        User user = new User(tier, initialBalance);
+        int ownedGameId1 = 1;
+        int ownedGameId2 = 4;
+        user.addToOwnedGames(SampleData.GAMES.get(ownedGameId1));
+        user.addToOwnedGames(SampleData.GAMES.get(ownedGameId2));
+        int numberOfNotOwnedGame = 3;
+        Game alienGame = SampleData.GAMES.get(numberOfNotOwnedGame);
+        assertFalse(user.hasGame(alienGame));
     }
 
     @Test
-    public void addGame() {
-        assertTrue(user.addToOwnedGames(game));
-        assertTrue(user.getGames().contains(game));
+    void addGame() {
+        int tierLvl = 4;
+        Tier tier = SampleData.TIERS.get(tierLvl);
+        double sumOfMoney = 123.15d;
+        BigDecimal dif = BigDecimal.valueOf(sumOfMoney * .1d);
+        BigDecimal initialBalance = BigDecimal.valueOf(sumOfMoney);
+        User user = new User(tier, initialBalance);
+        int numberOfNotOwnedGameId = 3;
+        Game alienGame = SampleData.GAMES.get(numberOfNotOwnedGameId);
+        assertTrue(user.addToOwnedGames(alienGame));
+        assertTrue(user.getGames().contains(alienGame));
     }
 
     @Test
-    public void canPay() {
+    void canPay() {
+        int tierLvl = 4;
+        Tier tier = SampleData.TIERS.get(tierLvl);
+        double sumOfMoney = 123.15d;
+        BigDecimal dif = BigDecimal.valueOf(sumOfMoney * .1d);
+        BigDecimal initialBalance = BigDecimal.valueOf(sumOfMoney);
+        User user = new User(tier, initialBalance);
         BigDecimal gamePriceLessThanBalance = initialBalance.subtract(dif);
         assertTrue(user.canPay(gamePriceLessThanBalance));
     }
 
     @Test
-    public void cannotPay() {
+    void cannotPay() {
+        int tierLvl = 4;
+        Tier tier = SampleData.TIERS.get(tierLvl);
+        double sumOfMoney = 123.15d;
+        BigDecimal dif = BigDecimal.valueOf(sumOfMoney * .1d);
+        BigDecimal initialBalance = BigDecimal.valueOf(sumOfMoney);
+        User user = new User(tier, initialBalance);
         BigDecimal gamePriceMoreThanBalance = initialBalance.add(dif);
         assertFalse(user.canPay(gamePriceMoreThanBalance));
     }
 
     @Test
-    public void withdrawBalance() {
-        if (initialBalance.compareTo(game.getPrice()) >= 0) {
-            user.withdrawBalance(game.getPrice());
-            BigDecimal restOfBalance = initialBalance.subtract(game.getPrice());
-            assertTrue(user.getBalance().equals(restOfBalance));
-        }
-    }
-
-    @BeforeEach
-    public void restoreState() {
-        if (user.getBalance().compareTo(initialBalance) != 0)
-            user.withdrawBalance(initialBalance.subtract(user.getBalance()));
-
-        List<Game> ownedGames = user.getGames();
-        if (ownedGames.size() > 2) {
-            ownedGames.clear();
-            ownedGames.add(SampleData.getGames().get(ownedGameId1));
-            ownedGames.add(SampleData.getGames().get(ownedGameId2));
-        }
+    void withdrawBalance() {
+        int tierLvl = 4;
+        Tier tier = SampleData.TIERS.get(tierLvl);
+        double sumOfMoney = 123.15d;
+        BigDecimal initialBalance = BigDecimal.valueOf(sumOfMoney);
+        User user = new User(tier, initialBalance);
+        int numberOfNotOwnedGame = 3;
+        Game aGame = SampleData.GAMES.get(numberOfNotOwnedGame);
+        user.withdrawBalance(aGame.getPrice());
+        BigDecimal restOfBalance = initialBalance.subtract(aGame.getPrice());
+        assertTrue(user.getBalance().equals(restOfBalance));
     }
 }
 

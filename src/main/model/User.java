@@ -1,7 +1,6 @@
 package model;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,20 +44,19 @@ public class User {
     }
 
     public BigDecimal getBalance() {
-        return balance.setScale(2, RoundingMode.UP);
+        return balance;
     }
 
-    public void depositBalance(BigDecimal sumToAdd) {
-        this.balance = balance.add(sumToAdd);
+    public BigDecimal depositBalance(BigDecimal amount) {
+        return balance = balance.add(amount);
     }
 
     public boolean canPay(BigDecimal price) {
         return price.compareTo(balance) <= 0;
     }
 
-    public BigDecimal withdrawBalance(BigDecimal price) {
-        depositBalance(getBalance().subtract(price));
-        return getBalance();
+    public BigDecimal withdrawBalance(BigDecimal amount) {
+        return balance = balance.subtract(amount);
     }
 }
 

@@ -9,8 +9,18 @@ public class Game {
     private final String name;
     private final BigDecimal price;
 
+    static {
+        idCounter = 1;
+    }
+
     public Game(String name, BigDecimal price) {
         id = idCounter++;
+        this.name = name;
+        this.price = price;
+    }
+
+    public Game(int id, String name, BigDecimal price) {
+        this.id = id;
         this.name = name;
         this.price = price;
     }
@@ -43,13 +53,14 @@ public class Game {
 
         Game game = (Game) o;
 
-        return name.equals(game.getName());
+        if (!id.equals(game.id)) return false;
+        return name.equals(game.name);
     }
 
     @Override
     public int hashCode() {
-        int result = 31;
-        result = 17 * result + (name == "" ? 0 : (name + price).hashCode());
+        int result = id.hashCode();
+        result = 31 * result + name.hashCode();
         return result;
     }
 }
