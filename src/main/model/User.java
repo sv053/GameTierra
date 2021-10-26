@@ -3,9 +3,10 @@ package model;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashSet;
+import java.util.Set;
 
 public class User {
-    private final HashSet<Game> games;
+    private final Set<Game> games;
     private final Tier tier;
     private BigDecimal balance;
 
@@ -19,12 +20,11 @@ public class User {
         return tier;
     }
 
-    public HashSet<Game> getGames() {
+    public Set<Game> getGames() {
         return games;
     }
 
     public boolean hasGame(Game game) {
-        //  return games.contains(game);
         return games.stream()
                 .map(Game::getName)
                 .anyMatch(name -> name.equals(game.getName()));

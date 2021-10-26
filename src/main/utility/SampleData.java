@@ -1,4 +1,4 @@
-package utils;
+package utility;
 
 import model.Game;
 import model.Tier;
@@ -14,8 +14,6 @@ public final class SampleData {
     static {
         GAMES = List.of(
                 new Game("THE_WITCHER", BigDecimal.valueOf(17.28d)),
-                new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d)),
-                new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d)),
                 new Game("GRAND_THEFT_AUTO", RandomBigDecimal.getAndFormatRandomBigDecimal()),
                 new Game("RED_DEAD_REDEMPTION", RandomBigDecimal.getAndFormatRandomBigDecimal()),
                 new Game("SKYRIM", BigDecimal.valueOf(87.88d)),

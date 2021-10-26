@@ -1,4 +1,4 @@
-package utils;
+package utility;
 
 public enum UiPhrases {
     WELCOME("\nHi! Welcome to GameTierra! \nYour subscription type is : "),

@@ -27,14 +27,14 @@ class GameTest {
     @Test
     void testUnequals() {
         Game game1 = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
-        Game game2 = new Game(1, "THE_WITCHER_", null);
+        Game game2 = new Game(1, "test", null);
         assertNotEquals(game1, game2);
     }
 
     @Test
     void testDiffHashCode() {
         Game game1 = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
-        Game game2 = new Game(1, "THE_WITCHER_", BigDecimal.valueOf(17.28d));
+        Game game2 = new Game(1, "test", BigDecimal.valueOf(17.28d));
         Game game3 = new Game(2, "THE_WITCHER", BigDecimal.valueOf(17.28d));
         assertNotEquals(game1.hashCode(), game2.hashCode());
         assertNotEquals(game1.hashCode(), game3.hashCode());

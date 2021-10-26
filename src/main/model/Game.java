@@ -1,22 +1,22 @@
 package model;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class Game {
-    public static Integer idCounter = 1;
-
+    private static int idCounter = 1;
     private final int id;
     private final String name;
     private final BigDecimal price;
+
+    public Game(String name, BigDecimal price) {
+        this(idCounter++, name, price);
+    }
 
     public Game(int id, String name, BigDecimal price) {
         this.id = id;
         this.name = name;
         this.price = price;
-    }
-
-    public Game(String name, BigDecimal price) {
-        this(idCounter++, name, price);
     }
 
     public int getId() {
@@ -33,13 +33,15 @@ public class Game {
 
     @Override
     public boolean equals(Object o) {
-        return ((o instanceof Game) && id == ((Game) o).id)
-                && ((this == o) || name.equals(((Game) o).name));
+        if (this == o) return true;
+        if (!(o instanceof Game) || (id != ((Game) o).id)) return false;
+
+        return Objects.equals(name, ((Game) o).name);
     }
 
     @Override
     public int hashCode() {
-        int result = id;
+        int result = Integer.hashCode(id);
         result = 31 * result + name.hashCode();
         return result;
     }

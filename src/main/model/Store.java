@@ -1,32 +1,25 @@
 package model;
 
-import utils.SampleData;
+import utility.SampleData;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Store {
-    //    private Map<Integer, List<Game>> games;
-    private Map<Integer, Game> games;
     private static Store instance;
+    private List<Game> games;
+    private Map<Integer, Game> gamesForSearch;
 
     private Store() {
-        games = new HashMap<>();
+        getAllGames();
     }
 
-    public void setGames() {
-        this.games = SampleData.GAMES.stream()
-                .distinct()
-                .collect(
-                        //                 Collectors.groupingBy(Game::getId));
-                        Collectors.toMap(Game::getId, g -> g,
-                                (oldValue, newValue) -> (oldValue)));
-    }
-
-    public Map<Integer, Game> getGames() {
-        return games;
+    public Game searchGame(int id) {
+        getGamesForSearch();
+        return gamesForSearch.get(id);
     }
 
     public static Store getInstance() {
@@ -35,24 +28,39 @@ public class Store {
         return instance;
     }
 
+    public List<Game> getAllGames() {
+        return games = SampleData.GAMES;
+    }
+
+    private Map<Integer, Game> getGamesForSearch() {
+        return gamesForSearch = games.stream()
+                .collect(
+                        Collectors.toMap(Game::getId, Function.identity(),
+                                (oldValue, newValue) -> (oldValue)));
+    }
+
     public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
         double percentage = user.getTier().getCashbackPercentage();
         BigDecimal percentageShare = BigDecimal.valueOf(percentage * 0.01d);
         return gamePrice.multiply(percentageShare);
     }
 
-    public User buyGame(int gameId, User user) {
-        setGames();
-        if (!games.containsKey(gameId)) return user;
-        Game gameToBuy = games.get(gameId);
-
+    public boolean buyGame(int gameId, User user) {
+        getGamesForSearch();
+        Game gameToBuy = null;
+        try {
+            gameToBuy = gamesForSearch.get(gameId);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            e.printStackTrace();
+        }
         if (user.canPay(gameToBuy.getPrice()) && !user.hasGame(gameToBuy)) {
             BigDecimal cashback = calculateCashback(gameToBuy.getPrice(), user);
             user.withdrawBalance(gameToBuy.getPrice());
             user.depositBalance(cashback);
             user.addGame(gameToBuy);
+            return true;
         }
-        return user;
+        return false;
     }
 }
 
