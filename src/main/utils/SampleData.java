@@ -8,11 +8,14 @@ import java.util.List;
 
 public final class SampleData {
 
-    public static List<Game> GAMES;
-    public static List<Tier> TIERS;
+    public static final List<Game> GAMES;
+    public static final List<Tier> TIERS;
 
     static {
-        GAMES = List.of(new Game("THE_WITCHER", BigDecimal.valueOf(17.28d)),
+        GAMES = List.of(
+                new Game("THE_WITCHER", BigDecimal.valueOf(17.28d)),
+                new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d)),
+                new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d)),
                 new Game("GRAND_THEFT_AUTO", RandomBigDecimal.getAndFormatRandomBigDecimal()),
                 new Game("RED_DEAD_REDEMPTION", RandomBigDecimal.getAndFormatRandomBigDecimal()),
                 new Game("SKYRIM", BigDecimal.valueOf(87.88d)),

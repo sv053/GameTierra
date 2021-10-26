@@ -11,7 +11,7 @@ public final class RandomBigDecimal {
 
     public static BigDecimal getAndFormatRandomBigDecimal() {
         return BigDecimal.valueOf(Math.abs(new Random().nextGaussian() * 100.d))
-                .setScale(2, RoundingMode.UP);
+                .setScale(2, RoundingMode.HALF_UP);
     }
 }
 

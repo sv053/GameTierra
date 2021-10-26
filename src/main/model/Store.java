@@ -3,14 +3,30 @@ package model;
 import utils.SampleData;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Store {
-    private final List<Game> games;
+    //    private Map<Integer, List<Game>> games;
+    private Map<Integer, Game> games;
     private static Store instance;
 
     private Store() {
-        games = SampleData.GAMES;
+        games = new HashMap<>();
+    }
+
+    public void setGames() {
+        this.games = SampleData.GAMES.stream()
+                .distinct()
+                .collect(
+                        //                 Collectors.groupingBy(Game::getId));
+                        Collectors.toMap(Game::getId, g -> g,
+                                (oldValue, newValue) -> (oldValue)));
+    }
+
+    public Map<Integer, Game> getGames() {
+        return games;
     }
 
     public static Store getInstance() {
@@ -19,27 +35,22 @@ public class Store {
         return instance;
     }
 
-    public Game getGameById(Integer gameId) {
-        return games.stream()
-                .filter(g -> g.getId() == gameId)
-                .findAny()
-                .get();
-    }
-
     public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
-        double percentage = user.getTier()
-                .getCashbackPercentage();
+        double percentage = user.getTier().getCashbackPercentage();
         BigDecimal percentageShare = BigDecimal.valueOf(percentage * 0.01d);
         return gamePrice.multiply(percentageShare);
     }
 
     public User buyGame(int gameId, User user) {
-        Game gameToBuy = getGameById(gameId);
-        if (user.canPay(gameToBuy.getPrice())) {
+        setGames();
+        if (!games.containsKey(gameId)) return user;
+        Game gameToBuy = games.get(gameId);
+
+        if (user.canPay(gameToBuy.getPrice()) && !user.hasGame(gameToBuy)) {
             BigDecimal cashback = calculateCashback(gameToBuy.getPrice(), user);
             user.withdrawBalance(gameToBuy.getPrice());
             user.depositBalance(cashback);
-            user.addToOwnedGames(gameToBuy);
+            user.addGame(gameToBuy);
         }
         return user;
     }

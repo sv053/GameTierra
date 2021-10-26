@@ -2,71 +2,68 @@ package test.model;
 
 import model.Game;
 import model.Store;
-import model.Tier;
 import model.User;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import utils.SampleData;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
+import java.math.RoundingMode;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StoreTest {
 
-    private static BigDecimal initialBalance;
-
-    @BeforeAll
-    static void init() {
-        double sumOfMoney = 156.82;
-        initialBalance = BigDecimal.valueOf(sumOfMoney);
-    }
-
-    @Test
-    void getGameById() {
-        int gameId = 3;
-        Iterator<Game> iterator = SampleData.GAMES.listIterator();
-        Game searchResult = null;
-
-        while (iterator.hasNext()) {
-            searchResult = iterator.next();
-            if (searchResult.getId().equals(gameId)) break;
-        }
-        assertEquals(searchResult, Store.getInstance().getGameById(gameId));
-    }
-
     @Test
     void buyGame() {
-        int tierLvl = 4;
-        Tier tier = SampleData.TIERS.get(tierLvl);
-        User user = new User(tier, initialBalance);
+        Store.getInstance().setGames();
+        BigDecimal initBalance = BigDecimal.valueOf(156.82);
+        User user = new User(SampleData.TIERS.get(1), initBalance);
+        Game game = Store.getInstance().getGames().get(1);
 
-        int gameId = 3;
-        Game game = SampleData.GAMES.stream().filter(n -> n.getId() == gameId).findFirst().get();
-        user = Store.getInstance().buyGame(gameId, user);
+        Store.getInstance().buyGame(1, user);
 
-        BigDecimal cashback = game.getPrice().multiply(BigDecimal.valueOf(user.getTier().getCashbackPercentage() * 0.01));
-        BigDecimal expectedBalance = initialBalance.subtract(game.getPrice()).add(cashback);
+        BigDecimal cashback = game.getPrice().multiply(BigDecimal.valueOf
+                (user.getTier().getCashbackPercentage() * 0.01));
+        BigDecimal expectedBalance = initBalance.subtract(game.getPrice()).add(cashback)
+                .setScale(2, RoundingMode.HALF_UP);
 
         assertEquals(expectedBalance, user.getBalance());
         assertTrue(user.hasGame(game));
     }
 
     @Test
+    void doesNotBuyGameDoesntExist() {
+        Store.getInstance().setGames();
+        BigDecimal initBalance = BigDecimal.valueOf(156.82);
+        User user = new User(SampleData.TIERS.get(1), initBalance);
+
+        assertEquals(Store.getInstance().buyGame(11, user).getBalance(), initBalance);
+    }
+
+    @Test
+    void doesNotBuyAlreadyHasGame() {
+        Store.getInstance().setGames();
+        BigDecimal initBalance = BigDecimal.valueOf(156.82);
+        User user = new User(SampleData.TIERS.get(1), initBalance);
+        Game game = Store.getInstance().getGames().get(1);
+
+        user.addGame(game);
+        Store.getInstance().buyGame(game.getId(), user);
+
+        assertEquals(user.getBalance(), initBalance);
+        assertTrue(user.hasGame(game));
+    }
+
+    @Test
     void calculateCashback() {
-        int tierLvl = 3;
-        Tier tier = SampleData.TIERS.get(tierLvl);
-        User user = new User(tier, initialBalance);
-        int gameId = 3;
-        Game game = SampleData.GAMES.get(gameId);
+        User user = new User(SampleData.TIERS.get(2), BigDecimal.valueOf(156.82));
+        Game game = new Game(0, null, BigDecimal.valueOf(15));
 
         BigDecimal cashbackPercentage = BigDecimal.valueOf(user.getTier().getCashbackPercentage() * 0.01d);
-        BigDecimal cashback = game.getPrice().multiply(cashbackPercentage);
-        BigDecimal newBalance = user.getBalance().add(cashback);
-        assertTrue(Store.getInstance().calculateCashback(game.getPrice(), user).compareTo(newBalance) <= 0);
-        user.getBalance();
+        BigDecimal expectedCashback = game.getPrice().multiply(cashbackPercentage);
+
+        assertEquals(Store.getInstance().calculateCashback(game.getPrice(), user), expectedCashback);
     }
 }
 

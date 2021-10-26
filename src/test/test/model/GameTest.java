@@ -2,26 +2,42 @@ package test.model;
 
 import model.Game;
 import org.junit.jupiter.api.Test;
-import utils.SampleData;
+
+import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class GameTest {
 
     @Test
     void testEquals() {
-        int index = 0;
-        Game game1 = SampleData.GAMES.get(index);
-        Game game2 = new Game(game1.getId(), game1.getName(), game1.getPrice());
+        Game game1 = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
+        Game game2 = new Game(1, "THE_WITCHER", null);
         assertEquals(game1, game2);
     }
 
     @Test
     void testHashCode() {
-        int index = 0;
-        Game game1 = SampleData.GAMES.get(index);
-        Game game2 = new Game(game1.getId(), game1.getName(), game1.getPrice());
+        Game game1 = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
+        Game game2 = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
         assertEquals(game1.hashCode(), game2.hashCode());
+    }
+
+    @Test
+    void testUnequals() {
+        Game game1 = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
+        Game game2 = new Game(1, "THE_WITCHER_", null);
+        assertNotEquals(game1, game2);
+    }
+
+    @Test
+    void testDiffHashCode() {
+        Game game1 = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
+        Game game2 = new Game(1, "THE_WITCHER_", BigDecimal.valueOf(17.28d));
+        Game game3 = new Game(2, "THE_WITCHER", BigDecimal.valueOf(17.28d));
+        assertNotEquals(game1.hashCode(), game2.hashCode());
+        assertNotEquals(game1.hashCode(), game3.hashCode());
     }
 }
 

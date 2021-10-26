@@ -3,21 +3,11 @@ package model;
 import java.math.BigDecimal;
 
 public class Game {
-    public static int idCounter;
+    public static Integer idCounter = 1;
 
-    private final Integer id;
+    private final int id;
     private final String name;
     private final BigDecimal price;
-
-    static {
-        idCounter = 1;
-    }
-
-    public Game(String name, BigDecimal price) {
-        id = idCounter++;
-        this.name = name;
-        this.price = price;
-    }
 
     public Game(int id, String name, BigDecimal price) {
         this.id = id;
@@ -25,16 +15,33 @@ public class Game {
         this.price = price;
     }
 
-    public Integer getId() {
+    public Game(String name, BigDecimal price) {
+        this(idCounter++, name, price);
+    }
+
+    public int getId() {
         return id;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
     }
 
     public String getName() {
         return name;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    @Override
+    public boolean equals(Object o) {
+        return ((o instanceof Game) && id == ((Game) o).id)
+                && ((this == o) || name.equals(((Game) o).name));
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + name.hashCode();
+        return result;
     }
 
     @Override
@@ -44,24 +51,6 @@ public class Game {
                 "name='" + name + '\'' +
                 ", price=$" + price +
                 '}' + '\n';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Game game = (Game) o;
-
-        if (!id.equals(game.id)) return false;
-        return name.equals(game.name);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + name.hashCode();
-        return result;
     }
 }
 
