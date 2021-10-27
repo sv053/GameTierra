@@ -2,7 +2,6 @@ package test.model;
 
 import model.Game;
 import model.User;
-import module.store.Store;
 import org.junit.jupiter.api.Test;
 import utility.SampleData;
 
@@ -11,7 +10,6 @@ import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserTest {
-    private final Store store = Store.getInstance();
 
     @Test
     void hasGame() {
@@ -52,7 +50,7 @@ class UserTest {
         BigDecimal balance = BigDecimal.valueOf(123.15);
         User user = new User(SampleData.TIERS.get(4), balance);
 
-        assertFalse(user.canPay(balance.add(BigDecimal.valueOf(1))));
+        assertFalse(user.canPay(balance.add(BigDecimal.ONE)));
     }
 
     @Test

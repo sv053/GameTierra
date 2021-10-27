@@ -11,17 +11,17 @@ import java.math.RoundingMode;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class StoreTest {
+class StoreTest {
     private final Store store = Store.getInstance();
 
     @Test
     void buyGame() {
         BigDecimal initBalance = BigDecimal.valueOf(156.82);
         User user = new User(SampleData.TIERS.get(1), initBalance);
-        int id = 1;
-        Game game = new Game(id, "THE_WITCHER", BigDecimal.valueOf(17.28d));
+        int gameId = 1;
+        Game game = new Game(gameId, "THE_WITCHER", BigDecimal.valueOf(17.28d));
 
-        store.buyGame(id, user);
+        store.buyGame(gameId, user);
 
         BigDecimal cashback = game.getPrice().multiply(BigDecimal.valueOf
                 (user.getTier().getCashbackPercentage() * 0.01));
