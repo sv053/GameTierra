@@ -34,9 +34,10 @@ public class Game {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Game) || (id != ((Game) o).id)) return false;
+        if (!(o instanceof Game)) return false;
 
-        return Objects.equals(name, ((Game) o).name);
+        return id == ((Game) o).id &&
+                Objects.equals(name, ((Game) o).name);
     }
 
     @Override

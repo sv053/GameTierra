@@ -25,9 +25,7 @@ public class User {
     }
 
     public boolean hasGame(Game game) {
-        return games.stream()
-                .map(Game::getName)
-                .anyMatch(name -> name.equals(game.getName()));
+        return games.contains(game);
     }
 
     public boolean addGame(Game game) {
@@ -49,11 +47,15 @@ public class User {
     }
 
     public BigDecimal depositBalance(BigDecimal amount) {
-        return balance = balance.add(amount).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal sum = balance.add(amount).plus().setScale(2, RoundingMode.HALF_UP);
+        balance = sum;
+        return balance;
     }
 
     public BigDecimal withdrawBalance(BigDecimal amount) {
-        return balance = balance.subtract(amount).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal sum = balance.subtract(amount).setScale(2, RoundingMode.HALF_UP);
+        balance = sum;
+        return balance;
     }
 
     public boolean canPay(BigDecimal price) {

@@ -18,7 +18,6 @@ public enum UiPhrases {
     public final String phrase;
 
     UiPhrases(String message) {
-
         phrase = message;
     }
 

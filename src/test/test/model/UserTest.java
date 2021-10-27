@@ -11,19 +11,21 @@ import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserTest {
+    private final Store store = Store.getInstance();
 
     @Test
     void hasGame() {
+        Game game = store.searchGame(2);
         User user = new User(SampleData.TIERS.get(1), BigDecimal.valueOf(123.15d));
-        user.addGame(Store.getInstance().searchGame(2));
+        user.addGame(game);
 
-        assertTrue(user.hasGame(Store.getInstance().searchGame(2)));
+        assertTrue(user.hasGame(game));
     }
 
     @Test
     void doesNotHaveGame() {
         User user = new User(SampleData.TIERS.get(1), BigDecimal.valueOf(123));
-        Game alienGame = Store.getInstance().searchGame(3);
+        Game alienGame = store.searchGame(3);
 
         assertFalse(user.hasGame(alienGame));
     }
@@ -31,7 +33,7 @@ class UserTest {
     @Test
     void addGame() {
         User user = new User(SampleData.TIERS.get(1), BigDecimal.valueOf(87.5));
-        Game aGame = Store.getInstance().searchGame(3);
+        Game aGame = store.searchGame(3);
 
         assertTrue(user.addGame(aGame));
         assertTrue(user.getGames().contains(aGame));
@@ -61,7 +63,7 @@ class UserTest {
 
         user.withdrawBalance(amount);
 
-        assertEquals(user.getBalance(), balance.subtract(amount));
+        assertEquals(balance.subtract(amount), user.getBalance());
     }
 
     @Test
@@ -72,7 +74,7 @@ class UserTest {
 
         user.depositBalance(amount);
 
-        assertEquals(user.getBalance(), initialBalance.add(amount));
+        assertEquals(initialBalance.add(amount), user.getBalance());
     }
 }
 

@@ -32,12 +32,17 @@ class GameTest {
     }
 
     @Test
+    void testDifHashCode() {
+        Game game1 = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
+        Game game2 = new Game(2, "THE_WITCHER", BigDecimal.valueOf(17.28d));
+        assertNotEquals(game1.hashCode(), game2.hashCode());
+    }
+
+    @Test
     void testDiffHashCode() {
         Game game1 = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
         Game game2 = new Game(1, "test", BigDecimal.valueOf(17.28d));
-        Game game3 = new Game(2, "THE_WITCHER", BigDecimal.valueOf(17.28d));
         assertNotEquals(game1.hashCode(), game2.hashCode());
-        assertNotEquals(game1.hashCode(), game3.hashCode());
     }
 }
 

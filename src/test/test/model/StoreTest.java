@@ -12,14 +12,15 @@ import java.math.RoundingMode;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class StoreTest {
+    private final Store store = Store.getInstance();
 
     @Test
     void buyGame() {
         BigDecimal initBalance = BigDecimal.valueOf(156.82);
         User user = new User(SampleData.TIERS.get(1), initBalance);
-        Game game = Store.getInstance().searchGame(1);
+        Game game = store.searchGame(1);
 
-        Store.getInstance().buyGame(1, user);
+        store.buyGame(1, user);
 
         BigDecimal cashback = game.getPrice().multiply(BigDecimal.valueOf
                 (user.getTier().getCashbackPercentage() * 0.01));
@@ -31,22 +32,20 @@ public class StoreTest {
     }
 
     @Test
-    void doesNotBuyGameDoesntExist() {
-        User user = new User(SampleData.TIERS.get(1), BigDecimal.valueOf(156.82));
-
-        assertThrows(NullPointerException.class, () -> Store.getInstance().buyGame(1213313313, user));
+    void gameDoesntExist() {
+        assertThrows(IllegalArgumentException.class, () -> store.searchGame(1213313313));
     }
 
     @Test
-    void doesNotBuyAlreadyHasGame() {
+    void doesNotBuyAlreadyOwned() {
         BigDecimal initBalance = BigDecimal.valueOf(156.82);
         User user = new User(SampleData.TIERS.get(1), initBalance);
-        Game game = Store.getInstance().searchGame(1);
+        Game game = store.searchGame(1);
 
         user.addGame(game);
-        Store.getInstance().buyGame(game.getId(), user);
+        store.buyGame(game.getId(), user);
 
-        assertEquals(user.getBalance(), initBalance);
+        assertEquals(initBalance, user.getBalance());
         assertTrue(user.hasGame(game));
     }
 
@@ -58,14 +57,14 @@ public class StoreTest {
         BigDecimal cashbackPercentage = BigDecimal.valueOf(user.getTier().getCashbackPercentage() * 0.01d);
         BigDecimal expectedCashback = game.getPrice().multiply(cashbackPercentage);
 
-        assertEquals(Store.getInstance().calculateCashback(game.getPrice(), user), expectedCashback);
+        assertEquals(expectedCashback, store.calculateCashback(game.getPrice(), user));
     }
 
     @Test
     void searchGame() {
         Game gameToSearch = new Game(7, "ASSASSIN_S_CREED", null);
 
-        assertEquals(gameToSearch, Store.getInstance().searchGame(7));
+        assertEquals(gameToSearch, store.searchGame(7));
     }
 }
 

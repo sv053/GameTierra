@@ -10,16 +10,23 @@ import java.util.stream.Collectors;
 
 public class Store {
     private static Store instance;
-    private List<Game> games;
-    private Map<Integer, Game> gamesForSearch;
+    private final List<Game> games;
+    private final Map<Integer, Game> gameById;
 
     private Store() {
-        getAllGames();
+        games = SampleData.GAMES;
+        gameById = games.stream()
+                .collect(
+                        Collectors.toMap(Game::getId, Function.identity(),
+                                (oldValue, newValue) -> (oldValue)));
     }
 
     public Game searchGame(int id) {
-        getGamesForSearch();
-        return gamesForSearch.get(id);
+        Game game = gameById.get(id);
+        if (game == null) {
+            throw new IllegalArgumentException("Game with id " + id + " not found");
+        }
+        return game;
     }
 
     public static Store getInstance() {
@@ -29,14 +36,7 @@ public class Store {
     }
 
     public List<Game> getAllGames() {
-        return games = SampleData.GAMES;
-    }
-
-    private Map<Integer, Game> getGamesForSearch() {
-        return gamesForSearch = games.stream()
-                .collect(
-                        Collectors.toMap(Game::getId, Function.identity(),
-                                (oldValue, newValue) -> (oldValue)));
+        return games;
     }
 
     public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
@@ -46,19 +46,17 @@ public class Store {
     }
 
     public boolean buyGame(int gameId, User user) {
-        getGamesForSearch();
-        Game gameToBuy = null;
-        try {
-            gameToBuy = gamesForSearch.get(gameId);
-        } catch (NullPointerException | IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-        if (user.canPay(gameToBuy.getPrice()) && !user.hasGame(gameToBuy)) {
-            BigDecimal cashback = calculateCashback(gameToBuy.getPrice(), user);
-            user.withdrawBalance(gameToBuy.getPrice());
-            user.depositBalance(cashback);
-            user.addGame(gameToBuy);
-            return true;
+        Game gameToBuy = searchGame(gameId);
+
+        if (!gameToBuy.equals(null)) {
+            BigDecimal price = gameToBuy.getPrice();
+            if (user.canPay(price) && !user.hasGame(gameToBuy)) {
+                BigDecimal cashback = calculateCashback(price, user);
+                user.withdrawBalance(price);
+                user.depositBalance(cashback);
+                user.addGame(gameToBuy);
+                return true;
+            }
         }
         return false;
     }
