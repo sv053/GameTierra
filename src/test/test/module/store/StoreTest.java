@@ -1,8 +1,8 @@
-package test.model;
+package test.module.store;
 
 import model.Game;
-import model.Store;
 import model.User;
+import module.store.Store;
 import org.junit.jupiter.api.Test;
 import utility.SampleData;
 
@@ -18,9 +18,10 @@ public class StoreTest {
     void buyGame() {
         BigDecimal initBalance = BigDecimal.valueOf(156.82);
         User user = new User(SampleData.TIERS.get(1), initBalance);
-        Game game = store.searchGame(1);
+        int id = 1;
+        Game game = new Game(id, "THE_WITCHER", BigDecimal.valueOf(17.28d));
 
-        store.buyGame(1, user);
+        store.buyGame(id, user);
 
         BigDecimal cashback = game.getPrice().multiply(BigDecimal.valueOf
                 (user.getTier().getCashbackPercentage() * 0.01));
@@ -37,12 +38,12 @@ public class StoreTest {
     }
 
     @Test
-    void doesNotBuyAlreadyOwned() {
+    void didNotBuyAlreadyOwned() {
+        Game game = new Game(4, "SKYRIM", BigDecimal.valueOf(87.88d));
         BigDecimal initBalance = BigDecimal.valueOf(156.82);
         User user = new User(SampleData.TIERS.get(1), initBalance);
-        Game game = store.searchGame(1);
-
         user.addGame(game);
+
         store.buyGame(game.getId(), user);
 
         assertEquals(initBalance, user.getBalance());
@@ -61,10 +62,11 @@ public class StoreTest {
     }
 
     @Test
-    void searchGame() {
-        Game gameToSearch = new Game(7, "ASSASSIN_S_CREED", null);
+    void searchGameById() {
+        int id = 7;
+        Game gameToSearch = new Game(id, "ASSASSIN_S_CREED", null);
 
-        assertEquals(gameToSearch, store.searchGame(7));
+        assertEquals(gameToSearch, store.searchGame(id));
     }
 }
 

@@ -47,14 +47,12 @@ public class User {
     }
 
     public BigDecimal depositBalance(BigDecimal amount) {
-        BigDecimal sum = balance.add(amount).plus().setScale(2, RoundingMode.HALF_UP);
-        balance = sum;
+        balance = balance.add(amount).plus().setScale(2, RoundingMode.HALF_UP);
         return balance;
     }
 
     public BigDecimal withdrawBalance(BigDecimal amount) {
-        BigDecimal sum = balance.subtract(amount).setScale(2, RoundingMode.HALF_UP);
-        balance = sum;
+        balance = balance.subtract(amount).setScale(2, RoundingMode.HALF_UP);
         return balance;
     }
 

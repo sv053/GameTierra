@@ -1,5 +1,7 @@
-package model;
+package module.store;
 
+import model.Game;
+import model.User;
 import utility.SampleData;
 
 import java.math.BigDecimal;
@@ -21,18 +23,18 @@ public class Store {
                                 (oldValue, newValue) -> (oldValue)));
     }
 
+    public static Store getInstance() {
+        if (instance == null)
+            instance = new Store();
+        return instance;
+    }
+
     public Game searchGame(int id) {
         Game game = gameById.get(id);
         if (game == null) {
             throw new IllegalArgumentException("Game with id " + id + " not found");
         }
         return game;
-    }
-
-    public static Store getInstance() {
-        if (instance == null)
-            instance = new Store();
-        return instance;
     }
 
     public List<Game> getAllGames() {
@@ -47,16 +49,13 @@ public class Store {
 
     public boolean buyGame(int gameId, User user) {
         Game gameToBuy = searchGame(gameId);
-
-        if (!gameToBuy.equals(null)) {
-            BigDecimal price = gameToBuy.getPrice();
-            if (user.canPay(price) && !user.hasGame(gameToBuy)) {
-                BigDecimal cashback = calculateCashback(price, user);
-                user.withdrawBalance(price);
-                user.depositBalance(cashback);
-                user.addGame(gameToBuy);
-                return true;
-            }
+        BigDecimal price = gameToBuy.getPrice();
+        if (user.canPay(price) && !user.hasGame(gameToBuy)) {
+            BigDecimal cashback = calculateCashback(price, user);
+            user.withdrawBalance(price);
+            user.depositBalance(cashback);
+            user.addGame(gameToBuy);
+            return true;
         }
         return false;
     }

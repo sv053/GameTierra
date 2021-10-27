@@ -1,8 +1,8 @@
 package test.model;
 
 import model.Game;
-import model.Store;
 import model.User;
+import module.store.Store;
 import org.junit.jupiter.api.Test;
 import utility.SampleData;
 
@@ -15,7 +15,7 @@ class UserTest {
 
     @Test
     void hasGame() {
-        Game game = store.searchGame(2);
+        Game game = new Game(4, "SKYRIM", BigDecimal.valueOf(87.88d));
         User user = new User(SampleData.TIERS.get(1), BigDecimal.valueOf(123.15d));
         user.addGame(game);
 
@@ -25,7 +25,7 @@ class UserTest {
     @Test
     void doesNotHaveGame() {
         User user = new User(SampleData.TIERS.get(1), BigDecimal.valueOf(123));
-        Game alienGame = store.searchGame(3);
+        Game alienGame = new Game(4, "SKYRIM", BigDecimal.valueOf(87.88d));
 
         assertFalse(user.hasGame(alienGame));
     }
@@ -33,7 +33,7 @@ class UserTest {
     @Test
     void addGame() {
         User user = new User(SampleData.TIERS.get(1), BigDecimal.valueOf(87.5));
-        Game aGame = store.searchGame(3);
+        Game aGame = new Game(4, "SKYRIM", BigDecimal.valueOf(87.88d));
 
         assertTrue(user.addGame(aGame));
         assertTrue(user.getGames().contains(aGame));
