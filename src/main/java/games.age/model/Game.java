@@ -1,4 +1,4 @@
-package model;
+package games.age.model;
 
 import java.math.BigDecimal;
 import java.util.Objects;

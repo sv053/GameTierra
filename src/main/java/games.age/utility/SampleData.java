@@ -1,7 +1,7 @@
-package utility;
+package games.age.utility;
 
-import model.Game;
-import model.Tier;
+import games.age.model.Game;
+import games.age.model.Tier;
 
 import java.math.BigDecimal;
 import java.util.List;

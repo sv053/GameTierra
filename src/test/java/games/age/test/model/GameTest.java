@@ -1,6 +1,6 @@
-package test.model;
+package games.age.test.model;
 
-import model.Game;
+import games.age.model.Game;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

@@ -1,4 +1,4 @@
-package model;
+package games.age.model;
 
 
 public class Tier {

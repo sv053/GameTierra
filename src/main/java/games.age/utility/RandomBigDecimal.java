@@ -1,4 +1,4 @@
-package utility;
+package games.age.utility;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

@@ -1,13 +1,12 @@
-package test.model;
+package games.age.test.model;
 
-import model.Game;
-import model.User;
+import games.age.model.Game;
+import games.age.model.User;
+import games.age.utility.SampleData;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import utility.SampleData;
 
 import java.math.BigDecimal;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class UserTest {
 
@@ -20,12 +19,15 @@ class UserTest {
         assertTrue(user.hasGame(game));
     }
 
+    private void assertTrue(boolean hasGame) {
+    }
+
     @Test
     void doesNotHaveGame() {
         User user = new User(SampleData.TIERS.get(1), BigDecimal.valueOf(123));
         Game alienGame = new Game(4, "SKYRIM", BigDecimal.valueOf(87.88d));
 
-        assertFalse(user.hasGame(alienGame));
+        Assertions.assertFalse(user.hasGame(alienGame));
     }
 
     @Test
@@ -50,7 +52,7 @@ class UserTest {
         BigDecimal balance = BigDecimal.valueOf(123.15);
         User user = new User(SampleData.TIERS.get(4), balance);
 
-        assertFalse(user.canPay(balance.add(BigDecimal.ONE)));
+        Assertions.assertFalse(user.canPay(balance.add(BigDecimal.ONE)));
     }
 
     @Test
@@ -61,7 +63,7 @@ class UserTest {
 
         user.withdrawBalance(amount);
 
-        assertEquals(balance.subtract(amount), user.getBalance());
+        Assertions.assertEquals(balance.subtract(amount), user.getBalance());
     }
 
     @Test
@@ -72,7 +74,7 @@ class UserTest {
 
         user.depositBalance(amount);
 
-        assertEquals(initialBalance.add(amount), user.getBalance());
+        Assertions.assertEquals(initialBalance.add(amount), user.getBalance());
     }
 }
 
