@@ -6,7 +6,7 @@
     <build>
         <defaultGoal>install</defaultGoal>
     </build>
-    <groupId>gamesage</groupId>
+    <groupId>com.corp.gamesage</groupId>
     <artifactId>GameTierra</artifactId>
     <version>1.0-SNAPSHOT</version>
 
