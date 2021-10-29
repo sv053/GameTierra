@@ -1,4 +1,4 @@
-package utility;
+package gamesage.utility;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

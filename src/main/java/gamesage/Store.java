@@ -1,8 +1,9 @@
-package module.store;
+package gamesage;
 
-import model.Game;
-import model.User;
-import utility.SampleData;
+
+import gamesage.model.Game;
+import gamesage.model.User;
+import gamesage.utility.SampleData;
 
 import java.math.BigDecimal;
 import java.util.List;

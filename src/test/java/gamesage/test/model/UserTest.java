@@ -1,9 +1,9 @@
-package test.model;
+package gamesage.test.model;
 
-import model.Game;
-import model.User;
+import gamesage.model.Game;
+import gamesage.model.User;
+import gamesage.utility.SampleData;
 import org.junit.jupiter.api.Test;
-import utility.SampleData;
 
 import java.math.BigDecimal;
 

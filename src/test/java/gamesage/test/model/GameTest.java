@@ -1,6 +1,6 @@
-package test.model;
+package gamesage.test.model;
 
-import model.Game;
+import gamesage.model.Game;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -20,7 +20,7 @@ class GameTest {
     @Test
     void testEqualsWithSameIdsDifferentNames() {
         Game game1 = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
-        Game game2 = new Game(1, "test", null);
+        Game game2 = new Game(1, "games/age/test", null);
         assertNotEquals(game1, game2);
     }
 
@@ -48,7 +48,7 @@ class GameTest {
     @Test
     void testHashCodeWithSameIdsDifferentNames() {
         Game game1 = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
-        Game game2 = new Game(1, "test", BigDecimal.valueOf(17.28d));
+        Game game2 = new Game(1, "games/age/test", BigDecimal.valueOf(17.28d));
         assertNotEquals(game1.hashCode(), game2.hashCode());
     }
 }
