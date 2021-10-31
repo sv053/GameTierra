@@ -3,7 +3,6 @@ package com.gamesage.store;
 import com.gamesage.store.model.Game;
 import com.gamesage.store.model.User;
 import com.gamesage.store.utility.SampleData;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -66,7 +65,7 @@ class StoreTest {
         int id = 7;
         Game gameToSearch = new Game(id, "ASSASSIN_S_CREED", null);
 
-        Assertions.assertEquals(gameToSearch, store.searchGame(id));
+        assertEquals(gameToSearch, store.searchGame(id));
     }
 }
 
