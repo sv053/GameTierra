@@ -1,4 +1,4 @@
-package model;
+package com.gamesage.store.model;
 
 
 public class Tier {

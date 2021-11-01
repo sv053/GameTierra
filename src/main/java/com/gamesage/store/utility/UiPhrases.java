@@ -1,4 +1,4 @@
-package utility;
+package com.gamesage.store.utility;
 
 public enum UiPhrases {
     WELCOME("\nHi! Welcome to GameTierra! \nYour subscription type is : "),

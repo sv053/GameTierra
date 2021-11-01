@@ -1,4 +1,4 @@
-package model;
+package com.gamesage.store.model;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

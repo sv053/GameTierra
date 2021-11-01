@@ -1,10 +1,9 @@
-package test.module.store;
+package com.gamesage.store;
 
-import model.Game;
-import model.User;
-import module.store.Store;
+import com.gamesage.store.model.Game;
+import com.gamesage.store.model.User;
+import com.gamesage.store.utility.SampleData;
 import org.junit.jupiter.api.Test;
-import utility.SampleData;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
