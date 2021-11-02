@@ -1,7 +1,8 @@
-package com.gamesage.store.utility;
+package com.gamesage.store.data.repository;
 
-import com.gamesage.store.model.Game;
-import com.gamesage.store.model.Tier;
+import com.gamesage.store.data.entity.Game;
+import com.gamesage.store.data.entity.Tier;
+import com.gamesage.store.util.RandomBigDecimal;
 
 import java.math.BigDecimal;
 import java.util.List;

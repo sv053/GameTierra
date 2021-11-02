@@ -1,4 +1,4 @@
-package com.gamesage.store.model;
+package com.gamesage.store.data.entity;
 
 import org.junit.jupiter.api.Test;
 

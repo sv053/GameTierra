@@ -1,9 +1,9 @@
-package com.gamesage.store;
+package com.gamesage.store.service;
 
 
-import com.gamesage.store.model.Game;
-import com.gamesage.store.model.User;
-import com.gamesage.store.utility.SampleData;
+import com.gamesage.store.data.entity.Game;
+import com.gamesage.store.data.entity.User;
+import com.gamesage.store.data.repository.SampleData;
 
 import java.math.BigDecimal;
 import java.util.List;

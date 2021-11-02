@@ -1,6 +1,6 @@
-package com.gamesage.store.model;
+package com.gamesage.store.data.entity;
 
-import com.gamesage.store.utility.SampleData;
+import com.gamesage.store.data.repository.SampleData;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
