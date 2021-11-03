@@ -28,7 +28,7 @@ class StoreTest {
                 .setScale(2, RoundingMode.HALF_UP);
 
         assertEquals(expectedBalance, user.getBalance());
-        assertTrue(user.hasGame(game));
+        assertTrue(user.getGames().contains(game.getId()));
     }
 
     @Test
@@ -38,26 +38,26 @@ class StoreTest {
 
     @Test
     void didNotBuyAlreadyOwned() {
-        Game game = new Game(4, "SKYRIM", BigDecimal.valueOf(87.88d));
+        int gameId = 4;
         BigDecimal initBalance = BigDecimal.valueOf(156.82);
         User user = new User(SampleData.TIERS.get(1), initBalance);
-        user.addGame(game);
+        user.addGame(gameId);
 
-        store.buyGame(game.getId(), user);
+        store.buyGame(gameId, user);
 
         assertEquals(initBalance, user.getBalance());
-        assertTrue(user.hasGame(game));
+        assertTrue(user.getGames().contains(gameId));
     }
 
     @Test
     void calculateCashback() {
-        User user = new User(SampleData.TIERS.get(2), BigDecimal.valueOf(156.82));
+        double userPercentage = SampleData.TIERS.get(2).getCashbackPercentage();
         Game game = new Game(0, null, BigDecimal.valueOf(15));
 
-        BigDecimal cashbackPercentage = BigDecimal.valueOf(user.getTier().getCashbackPercentage() * 0.01d);
+        BigDecimal cashbackPercentage = BigDecimal.valueOf(userPercentage * 0.01d);
         BigDecimal expectedCashback = game.getPrice().multiply(cashbackPercentage);
 
-        assertEquals(expectedCashback, store.calculateCashback(game.getPrice(), user));
+        assertEquals(expectedCashback, store.calculateCashback(game.getPrice(), userPercentage));
     }
 
     @Test
