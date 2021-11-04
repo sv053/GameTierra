@@ -1,8 +1,8 @@
 package com.gamesage.store.service;
 
-import com.gamesage.store.data.entity.Game;
-import com.gamesage.store.data.entity.User;
-import com.gamesage.store.data.repository.SampleData;
+import com.gamesage.store.data.model.Game;
+import com.gamesage.store.data.model.User;
+import com.gamesage.store.data.sample.SampleData;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -28,7 +28,7 @@ class StoreTest {
                 .setScale(2, RoundingMode.HALF_UP);
 
         assertEquals(expectedBalance, user.getBalance());
-        assertTrue(user.getGames().contains(game.getId()));
+        assertTrue(user.getGames().contains(game));
     }
 
     @Test
@@ -39,25 +39,26 @@ class StoreTest {
     @Test
     void didNotBuyAlreadyOwned() {
         int gameId = 4;
+        Game game = Store.getInstance().searchGame(gameId);
         BigDecimal initBalance = BigDecimal.valueOf(156.82);
         User user = new User(SampleData.TIERS.get(1), initBalance);
-        user.addGame(gameId);
+        user.addGame(game);
 
         store.buyGame(gameId, user);
 
         assertEquals(initBalance, user.getBalance());
-        assertTrue(user.getGames().contains(gameId));
+        assertTrue(user.getGames().contains(game));
     }
 
     @Test
     void calculateCashback() {
-        double userPercentage = SampleData.TIERS.get(2).getCashbackPercentage();
+        User user = new User(SampleData.TIERS.get(1), BigDecimal.TEN);
         Game game = new Game(0, null, BigDecimal.valueOf(15));
 
-        BigDecimal cashbackPercentage = BigDecimal.valueOf(userPercentage * 0.01d);
+        BigDecimal cashbackPercentage = BigDecimal.valueOf(user.getTier().getCashbackPercentage() * 0.01d);
         BigDecimal expectedCashback = game.getPrice().multiply(cashbackPercentage);
 
-        assertEquals(expectedCashback, store.calculateCashback(game.getPrice(), userPercentage));
+        assertEquals(expectedCashback, store.calculateCashback(game.getPrice(), user));
     }
 
     @Test

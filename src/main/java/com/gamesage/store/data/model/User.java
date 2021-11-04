@@ -1,11 +1,12 @@
-package com.gamesage.store.data.entity;
+package com.gamesage.store.data.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashSet;
 import java.util.Set;
 
 public class User {
-    private final Set<Integer> gameIds;
+    private final Set<Game> games;
     private int id;
     private final Tier tier;
     private BigDecimal balance;
@@ -13,7 +14,7 @@ public class User {
     public User(Tier tier, BigDecimal balance) {
         this.tier = tier;
         this.balance = balance;
-        gameIds = new HashSet<>();
+        games = new HashSet<>();
     }
 
     public int getId() {
@@ -28,12 +29,12 @@ public class User {
         return tier;
     }
 
-    public Set<Integer> getGames() {
-        return gameIds;
+    public Set<Game> getGames() {
+        return games;
     }
 
-    public boolean addGame(int id) {
-        return gameIds.add(id);
+    public boolean addGame(Game game) {
+        return games.add(game);
     }
 
     @Override
@@ -50,9 +51,18 @@ public class User {
         return balance;
     }
 
-    public BigDecimal updateBalance(BigDecimal restOfBalance) {
-        balance = restOfBalance.plus();
+    public BigDecimal depositBalance(BigDecimal amount) {
+        balance = balance.add(amount).setScale(2, RoundingMode.HALF_UP);
         return balance;
+    }
+
+    public BigDecimal withdrawBalance(BigDecimal amount) {
+        balance = balance.subtract(amount).setScale(2, RoundingMode.HALF_UP);
+        return balance;
+    }
+
+    public boolean canPay(BigDecimal price) {
+        return price.compareTo(balance) <= 0;
     }
 }
 
