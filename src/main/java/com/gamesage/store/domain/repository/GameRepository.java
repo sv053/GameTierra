@@ -1,6 +1,6 @@
-package com.gamesage.store.data.repository;
+package com.gamesage.store.domain.repository;
 
-import com.gamesage.store.data.model.Game;
+import com.gamesage.store.domain.model.Game;
 
 import java.util.List;
 import java.util.Map;

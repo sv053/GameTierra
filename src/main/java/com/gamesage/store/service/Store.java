@@ -1,10 +1,10 @@
 package com.gamesage.store.service;
 
 
-import com.gamesage.store.data.model.Game;
-import com.gamesage.store.data.model.User;
-import com.gamesage.store.data.repository.GameRepository;
-import com.gamesage.store.data.sample.SampleData;
+import com.gamesage.store.domain.model.Game;
+import com.gamesage.store.domain.model.User;
+import com.gamesage.store.domain.repository.GameRepository;
+import com.gamesage.store.domain.sample.SampleData;
 
 import java.math.BigDecimal;
 import java.util.List;

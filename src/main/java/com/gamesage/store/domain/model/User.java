@@ -1,4 +1,4 @@
-package com.gamesage.store.data.model;
+package com.gamesage.store.domain.model;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -43,7 +43,7 @@ public class User {
                 " tier=" + tier.getLevel() +
                 ", cashback=" + tier.getCashbackPercentage() + "%" +
                 ", balance=$" + balance +
-                ", gameIds=\\n" + getGames() +
+                ", games=\\n" + getGames() +
                 '}';
     }
 
@@ -63,6 +63,10 @@ public class User {
 
     public boolean canPay(BigDecimal price) {
         return price.compareTo(balance) <= 0;
+    }
+
+    public boolean hasGame(Game game) {
+        return games.contains(game);
     }
 }
 

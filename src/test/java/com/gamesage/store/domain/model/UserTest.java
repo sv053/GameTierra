@@ -1,6 +1,6 @@
-package com.gamesage.store.data.model;
+package com.gamesage.store.domain.model;
 
-import com.gamesage.store.data.sample.SampleData;
+import com.gamesage.store.domain.sample.SampleData;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -45,6 +45,23 @@ class UserTest {
     void cannotPay() {
         User user = new User(SampleData.TIERS.get(2), BigDecimal.ONE);
         assertFalse(user.canPay(BigDecimal.TEN));
+    }
+
+    @Test
+    void hasGame() {
+        Game game = new Game(4, "SKYRIM", BigDecimal.valueOf(87.88d));
+        User user = new User(SampleData.TIERS.get(1), BigDecimal.valueOf(123.15d));
+        user.addGame(game);
+
+        assertTrue(user.hasGame(game));
+    }
+
+    @Test
+    void doesNotHaveGame() {
+        User user = new User(SampleData.TIERS.get(1), BigDecimal.valueOf(123));
+        Game alienGame = new Game(4, "SKYRIM", BigDecimal.valueOf(87.88d));
+
+        assertFalse(user.hasGame(alienGame));
     }
 }
 

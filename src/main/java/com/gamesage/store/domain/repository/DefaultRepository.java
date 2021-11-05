@@ -1,4 +1,4 @@
-package com.gamesage.store.data.repository;
+package com.gamesage.store.domain.repository;
 
 import java.util.List;
 

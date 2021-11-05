@@ -1,6 +1,6 @@
-package com.gamesage.store.data.repository;
+package com.gamesage.store.domain.repository;
 
-import com.gamesage.store.data.model.Game;
+import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.util.RandomBigDecimal;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;

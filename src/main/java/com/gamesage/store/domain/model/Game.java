@@ -1,4 +1,4 @@
-package com.gamesage.store.data.model;
+package com.gamesage.store.domain.model;
 
 import java.math.BigDecimal;
 import java.util.Objects;
