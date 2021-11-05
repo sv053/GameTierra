@@ -3,15 +3,15 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.data.model.Game;
 import com.gamesage.store.data.model.User;
+import com.gamesage.store.data.repository.GameRepository;
 import com.gamesage.store.data.sample.SampleData;
-import com.gamesage.store.util.ListToMapConverter;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public class Store {
     private static Store instance;
-
+    private GameRepository repository;
     private Store() {
     }
 
@@ -26,8 +26,8 @@ public class Store {
     }
 
     public Game searchGame(int id) {
-        ListToMapConverter converter = new ListToMapConverter();
-        Game game = converter.getGameById().get(id);
+        repository = new GameRepository();
+        Game game = repository.read(SampleData.GAMES).get(id);
         if (game == null) {
             throw new IllegalArgumentException("Game with id " + id + " not found");
         }
