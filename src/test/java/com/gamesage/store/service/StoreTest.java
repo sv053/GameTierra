@@ -1,20 +1,25 @@
 package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.Game;
+import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
+import com.gamesage.store.domain.repository.GameRepository;
+import com.gamesage.store.domain.repository.Repository;
 import com.gamesage.store.domain.sample.SampleData;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class StoreTest {
-    private final Store store = Store.getInstance();
 
     @Test
     void buyGame() {
+        Store store = new Store();
+        store.assignRepository(new GameRepository().updateAll(SampleData.GAMES));
         BigDecimal initBalance = BigDecimal.valueOf(156.82);
         User user = new User(SampleData.TIERS.get(1), initBalance);
         int gameId = 1;
@@ -33,13 +38,17 @@ class StoreTest {
 
     @Test
     void gameDoesntExist() {
+        Store store = new Store();
+        store.assignRepository(new GameRepository().updateAll(SampleData.GAMES));
         assertThrows(IllegalArgumentException.class, () -> store.searchGame(1213313313));
     }
 
     @Test
     void didNotBuyAlreadyOwned() {
+        Store store = new Store();
+        store.assignRepository(new GameRepository().updateAll(SampleData.GAMES));
         int gameId = 4;
-        Game game = Store.getInstance().searchGame(gameId);
+        Game game = store.searchGame(gameId);
         BigDecimal initBalance = BigDecimal.valueOf(156.82);
         User user = new User(SampleData.TIERS.get(1), initBalance);
         user.addGame(game);
@@ -52,6 +61,8 @@ class StoreTest {
 
     @Test
     void calculateCashback() {
+        Store store = new Store();
+        store.assignRepository(new GameRepository().updateAll(SampleData.GAMES));
         User user = new User(SampleData.TIERS.get(1), BigDecimal.TEN);
         Game game = new Game(0, null, BigDecimal.valueOf(15));
 
@@ -63,10 +74,44 @@ class StoreTest {
 
     @Test
     void searchGameById() {
+        Store store = new Store();
+        store.assignRepository(new GameRepository().updateAll(SampleData.GAMES));
         int id = 7;
         Game gameToSearch = new Game(id, "ASSASSIN_S_CREED", null);
 
         assertEquals(gameToSearch, store.searchGame(id));
+    }
+
+    @Test
+    void getGames() {
+        Store store = new Store();
+        store.assignRepository(new GameRepository().updateAll(SampleData.GAMES));
+        assertNotNull(store.getGames());
+    }
+
+    @Test
+    void getGamesWrongRepType() {
+
+        Store store = new Store();
+        store.assignRepository(new AnotherRep());
+        assertEquals(store.getGames(), null);
+    }
+
+    class AnotherRep implements Repository<Tier> {
+        @Override
+        public List<Tier> findAll() {
+            return null;
+        }
+
+        @Override
+        public Repository updateAll(List<Tier> items) {
+            return null;
+        }
+
+        @Override
+        public Tier findById(int id) {
+            return null;
+        }
     }
 }
 

@@ -1,23 +1,23 @@
 package com.gamesage.store.domain.repository;
 
 import com.gamesage.store.domain.model.Game;
+import com.gamesage.store.domain.sample.SampleData;
 import com.gamesage.store.util.RandomBigDecimal;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class GameRepositoryTest {
 
     @ParameterizedTest
     @ValueSource(ints = {1, 2, 3})
-    void read(int gameId) {
+    void toMap(int gameId) {
 
         Game game = new Game(1, "SKYRIM", null);
         List<Game> games = Arrays.asList(
@@ -29,11 +29,16 @@ class GameRepositoryTest {
                 new Game(3, "ASSASSIN_S_CREED", RandomBigDecimal.getAndFormatRandomBigDecimal())
         );
 
-        GameRepository repository = new GameRepository();
-        Map<Integer, Game> gamesById = repository.read(games);
+        GameRepository repository = new GameRepository().updateAll(games);
+        assertNotNull(repository.getGameById().get(gameId));
+        assertEquals(repository.getGameById().get(game.getId()), game);
+        assertEquals(repository.getGameById().size(), 3);
+    }
 
-        assertNotNull(gamesById.get(gameId));
-        assertEquals(gamesById.get(game.getId()), game);
-        assertEquals(gamesById.size(), 3);
+    @Test
+    void findByIdNotFoundWrongKey() {
+        GameRepository repository = new GameRepository().updateAll(SampleData.GAMES);
+        assertThrows(IllegalArgumentException.class, () -> repository.findById(1213313313));
     }
 }
+

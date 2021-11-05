@@ -3,35 +3,24 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.GameRepository;
-import com.gamesage.store.domain.sample.SampleData;
+import com.gamesage.store.domain.repository.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public class Store {
-    private static Store instance;
-    private GameRepository repository;
-    private Store() {
+    private Repository repository;
+
+    public void assignRepository(Repository rep) {
+        this.repository = rep;
     }
 
-    public static List<Game> getGames() {
-        return SampleData.GAMES;
-    }
-
-    public static Store getInstance() {
-        if (instance == null)
-            instance = new Store();
-        return instance;
+    public List<Game> getGames() {
+        return (List<Game>) repository.findAll();
     }
 
     public Game searchGame(int id) {
-        repository = new GameRepository();
-        Game game = repository.read(SampleData.GAMES).get(id);
-        if (game == null) {
-            throw new IllegalArgumentException("Game with id " + id + " not found");
-        }
-        return game;
+        return (Game) repository.findById(id);
     }
 
     public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
@@ -42,7 +31,7 @@ public class Store {
     public boolean buyGame(int gameId, User user) {
         Game game = searchGame(gameId);
         BigDecimal price = game.getPrice();
-        if (!user.getGames().contains(game)) {
+        if (!user.hasGame(game)) {
             if (user.canPay(price)) {
                 BigDecimal cashback = calculateCashback(price, user);
                 user.withdrawBalance(price);
