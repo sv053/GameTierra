@@ -1,16 +1,19 @@
-package com.gamesage.store.domain.model;
+package com.gamesage.service.domain.model;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
 public class Game {
-    private static int idCounter = 1;
-    private final int id;
+    private int id;
     private final String name;
     private final BigDecimal price;
 
     public Game(String name, BigDecimal price) {
-        this(idCounter++, name, price);
+        this(0, name, price);
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Game(int id, String name, BigDecimal price) {

@@ -1,16 +1,13 @@
-package com.gamesage.store.service;
+package com.gamesage.service.service;
 
-import com.gamesage.store.domain.model.Game;
-import com.gamesage.store.domain.model.Tier;
-import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.GameRepository;
-import com.gamesage.store.domain.repository.Repository;
-import com.gamesage.store.domain.sample.SampleData;
+import com.gamesage.service.domain.model.Game;
+import com.gamesage.service.domain.model.User;
+import com.gamesage.service.domain.repository.GameRepository;
+import com.gamesage.service.domain.sample.SampleData;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,8 +15,9 @@ class StoreTest {
 
     @Test
     void buyGame() {
-        Store store = new Store();
-        store.assignRepository(new GameRepository().updateAll(SampleData.GAMES));
+        GameRepository repository = new GameRepository();
+        repository.createAll(SampleData.GAMES);
+        Store store = new Store(repository);
         BigDecimal initBalance = BigDecimal.valueOf(156.82);
         User user = new User(SampleData.TIERS.get(1), initBalance);
         int gameId = 1;
@@ -38,15 +36,17 @@ class StoreTest {
 
     @Test
     void gameDoesntExist() {
-        Store store = new Store();
-        store.assignRepository(new GameRepository().updateAll(SampleData.GAMES));
+        GameRepository repository = new GameRepository();
+        repository.createAll(SampleData.GAMES);
+        Store store = new Store(repository);
         assertThrows(IllegalArgumentException.class, () -> store.searchGame(1213313313));
     }
 
     @Test
     void didNotBuyAlreadyOwned() {
-        Store store = new Store();
-        store.assignRepository(new GameRepository().updateAll(SampleData.GAMES));
+        GameRepository repository = new GameRepository();
+        repository.createAll(SampleData.GAMES);
+        Store store = new Store(repository);
         int gameId = 4;
         Game game = store.searchGame(gameId);
         BigDecimal initBalance = BigDecimal.valueOf(156.82);
@@ -61,8 +61,9 @@ class StoreTest {
 
     @Test
     void calculateCashback() {
-        Store store = new Store();
-        store.assignRepository(new GameRepository().updateAll(SampleData.GAMES));
+        GameRepository repository = new GameRepository();
+        repository.createAll(SampleData.GAMES);
+        Store store = new Store(repository);
         User user = new User(SampleData.TIERS.get(1), BigDecimal.TEN);
         Game game = new Game(0, null, BigDecimal.valueOf(15));
 
@@ -74,8 +75,9 @@ class StoreTest {
 
     @Test
     void searchGameById() {
-        Store store = new Store();
-        store.assignRepository(new GameRepository().updateAll(SampleData.GAMES));
+        GameRepository repository = new GameRepository();
+        repository.createAll(SampleData.GAMES);
+        Store store = new Store(repository);
         int id = 7;
         Game gameToSearch = new Game(id, "ASSASSIN_S_CREED", null);
 
@@ -84,34 +86,10 @@ class StoreTest {
 
     @Test
     void getGames() {
-        Store store = new Store();
-        store.assignRepository(new GameRepository().updateAll(SampleData.GAMES));
+        GameRepository repository = new GameRepository();
+        repository.createAll(SampleData.GAMES);
+        Store store = new Store(repository);
         assertNotNull(store.getGames());
-    }
-
-    @Test
-    void getGamesWrongRepType() {
-
-        Store store = new Store();
-        store.assignRepository(new AnotherRep());
-        assertEquals(store.getGames(), null);
-    }
-
-    class AnotherRep implements Repository<Tier> {
-        @Override
-        public List<Tier> findAll() {
-            return null;
-        }
-
-        @Override
-        public Repository updateAll(List<Tier> items) {
-            return null;
-        }
-
-        @Override
-        public Tier findById(int id) {
-            return null;
-        }
     }
 }
 
