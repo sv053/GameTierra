@@ -1,8 +1,8 @@
-package com.gamesage.service.domain.sample;
+package com.gamesage.store.domain.sample;
 
-import com.gamesage.service.domain.model.Game;
-import com.gamesage.service.domain.model.Tier;
-import com.gamesage.service.util.RandomBigDecimal;
+import com.gamesage.store.domain.model.Game;
+import com.gamesage.store.domain.model.Tier;
+import com.gamesage.store.util.RandomBigDecimal;
 
 import java.math.BigDecimal;
 import java.util.List;

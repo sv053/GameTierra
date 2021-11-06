@@ -1,6 +1,6 @@
-package com.gamesage.service.domain.model;
+package com.gamesage.store.domain.model;
 
-import com.gamesage.service.domain.sample.SampleData;
+import com.gamesage.store.domain.sample.SampleData;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

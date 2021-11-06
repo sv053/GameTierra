@@ -1,23 +1,17 @@
-package com.gamesage.service.service;
+package com.gamesage.store.service;
 
 
-import com.gamesage.service.domain.model.Game;
-import com.gamesage.service.domain.model.User;
-import com.gamesage.service.domain.repository.GameRepository;
-import com.gamesage.service.domain.sample.SampleData;
+import com.gamesage.store.domain.model.Game;
+import com.gamesage.store.domain.model.User;
+import com.gamesage.store.domain.repository.GameRepository;
 
 import java.math.BigDecimal;
-import java.util.List;
 
-public class Store {
+public class GameService {
     private final GameRepository repository;
 
-    public Store(GameRepository rep) {
+    public GameService(GameRepository rep) {
         repository = rep;
-    }
-
-    public List<Game> getGames() {
-        return repository.createAll(SampleData.GAMES);
     }
 
     public Game searchGame(int id) {

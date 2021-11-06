@@ -1,7 +1,7 @@
-package com.gamesage.service.domain.repository;
+package com.gamesage.store.domain.repository;
 
-import com.gamesage.service.domain.model.Game;
-import com.gamesage.service.domain.sample.SampleData;
+import com.gamesage.store.domain.model.Game;
+import com.gamesage.store.domain.sample.SampleData;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

@@ -1,6 +1,6 @@
-package com.gamesage.service.domain.repository;
+package com.gamesage.store.domain.repository;
 
-import com.gamesage.service.domain.model.Game;
+import com.gamesage.store.domain.model.Game;
 
 import java.util.ArrayList;
 import java.util.List;
