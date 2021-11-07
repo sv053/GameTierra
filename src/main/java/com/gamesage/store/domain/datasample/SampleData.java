@@ -1,4 +1,4 @@
-package com.gamesage.store.domain.sample;
+package com.gamesage.store.domain.datasample;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Tier;

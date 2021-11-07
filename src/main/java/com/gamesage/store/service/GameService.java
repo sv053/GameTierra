@@ -3,19 +3,21 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.GameRepository;
+import com.gamesage.store.domain.repository.Repository;
 
 import java.math.BigDecimal;
 
 public class GameService {
-    private final GameRepository repository;
+    private final Repository<Game> repository;
 
-    public GameService(GameRepository rep) {
+    public GameService(Repository<Game> rep) {
         repository = rep;
     }
 
     public Game searchGame(int id) {
-        return repository.findById(id);
+        Game foundGame = repository.findBy(id);
+        if (foundGame == null) throw new NullPointerException("Game not found");
+        return foundGame;
     }
 
     public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
@@ -31,6 +33,7 @@ public class GameService {
             user.withdrawBalance(price);
             user.depositBalance(cashback);
             user.addGame(game);
+            return true;
         }
         return false;
     }

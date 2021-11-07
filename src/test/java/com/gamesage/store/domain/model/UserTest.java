@@ -1,6 +1,7 @@
 package com.gamesage.store.domain.model;
 
-import com.gamesage.store.domain.sample.SampleData;
+import com.gamesage.store.domain.datasample.SampleData;
+import com.gamesage.store.domain.repository.GameRepository;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -11,9 +12,11 @@ class UserTest {
 
     @Test
     void addGame() {
+        GameRepository repository = new GameRepository();
+        repository.createAll(SampleData.GAMES);
+
         User user = new User(SampleData.TIERS.get(1), BigDecimal.valueOf(87.5));
-        int gameId = 4;
-        Game game = SampleData.GAMES.get(gameId);
+        Game game = repository.getGames().get(4);
 
         assertTrue(user.addGame(game));
         assertTrue(user.getGames().contains(game));
