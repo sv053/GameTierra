@@ -57,7 +57,7 @@ class GameServiceTest {
         int gameId = 1;
         Game game = repository.findBy(gameId);
 
-        gameService.buyGame(1, user);
+        gameService.buyGame(gameId, user);
 
         assertTrue(user.getGames().contains(game));
     }
@@ -80,8 +80,7 @@ class GameServiceTest {
         repository.createAll(SampleData.GAMES);
         GameService gameService = new GameService(repository);
 
-        BigDecimal initBalance = BigDecimal.valueOf(156.82);
-        User user = new User(SampleData.TIERS.get(1), initBalance);
+        User user = new User(SampleData.TIERS.get(1), BigDecimal.ONE);
 
         assertFalse(gameService.buyGame(6, user));
     }
@@ -117,7 +116,7 @@ class GameServiceTest {
         repository.createAll(SampleData.GAMES);
         GameService gameService = new GameService(repository);
 
-        User user = new User(SampleData.TIERS.get(1), BigDecimal.TEN);
+        User user = new User(SampleData.TIERS.get(1), null);
         Game game = new Game(0, null, BigDecimal.valueOf(15));
 
         BigDecimal cashbackPercentage = BigDecimal.valueOf(user.getTier().getCashbackPercentage() * 0.01d);
@@ -131,10 +130,10 @@ class GameServiceTest {
         GameRepository repository = new GameRepository();
         repository.createAll(SampleData.GAMES);
         GameService gameService = new GameService(repository);
-        Integer id = 7;
-        Game gameToSearch = new Game(id, "ASSASSIN_S_CREED", null);
+        Integer gameId = 7;
+        Game gameToSearch = new Game(gameId, "ASSASSIN_S_CREED", null);
 
-        assertEquals(gameToSearch, gameService.searchGame(id));
+        assertEquals(gameToSearch, gameService.searchGame(gameId));
     }
 }
 
