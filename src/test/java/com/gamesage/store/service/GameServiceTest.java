@@ -48,21 +48,6 @@ class GameServiceTest {
     }
 
     @Test
-    void buyGameFalseHasGame() {
-        GameRepository repository = new GameRepository();
-        repository.createAll(SampleData.GAMES);
-        GameService gameService = new GameService(repository);
-        BigDecimal initBalance = BigDecimal.valueOf(156.82);
-        User user = new User(SampleData.TIERS.get(1), initBalance);
-        int gameId = 1;
-        Game game = repository.findBy(gameId);
-
-        gameService.buyGame(gameId, user);
-
-        assertTrue(user.getGames().contains(game));
-    }
-
-    @Test
     void buyGameTrue() {
         GameRepository repository = new GameRepository();
         repository.createAll(SampleData.GAMES);
