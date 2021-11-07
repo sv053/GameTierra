@@ -91,7 +91,7 @@ class GameServiceTest {
         repository.createAll(SampleData.GAMES);
         GameService gameService = new GameService(repository);
         Integer gameId = 4;
-        Game game = gameService.searchGame(gameId);
+        Game game = repository.findBy(gameId);
 
         BigDecimal initBalance = BigDecimal.valueOf(156.82);
         User user = new User(SampleData.TIERS.get(1), initBalance);
