@@ -9,52 +9,50 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class GameRepository implements Repository<Game> {
+public class GameRepository implements Repository<Game>, FindById<Game> {
 
     private final Map<Integer, Game> allGamesById;
     private final List<Game> games;
     private int gameIdCounter = 1;
 
     public GameRepository() {
-        games = new ArrayList<>();
-        allGamesById = new HashMap<>();
+        this.games = new ArrayList<>();
+        this.allGamesById = new HashMap<>();
     }
 
     public List<Game> getGames() {
-        return games;
-    }
-
-    private void setGameId(Game game) {
-        game.setId(gameIdCounter++);
-    }
-
-    private List<Game> setIdToAll(List<Game> gamesToAddId) {
-        gamesToAddId.forEach(g -> setGameId(g));
-        return gamesToAddId;
+        return this.games;
     }
 
     @Override
-    public List<Game> createAll(List<Game> gamesToAdd) {
-        games.addAll(setIdToAll(gamesToAdd));
-        addGamesToMapFromList(gamesToAdd);
-        return games;
+    public Game findBy(final Integer id) {
+        return this.allGamesById.containsKey(id) ? this.allGamesById.get(id) : null;
     }
 
-    private Map<Integer, Game> addGamesToMapFromList(List<Game> gamesToAdd) {
-        Map mapForNewGames = gamesToAdd.stream()
+    @Override
+    public List<Game> createAll(final List<Game> gamesToAdd) {
+        final List<Game> gamesWithId = this.addIdToAll(gamesToAdd);
+        this.games.addAll(gamesWithId);
+        this.addGamesToMapFromList(gamesWithId);
+        return gamesWithId;
+    }
+
+    private Map<Integer, Game> addGamesToMapFromList(final List<Game> gamesToAdd) {
+        final Map<Integer, Game> mapForNewGames = gamesToAdd.stream()
                 .collect(
                         Collectors.toMap(Game::getId, Function.identity(),
                                 (oldValue, newValue) -> (newValue)));
-        allGamesById.putAll(mapForNewGames);
-        return allGamesById;
+        this.allGamesById.putAll(mapForNewGames);
+        return this.allGamesById;
     }
 
-    @Override
-    public Game findBy(int id) {
-        if (!(allGamesById == null || allGamesById.isEmpty())
-                && allGamesById.containsKey(id))
-            return allGamesById.get(id);
-        else return null;
+    private List<Game> addIdToAll(final List<Game> gamesToAddId) {
+        gamesToAddId.forEach(this::setGameId);
+        return gamesToAddId;
+    }
+
+    private void setGameId(final Game game) {
+        game.setId(this.gameIdCounter++);
     }
 }
 

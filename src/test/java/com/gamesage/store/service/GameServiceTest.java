@@ -1,6 +1,6 @@
 package com.gamesage.store.service;
 
-import com.gamesage.store.domain.datasample.SampleData;
+import com.gamesage.store.domain.data.sample.SampleData;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.GameRepository;
@@ -15,19 +15,19 @@ class GameServiceTest {
 
     @Test
     void buyGameTrueNewBalance() {
-        GameRepository repository = new GameRepository();
+        final GameRepository repository = new GameRepository();
         repository.createAll(SampleData.GAMES);
-        GameService gameService = new GameService(repository);
-        BigDecimal initBalance = BigDecimal.valueOf(156.82);
-        User user = new User(SampleData.TIERS.get(1), initBalance);
-        int gameId = 1;
-        Game game = new Game(gameId, "THE_WITCHER", BigDecimal.valueOf(17.28d));
+        final GameService gameService = new GameService(repository);
+        final BigDecimal initBalance = BigDecimal.valueOf(156.82);
+        final User user = new User(SampleData.TIERS.get(1), initBalance);
+        final int gameId = 1;
+        final Game game = new Game(gameId, "THE_WITCHER", BigDecimal.valueOf(17.28d));
 
         gameService.buyGame(gameId, user);
 
-        BigDecimal cashback = game.getPrice().multiply(BigDecimal.valueOf
+        final BigDecimal cashback = game.getPrice().multiply(BigDecimal.valueOf
                 (user.getTier().getCashbackPercentage() * 0.01));
-        BigDecimal expectedBalance = initBalance.subtract(game.getPrice()).add(cashback)
+        final BigDecimal expectedBalance = initBalance.subtract(game.getPrice()).add(cashback)
                 .setScale(2, RoundingMode.HALF_UP);
 
         assertEquals(expectedBalance, user.getBalance());
@@ -35,12 +35,12 @@ class GameServiceTest {
 
     @Test
     void buyGameFalseSameBalance() {
-        GameRepository repository = new GameRepository();
+        final GameRepository repository = new GameRepository();
         repository.createAll(SampleData.GAMES);
-        GameService gameService = new GameService(repository);
+        final GameService gameService = new GameService(repository);
 
-        BigDecimal initBalance = BigDecimal.valueOf(156.82);
-        User user = new User(SampleData.TIERS.get(1), initBalance);
+        final BigDecimal initBalance = BigDecimal.valueOf(156.82);
+        final User user = new User(SampleData.TIERS.get(1), initBalance);
 
         gameService.buyGame(6, user);
 
@@ -49,37 +49,41 @@ class GameServiceTest {
 
     @Test
     void buyGameTrue() {
-        GameRepository repository = new GameRepository();
+        final GameRepository repository = new GameRepository();
         repository.createAll(SampleData.GAMES);
-        GameService gameService = new GameService(repository);
+        final GameService gameService = new GameService(repository);
 
-        BigDecimal initBalance = BigDecimal.valueOf(156.82);
-        User user = new User(SampleData.TIERS.get(1), initBalance);
+        final BigDecimal initBalance = BigDecimal.valueOf(156.82);
+        final User user = new User(SampleData.TIERS.get(1), initBalance);
 
         assertTrue(gameService.buyGame(1, user));
     }
 
     @Test
     void buyGameFalsePriceHigherThanBalance() {
-        GameRepository repository = new GameRepository();
+        final GameRepository repository = new GameRepository();
         repository.createAll(SampleData.GAMES);
-        GameService gameService = new GameService(repository);
+        final GameService gameService = new GameService(repository);
+        final BigDecimal initBalance = BigDecimal.ONE;
+        final Game game = repository.getGames().stream()
+                .filter(
+                        g -> g.getPrice().compareTo(initBalance) > 0)
+                .findAny().get();
+        final User user = new User(SampleData.TIERS.get(1), initBalance);
 
-        User user = new User(SampleData.TIERS.get(1), BigDecimal.ONE);
-
-        assertFalse(gameService.buyGame(6, user));
+        assertFalse(gameService.buyGame(game.getId(), user));
     }
 
     @Test
     void buyGameFalseAlreadyOwned() {
-        GameRepository repository = new GameRepository();
+        final GameRepository repository = new GameRepository();
         repository.createAll(SampleData.GAMES);
-        GameService gameService = new GameService(repository);
-        Integer gameId = 4;
-        Game game = repository.findBy(gameId);
+        final GameService gameService = new GameService(repository);
+        final Integer gameId = 4;
+        final Game game = repository.findBy(gameId);
 
-        BigDecimal initBalance = BigDecimal.valueOf(156.82);
-        User user = new User(SampleData.TIERS.get(1), initBalance);
+        final BigDecimal initBalance = BigDecimal.valueOf(156.82);
+        final User user = new User(SampleData.TIERS.get(1), initBalance);
         user.addGame(game);
 
         gameService.buyGame(gameId, user);
@@ -89,36 +93,36 @@ class GameServiceTest {
 
     @Test
     void searchGameDoesntExist() {
-        GameRepository repository = new GameRepository();
+        final GameRepository repository = new GameRepository();
         repository.createAll(SampleData.GAMES);
-        GameService gameService = new GameService(repository);
-        assertThrows(NullPointerException.class, () -> gameService.searchGame(1213313));
+        final GameService gameService = new GameService(repository);
+        assertThrows(IllegalArgumentException.class, () -> gameService.findById(1213313));
     }
 
     @Test
     void calculateCashback() {
-        GameRepository repository = new GameRepository();
+        final GameRepository repository = new GameRepository();
         repository.createAll(SampleData.GAMES);
-        GameService gameService = new GameService(repository);
+        final GameService gameService = new GameService(repository);
 
-        User user = new User(SampleData.TIERS.get(1), null);
-        Game game = new Game(0, null, BigDecimal.valueOf(15));
+        final User user = new User(SampleData.TIERS.get(1), null);
+        final Game game = new Game(0, null, BigDecimal.valueOf(15));
 
-        BigDecimal cashbackPercentage = BigDecimal.valueOf(user.getTier().getCashbackPercentage() * 0.01d);
-        BigDecimal expectedCashback = game.getPrice().multiply(cashbackPercentage);
+        final BigDecimal cashbackPercentage = BigDecimal.valueOf(user.getTier().getCashbackPercentage() * 0.01d);
+        final BigDecimal expectedCashback = game.getPrice().multiply(cashbackPercentage);
 
         assertEquals(expectedCashback, gameService.calculateCashback(game.getPrice(), user));
     }
 
     @Test
     void searchGame() {
-        GameRepository repository = new GameRepository();
+        final GameRepository repository = new GameRepository();
         repository.createAll(SampleData.GAMES);
-        GameService gameService = new GameService(repository);
-        Integer gameId = 7;
-        Game gameToSearch = new Game(gameId, "ASSASSIN_S_CREED", null);
+        final GameService gameService = new GameService(repository);
+        final Integer gameId = 7;
+        final Game gameToSearch = new Game(gameId, "ASSASSIN_S_CREED", null);
 
-        assertEquals(gameToSearch, gameService.searchGame(gameId));
+        assertEquals(gameToSearch, gameService.findById(gameId));
     }
 }
 

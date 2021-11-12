@@ -10,26 +10,27 @@ import java.math.BigDecimal;
 public class GameService {
     private final Repository<Game> repository;
 
-    public GameService(Repository<Game> rep) {
-        repository = rep;
+    public GameService(final Repository<Game> repository) {
+        this.repository = repository;
     }
 
-    public Game searchGame(int id) {
-        Game foundGame = repository.findBy(id);
-        if (foundGame == null) throw new NullPointerException("Game not found");
+    public Game findById(final int id) {
+        final Game foundGame = this.repository.findBy(id);
+        if (foundGame == null) throw new IllegalArgumentException("Game with id " + id + " is not found");
         return foundGame;
     }
 
-    public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
-        BigDecimal percentageShare = BigDecimal.valueOf(user.getTier().getCashbackPercentage() * 0.01d);
+    public BigDecimal calculateCashback(final BigDecimal gamePrice, final User user) {
+        final Double percentage = user.getTier().getCashbackPercentage();
+        final BigDecimal percentageShare = BigDecimal.valueOf(percentage * 0.01d);
         return gamePrice.multiply(percentageShare);
     }
 
-    public boolean buyGame(int gameId, User user) {
-        Game game = searchGame(gameId);
-        BigDecimal price = game.getPrice();
+    public boolean buyGame(final int gameId, final User user) {
+        final Game game = this.findById(gameId);
+        final BigDecimal price = game.getPrice();
         if (user.canPay(price) && (!user.hasGame(game))) {
-            BigDecimal cashback = calculateCashback(price, user);
+            final BigDecimal cashback = this.calculateCashback(price, user);
             user.withdrawBalance(price);
             user.depositBalance(cashback);
             user.addGame(game);
