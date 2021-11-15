@@ -6,31 +6,33 @@ import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.Repository;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 public class GameService {
-    private final Repository<Game> repository;
+    private final Repository<Game, Integer> repository;
 
-    public GameService(final Repository<Game> repository) {
+    public GameService(Repository<Game, Integer> repository) {
         this.repository = repository;
     }
 
-    public Game findById(final int id) {
-        final Game foundGame = this.repository.findBy(id);
-        if (foundGame == null) throw new IllegalArgumentException("Game with id " + id + " is not found");
-        return foundGame;
+    public Game findById(int id) {
+        Optional<Game> foundGame = this.repository.findBy(id);
+        if (foundGame.isEmpty()) {
+            throw new IllegalArgumentException("Game with id " + id + " is not found");
+        }
+        return foundGame.get();
     }
 
-    public BigDecimal calculateCashback(final BigDecimal gamePrice, final User user) {
-        final Double percentage = user.getTier().getCashbackPercentage();
-        final BigDecimal percentageShare = BigDecimal.valueOf(percentage * 0.01d);
-        return gamePrice.multiply(percentageShare);
+    public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
+        final BigDecimal percentage = BigDecimal.valueOf(user.getTier().getCashbackPercentage());
+        return gamePrice.multiply(percentage);
     }
 
-    public boolean buyGame(final int gameId, final User user) {
-        final Game game = this.findById(gameId);
-        final BigDecimal price = game.getPrice();
+    public boolean buyGame(int gameId, User user) {
+        Game game = this.findById(gameId);
+        BigDecimal price = game.getPrice();
         if (user.canPay(price) && (!user.hasGame(game))) {
-            final BigDecimal cashback = this.calculateCashback(price, user);
+            BigDecimal cashback = this.calculateCashback(price, user);
             user.withdrawBalance(price);
             user.depositBalance(cashback);
             user.addGame(game);

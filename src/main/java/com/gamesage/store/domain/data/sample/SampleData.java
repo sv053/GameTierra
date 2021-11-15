@@ -2,6 +2,7 @@ package com.gamesage.store.domain.data.sample;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Tier;
+import com.gamesage.store.domain.model.User;
 import com.gamesage.store.util.RandomBigDecimal;
 
 import java.math.BigDecimal;
@@ -11,6 +12,7 @@ public final class SampleData {
 
     public static final List<Game> GAMES;
     public static final List<Tier> TIERS;
+    public static final List<User> USERS;
 
     static {
         GAMES = List.of(
@@ -25,10 +27,14 @@ public final class SampleData {
 
         TIERS = List.of(
                 new Tier("FREE", 0.d),
-                new Tier("BRONZE", 5.0d),
-                new Tier("SILVER", 10.),
-                new Tier("GOLD", 20.),
-                new Tier("PLATINUM", 30.));
+                new Tier("BRONZE", 5.d),
+                new Tier("SILVER", 10.d),
+                new Tier("GOLD", 20.d),
+                new Tier("PLATINUM", 30.d));
+
+        USERS = List.of(
+                new User("terral", SampleData.TIERS.get(3), BigDecimal.valueOf(100))
+        );
     }
 
     private SampleData() {

@@ -3,8 +3,9 @@ package com.gamesage.store.domain.repository;
 import java.util.List;
 import java.util.Optional;
 
-public interface Repository<T> {
+public interface Repository<T, K> {
    List<T> createAll(List<T> items);
 
-   Optional<T> findBy(Optional<Integer> key);
+   Optional<T> findBy(K key);
 }
+
