@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 public class Game {
+
     private Integer id;
     private final String name;
     private final BigDecimal price;
@@ -19,7 +20,7 @@ public class Game {
     }
 
     public Integer getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(Integer id) {
@@ -27,11 +28,11 @@ public class Game {
     }
 
     public BigDecimal getPrice() {
-        return price;
+        return this.price;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Override
@@ -39,13 +40,14 @@ public class Game {
         if (this == o) return true;
         if (!(o instanceof Game)) return false;
 
-        return this.id == ((Game) o).id &&
-                Objects.equals(this.name, ((Game) o).name);
+        final Game game = (Game) o;
+        return Objects.equals(this.id, game.id) &&
+                Objects.equals(this.name, game.name);
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
+        int result = this.id.hashCode();
         result = 31 * result + this.name.hashCode();
         return result;
     }
@@ -53,9 +55,9 @@ public class Game {
     @Override
     public String toString() {
         return "Game{" +
-                "id='" + id + '\'' +
-                "name='" + name + '\'' +
-                ", price=$" + price +
+                "id='" + this.id + '\'' +
+                "name='" + this.name + '\'' +
+                ", price=$" + this.price +
                 '}' + '\n';
     }
 }

@@ -14,20 +14,20 @@ class GameRepositoryTest {
 
     @Test
     void findBy_NotFound() {
-        GameRepository repository = new GameRepository();
-        assertEquals(Optional.empty(), repository.findBy(1213313313));
+        final GameRepository repository = new GameRepository();
+        assertTrue(repository.findById(1213313313).isEmpty());
     }
 
     @Test
     void findBy_Success() {
-        GameRepository repository = new GameRepository();
-        List<Game> games = Arrays.asList(
+        final GameRepository repository = new GameRepository();
+        final List<Game> games = Arrays.asList(
                 new Game("addedGame1", null),
                 new Game("addedGame2", null)
         );
         repository.createAll(games);
-        Game game = games.get(games.size() - 1);
-        final Optional<Game> foundGame = repository.findBy(game.getId());
+        final Game game = games.get(games.size() - 1);
+        Optional<Game> foundGame = repository.findById(game.getId());
 
         assertTrue(foundGame.isPresent());
         if (foundGame.isPresent()) {
@@ -37,19 +37,16 @@ class GameRepositoryTest {
 
     @Test
     void createAll() {
-        GameRepository repository = new GameRepository();
+        final GameRepository repository = new GameRepository();
 
-        List<Game> games = Arrays.asList(
+        final List<Game> games = Arrays.asList(
                 new Game("addedGame1", null),
                 new Game("addedGame2", null)
         );
         repository.createAll(games);
 
-        assertEquals(games.size(), repository.getGames().size());
-
-        for (final Game game : games) {
-            assertTrue(games.contains(game));
-        }
+        assertEquals(games.size(), repository.getAll().size());
+        assertTrue(repository.getAll().containsAll(games));
     }
 }
 

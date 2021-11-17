@@ -1,9 +1,9 @@
 package com.gamesage.store.domain.repository;
 
-import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -15,21 +15,18 @@ class UserRepositoryTest {
 
     @Test
     void findBy_NotFound() {
-        UserRepository repository = new UserRepository();
-        assertEquals(Optional.empty(), repository.findBy("lark"));
+        final UserRepository repository = new UserRepository();
+        assertEquals(Optional.empty(), repository.findById(7));
     }
 
     @Test
-    void findBy_Success() {
-        UserRepository repository = new UserRepository();
-        final List<User> users = Arrays.asList(
-                new User(
-                        "thunder",
-                        new Tier("first", 75.),
-                        null));
+    void findById_Success() {
+        final UserRepository repository = new UserRepository();
+        List<User> users = new ArrayList<>();
+        User user = new User(8, "thunder", null, null);
+        users.add(user);
         repository.createAll(users);
-        final User user = users.get(users.size() - 1);
-        final Optional<User> foundUser = repository.findBy(user.getLogin());
+        Optional<User> foundUser = repository.findById(user.getId());
 
         assertTrue(foundUser.isPresent());
         if (foundUser.isPresent()) {
@@ -39,19 +36,16 @@ class UserRepositoryTest {
 
     @Test
     void createAll() {
-        UserRepository repository = new UserRepository();
+        final UserRepository repository = new UserRepository();
 
-        List<User> users = Arrays.asList(
-                new User("addedUser1", null, null),
-                new User("addedUser2", null, null)
+        final List<User> users = Arrays.asList(
+                new User(6, "addedUser1", null, null),
+                new User(7, "addedUser2", null, null)
         );
         repository.createAll(users);
 
-        assertEquals(users.size(), repository.getUsers().size());
-
-        for (final User user : users) {
-            assertTrue(repository.getUsers().contains(user));
-        }
+        assertEquals(users.size(), repository.getAll().size());
+        assertTrue(repository.getAll().containsAll(users));
     }
 }
 

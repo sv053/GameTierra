@@ -6,33 +6,31 @@ import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.Repository;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 public class GameService {
+
     private final Repository<Game, Integer> repository;
 
-    public GameService(Repository<Game, Integer> repository) {
+    public GameService(final Repository<Game, Integer> repository) {
         this.repository = repository;
     }
 
-    public Game findById(int id) {
-        Optional<Game> foundGame = this.repository.findBy(id);
-        if (foundGame.isEmpty()) {
-            throw new IllegalArgumentException("Game with id " + id + " is not found");
-        }
-        return foundGame.get();
+    public Game findById(final int id) {
+        return this.repository.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(String.format("Game with id %s not found", id)));
     }
 
-    public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
-        final BigDecimal percentage = BigDecimal.valueOf(user.getTier().getCashbackPercentage());
+    public BigDecimal calculateCashback(final BigDecimal gamePrice, final User user) {
+        BigDecimal percentage = BigDecimal.valueOf(user.getTier().getCashbackPercentage());
         return gamePrice.multiply(percentage);
     }
 
-    public boolean buyGame(int gameId, User user) {
-        Game game = this.findById(gameId);
-        BigDecimal price = game.getPrice();
+    public boolean buyGame(final int gameId, final User user) {
+        final Game game = this.findById(gameId);
+        final BigDecimal price = game.getPrice();
         if (user.canPay(price) && (!user.hasGame(game))) {
-            BigDecimal cashback = this.calculateCashback(price, user);
+            final BigDecimal cashback = this.calculateCashback(price, user);
             user.withdrawBalance(price);
             user.depositBalance(cashback);
             user.addGame(game);

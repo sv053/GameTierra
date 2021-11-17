@@ -6,38 +6,38 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class UserRepository implements Repository<User, String> {
+public class UserRepository implements Repository<User, Integer> {
+
     private final List<User> users;
-    private final Map<String, User> allUsersByLogin;
+    private final Map<Integer, User> allUsersById;
 
     public UserRepository() {
         this.users = new ArrayList<>();
-        this.allUsersByLogin = new HashMap<>();
+        this.allUsersById = new HashMap<>();
     }
 
-    public List<User> getUsers() {
+    @Override
+    public List<User> getAll() {
         return this.users;
     }
 
     @Override
-    public List<User> createAll(final List<User> usersToAdd) {
+    public void createAll(List<User> usersToAdd) {
         this.users.addAll(usersToAdd);
         this.addUsersToMap(usersToAdd);
-        return usersToAdd;
     }
 
-    private Map<String, User> addUsersToMap(final List<User> usersToAdd) {
-        final Map<String, User> mapForNewUsers = usersToAdd.stream()
+    private void addUsersToMap(List<User> usersToAdd) {
+        Map<Integer, User> mapForNewUsers = usersToAdd.stream()
                 .collect(
-                        Collectors.toMap(User::getLogin, Function.identity(),
+                        Collectors.toMap(User::getId, Function.identity(),
                                 (oldValue, newValue) -> (newValue)));
-        this.allUsersByLogin.putAll(mapForNewUsers);
-        return mapForNewUsers;
+        this.allUsersById.putAll(mapForNewUsers);
     }
 
     @Override
-    public Optional<User> findBy(final String login) {
-        return Optional.ofNullable(this.allUsersByLogin.get(login));
+    public Optional<User> findById(final Integer id) {
+        return Optional.ofNullable(this.allUsersById.get(id));
     }
 }
 
