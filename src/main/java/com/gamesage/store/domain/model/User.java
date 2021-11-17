@@ -14,7 +14,7 @@ public class User {
     private final Tier tier;
     private BigDecimal balance;
 
-    public User(final Integer id, final String login, Tier tier, BigDecimal balance) {
+    public User(Integer id, String login, final Tier tier, final BigDecimal balance) {
         this.id = id;
         this.login = login;
         this.tier = tier;
@@ -30,7 +30,7 @@ public class User {
         return this.id;
     }
 
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
@@ -42,7 +42,7 @@ public class User {
         return this.games;
     }
 
-    public boolean addGame(Game game) {
+    public boolean addGame(final Game game) {
         return this.games.add(game);
     }
 
@@ -50,30 +50,30 @@ public class User {
         return this.balance;
     }
 
-    public BigDecimal depositBalance(BigDecimal amount) {
+    public BigDecimal depositBalance(final BigDecimal amount) {
         this.balance = this.balance.add(amount).setScale(2, RoundingMode.HALF_UP);
         return this.balance;
     }
 
-    public BigDecimal withdrawBalance(BigDecimal amount) {
+    public BigDecimal withdrawBalance(final BigDecimal amount) {
         this.balance = this.balance.subtract(amount).setScale(2, RoundingMode.HALF_UP);
         return this.balance;
     }
 
-    public boolean canPay(BigDecimal price) {
+    public boolean canPay(final BigDecimal price) {
         return price.compareTo(this.balance) <= 0;
     }
 
-    public boolean hasGame(Game game) {
+    public boolean hasGame(final Game game) {
         return this.games.contains(game);
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (!(o instanceof User)) return false;
 
-        User user = (User) o;
+        final User user = (User) o;
 
         if (!Objects.equals(this.login, user.login)) return false;
         return this.id != null ? this.id.equals(user.id) : user.id == null;

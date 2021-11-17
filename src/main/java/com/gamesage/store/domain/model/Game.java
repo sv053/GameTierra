@@ -9,11 +9,11 @@ public class Game {
     private final String name;
     private final BigDecimal price;
 
-    public Game(String name, BigDecimal price) {
+    public Game(final String name, final BigDecimal price) {
         this(null, name, price);
     }
 
-    public Game(Integer id, String name, BigDecimal price) {
+    public Game(final Integer id, final String name, final BigDecimal price) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -23,7 +23,7 @@ public class Game {
         return this.id;
     }
 
-    public void setId(Integer id) {
+    public void setId(final Integer id) {
         this.id = id;
     }
 
@@ -36,11 +36,11 @@ public class Game {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (!(o instanceof Game)) return false;
 
-        final Game game = (Game) o;
+        Game game = (Game) o;
         return Objects.equals(this.id, game.id) &&
                 Objects.equals(this.name, game.name);
     }

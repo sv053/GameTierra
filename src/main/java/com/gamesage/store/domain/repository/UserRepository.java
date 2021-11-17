@@ -22,13 +22,13 @@ public class UserRepository implements Repository<User, Integer> {
     }
 
     @Override
-    public void createAll(List<User> usersToAdd) {
+    public void createAll(final List<User> usersToAdd) {
         this.users.addAll(usersToAdd);
         this.addUsersToMap(usersToAdd);
     }
 
-    private void addUsersToMap(List<User> usersToAdd) {
-        Map<Integer, User> mapForNewUsers = usersToAdd.stream()
+    private void addUsersToMap(final List<User> usersToAdd) {
+        final Map<Integer, User> mapForNewUsers = usersToAdd.stream()
                 .collect(
                         Collectors.toMap(User::getId, Function.identity(),
                                 (oldValue, newValue) -> (newValue)));
@@ -36,7 +36,7 @@ public class UserRepository implements Repository<User, Integer> {
     }
 
     @Override
-    public Optional<User> findById(final Integer id) {
+    public Optional<User> findById(Integer id) {
         return Optional.ofNullable(this.allUsersById.get(id));
     }
 }
