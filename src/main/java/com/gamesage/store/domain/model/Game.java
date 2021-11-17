@@ -7,57 +7,57 @@ public class Game {
 
     private Integer id;
     private final String name;
-    private final BigDecimal price;
+    private BigDecimal price;
 
-    public Game(final String name, final BigDecimal price) {
+    public Game(String name, BigDecimal price) {
         this(null, name, price);
     }
 
-    public Game(final Integer id, final String name, final BigDecimal price) {
+    public Game(Integer id, String name, BigDecimal price) {
         this.id = id;
         this.name = name;
         this.price = price;
     }
 
     public Integer getId() {
-        return this.id;
+        return id;
     }
 
-    public void setId(final Integer id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
     public BigDecimal getPrice() {
-        return this.price;
+        return price;
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Game)) return false;
 
         Game game = (Game) o;
-        return Objects.equals(this.id, game.id) &&
-                Objects.equals(this.name, game.name);
+        return Objects.equals(id, game.id) &&
+                Objects.equals(name, game.name);
     }
 
     @Override
     public int hashCode() {
-        int result = this.id.hashCode();
-        result = 31 * result + this.name.hashCode();
+        int result = id.hashCode();
+        result = 31 * result + name.hashCode();
         return result;
     }
 
     @Override
     public String toString() {
         return "Game{" +
-                "id='" + this.id + '\'' +
-                "name='" + this.name + '\'' +
-                ", price=$" + this.price +
+                "id='" + id + '\'' +
+                "name='" + name + '\'' +
+                ", price=$" + price +
                 '}' + '\n';
     }
 }

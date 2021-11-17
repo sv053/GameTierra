@@ -8,91 +8,91 @@ import java.util.Set;
 
 public class User {
 
-    private final Set<Game> games;
-    private final String login;
+    private Set<Game> games;
+    private String login;
     private Integer id;
-    private final Tier tier;
+    private Tier tier;
     private BigDecimal balance;
 
-    public User(Integer id, String login, final Tier tier, final BigDecimal balance) {
+    public User(Integer id, String login, Tier tier, BigDecimal balance) {
         this.id = id;
         this.login = login;
         this.tier = tier;
         this.balance = balance;
-        this.games = new HashSet<>();
+        games = new HashSet<>();
     }
 
     public String getLogin() {
-        return this.login;
+        return login;
     }
 
     public Integer getId() {
-        return this.id;
+        return id;
     }
 
-    public void setId(final int id) {
+    public void setId(int id) {
         this.id = id;
     }
 
     public Tier getTier() {
-        return this.tier;
+        return tier;
     }
 
     public Set<Game> getGames() {
-        return this.games;
+        return games;
     }
 
-    public boolean addGame(final Game game) {
-        return this.games.add(game);
+    public boolean addGame(Game game) {
+        return games.add(game);
     }
 
     public BigDecimal getBalance() {
-        return this.balance;
+        return balance;
     }
 
-    public BigDecimal depositBalance(final BigDecimal amount) {
-        this.balance = this.balance.add(amount).setScale(2, RoundingMode.HALF_UP);
-        return this.balance;
+    public BigDecimal depositBalance(BigDecimal amount) {
+        balance = balance.add(amount).setScale(2, RoundingMode.HALF_UP);
+        return balance;
     }
 
-    public BigDecimal withdrawBalance(final BigDecimal amount) {
-        this.balance = this.balance.subtract(amount).setScale(2, RoundingMode.HALF_UP);
-        return this.balance;
+    public BigDecimal withdrawBalance(BigDecimal amount) {
+        balance = balance.subtract(amount).setScale(2, RoundingMode.HALF_UP);
+        return balance;
     }
 
-    public boolean canPay(final BigDecimal price) {
-        return price.compareTo(this.balance) <= 0;
+    public boolean canPay(BigDecimal price) {
+        return price.compareTo(balance) <= 0;
     }
 
-    public boolean hasGame(final Game game) {
-        return this.games.contains(game);
+    public boolean hasGame(Game game) {
+        return games.contains(game);
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof User)) return false;
 
-        final User user = (User) o;
+        User user = (User) o;
 
-        if (!Objects.equals(this.login, user.login)) return false;
-        return this.id != null ? this.id.equals(user.id) : user.id == null;
+        if (!Objects.equals(login, user.login)) return false;
+        return id != null ? id.equals(user.id) : user.id == null;
     }
 
     @Override
     public int hashCode() {
-        int result = this.login != null ? this.login.hashCode() : 0;
-        result = 31 * result + Integer.hashCode(this.id);
+        int result = login != null ? login.hashCode() : 0;
+        result = 31 * result + Integer.hashCode(id);
         return result;
     }
 
     @Override
     public String toString() {
         return "User{" +
-                " tier=" + this.tier.getLevel() +
-                ", cashback=" + this.tier.getCashbackPercentage() * 100 + "%" +
-                ", balance=$" + this.balance +
-                ", games=\\n" + this.getGames() +
+                " tier=" + tier.getLevel() +
+                ", cashback=" + tier.getCashbackPercentage() * 100 + "%" +
+                ", balance=$" + balance +
+                ", games=\\n" + getGames() +
                 '}';
     }
 }

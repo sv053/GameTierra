@@ -14,19 +14,19 @@ class GameRepositoryTest {
 
     @Test
     void findBy_NotFound() {
-        final GameRepository repository = new GameRepository();
+        GameRepository repository = new GameRepository();
         assertTrue(repository.findById(1213313313).isEmpty());
     }
 
     @Test
     void findBy_Success() {
-        final GameRepository repository = new GameRepository();
-        final List<Game> games = Arrays.asList(
+        GameRepository repository = new GameRepository();
+        List<Game> games = Arrays.asList(
                 new Game("addedGame1", null),
                 new Game("addedGame2", null)
         );
         repository.createAll(games);
-        final Game game = games.get(games.size() - 1);
+        Game game = games.get(games.size() - 1);
         Optional<Game> foundGame = repository.findById(game.getId());
 
         assertTrue(foundGame.isPresent());
@@ -37,9 +37,9 @@ class GameRepositoryTest {
 
     @Test
     void createAll() {
-        final GameRepository repository = new GameRepository();
+        GameRepository repository = new GameRepository();
 
-        final List<Game> games = Arrays.asList(
+        List<Game> games = Arrays.asList(
                 new Game("addedGame1", null),
                 new Game("addedGame2", null)
         );

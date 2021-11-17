@@ -6,13 +6,13 @@ import com.gamesage.store.domain.repository.Repository;
 
 public class UserService {
 
-    private final Repository<User, Integer> repository;
+    private Repository<User, Integer> repository;
 
-    public UserService(final Repository<User, Integer> repository) {
+    public UserService(Repository<User, Integer> repository) {
         this.repository = repository;
     }
 
-    public User findById(final Integer id) {
+    public User findById(Integer id) {
         return repository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException(String.format("User with login " + id + " is not found")));
     }

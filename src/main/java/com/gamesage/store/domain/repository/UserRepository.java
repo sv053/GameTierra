@@ -8,36 +8,36 @@ import java.util.stream.Collectors;
 
 public class UserRepository implements Repository<User, Integer> {
 
-    private final List<User> users;
-    private final Map<Integer, User> allUsersById;
+    private List<User> users;
+    private Map<Integer, User> allUsersById;
 
     public UserRepository() {
-        this.users = new ArrayList<>();
-        this.allUsersById = new HashMap<>();
+        users = new ArrayList<>();
+        allUsersById = new HashMap<>();
     }
 
     @Override
     public List<User> getAll() {
-        return this.users;
+        return users;
     }
 
     @Override
-    public void createAll(final List<User> usersToAdd) {
-        this.users.addAll(usersToAdd);
-        this.addUsersToMap(usersToAdd);
+    public void createAll(List<User> usersToAdd) {
+        users.addAll(usersToAdd);
+        addUsersToMap(usersToAdd);
     }
 
-    private void addUsersToMap(final List<User> usersToAdd) {
-        final Map<Integer, User> mapForNewUsers = usersToAdd.stream()
+    private void addUsersToMap(List<User> usersToAdd) {
+        Map<Integer, User> mapForNewUsers = usersToAdd.stream()
                 .collect(
                         Collectors.toMap(User::getId, Function.identity(),
                                 (oldValue, newValue) -> (newValue)));
-        this.allUsersById.putAll(mapForNewUsers);
+        allUsersById.putAll(mapForNewUsers);
     }
 
     @Override
     public Optional<User> findById(Integer id) {
-        return Optional.ofNullable(this.allUsersById.get(id));
+        return Optional.ofNullable(allUsersById.get(id));
     }
 }
 

@@ -15,13 +15,13 @@ class UserRepositoryTest {
 
     @Test
     void findBy_NotFound() {
-        final UserRepository repository = new UserRepository();
+        UserRepository repository = new UserRepository();
         assertEquals(Optional.empty(), repository.findById(7));
     }
 
     @Test
     void findById_Success() {
-        final UserRepository repository = new UserRepository();
+        UserRepository repository = new UserRepository();
         List<User> users = new ArrayList<>();
         User user = new User(8, "thunder", null, null);
         users.add(user);
@@ -36,9 +36,9 @@ class UserRepositoryTest {
 
     @Test
     void createAll() {
-        final UserRepository repository = new UserRepository();
+        UserRepository repository = new UserRepository();
 
-        final List<User> users = Arrays.asList(
+        List<User> users = Arrays.asList(
                 new User(6, "addedUser1", null, null),
                 new User(7, "addedUser2", null, null)
         );

@@ -18,36 +18,36 @@ class GameServiceIntegrationTest {
 
     @Test
     void buyGame_Success_CheckingCorrectComputingOfTheNewBalance() {
-        final GameRepository repository = new GameRepository();
-        final Game game = new Game(null, "mistery island", BigDecimal.ONE);
-        final List<Game> games = new ArrayList<>();
+        GameRepository repository = new GameRepository();
+        Game game = new Game(null, "mistery island", BigDecimal.ONE);
+        List<Game> games = new ArrayList<>();
         games.add(game);
         repository.createAll(games);
-        final GameService gameService = new GameService(repository);
+        GameService gameService = new GameService(repository);
 
-        final BigDecimal initBalance = game.getPrice();
-        final User user = new User(1, null, SampleData.TIERS.get(1), initBalance);
+        BigDecimal initBalance = game.getPrice();
+        User user = new User(1, null, SampleData.TIERS.get(1), initBalance);
 
         gameService.buyGame(game.getId(), user);
 
-        final BigDecimal cashback = game.getPrice().multiply(BigDecimal.valueOf
+        BigDecimal cashback = game.getPrice().multiply(BigDecimal.valueOf
                 (user.getTier().getCashbackPercentage()));
-        final BigDecimal expectedBalance = initBalance.subtract(game.getPrice()).add(cashback)
+        BigDecimal expectedBalance = initBalance.subtract(game.getPrice()).add(cashback)
                 .setScale(2, RoundingMode.HALF_UP);
 
         assertEquals(expectedBalance, user.getBalance());
     }
 
     @Test
-    void buyGame_Fail_WhenPriceIsHigherThanBalance_CheckIfTheBalanceIsTheSameAsBeforeTheIntent() {
-        final GameRepository repository = new GameRepository();
+    void buyGame_Fail_PriceIsHigherThanBalance_CheckIfTheBalanceIsTheSameAsBeforeTheIntent() {
+        GameRepository repository = new GameRepository();
         repository.createAll(SampleData.GAMES);
-        final GameService gameService = new GameService(repository);
+        GameService gameService = new GameService(repository);
 
-        final BigDecimal initBalance = BigDecimal.valueOf(156.82);
-        final User user = new User(1, "lark", SampleData.TIERS.get(1), initBalance);
+        BigDecimal initBalance = BigDecimal.valueOf(156.82);
+        User user = new User(1, "lark", SampleData.TIERS.get(1), initBalance);
 
-        final Optional<Game> findGameResult = repository.getAll().stream()
+        Optional<Game> findGameResult = repository.getAll().stream()
                 .filter(g -> g.getPrice().compareTo(initBalance) > 0).findFirst();
         if (findGameResult.isPresent()) {
             gameService.buyGame(findGameResult.get().getId(), user);
@@ -57,13 +57,13 @@ class GameServiceIntegrationTest {
 
     @Test
     void buyGame_Success_ReturnsTrue() {
-        final BigDecimal initBalance = BigDecimal.valueOf(156.82);
-        final User user = new User(1, "", SampleData.TIERS.get(1), initBalance);
+        BigDecimal initBalance = BigDecimal.valueOf(156.82);
+        User user = new User(1, "", SampleData.TIERS.get(1), initBalance);
 
-        final GameRepository repository = new GameRepository();
+        GameRepository repository = new GameRepository();
         repository.createAll(SampleData.GAMES);
-        final GameService gameService = new GameService(repository);
-        final Optional<Game> game = repository.getAll().stream().findFirst();
+        GameService gameService = new GameService(repository);
+        Optional<Game> game = repository.getAll().stream().findFirst();
 
         if (game.isPresent()) {
             assertTrue(gameService.buyGame(game.get().getId(), user));
@@ -72,13 +72,13 @@ class GameServiceIntegrationTest {
 
     @Test
     void buyGame_Fail_CannotBuyAlreadyOwned_ReturnsFalse() {
-        final GameRepository repository = new GameRepository();
+        GameRepository repository = new GameRepository();
         repository.createAll(SampleData.GAMES);
-        final GameService gameService = new GameService(repository);
-        final int gameId = repository.getAll().size();
-        final Game game = repository.getAll().get(gameId - 1);
+        GameService gameService = new GameService(repository);
+        int gameId = repository.getAll().size();
+        Game game = repository.getAll().get(gameId - 1);
 
-        final User user = new User(1, "", SampleData.TIERS.get(1), game.getPrice());
+        User user = new User(1, "", SampleData.TIERS.get(1), game.getPrice());
         user.addGame(game);
 
         assertFalse(gameService.buyGame(gameId, user));
@@ -86,19 +86,19 @@ class GameServiceIntegrationTest {
 
     @Test
     void findById_Fail_TheGameIsNotFound_Exception() {
-        final GameRepository repository = new GameRepository();
-        final GameService gameService = new GameService(repository);
+        GameRepository repository = new GameRepository();
+        GameService gameService = new GameService(repository);
         assertThrows(IllegalArgumentException.class, () -> gameService.findById(1213313));
     }
 
     @Test
     void findById_Success_TheRightGameIsFound() {
-        final GameRepository repository = new GameRepository();
-        final Game gameToSearch = new Game(null, "mistery island", BigDecimal.ONE);
-        final List<Game> games = new ArrayList<>();
+        GameRepository repository = new GameRepository();
+        Game gameToSearch = new Game(null, "mistery island", BigDecimal.ONE);
+        List<Game> games = new ArrayList<>();
         games.add(gameToSearch);
         repository.createAll(games);
-        final GameService gameService = new GameService(repository);
+        GameService gameService = new GameService(repository);
 
         assertEquals(gameToSearch, gameService.findById(gameToSearch.getId()));
     }
