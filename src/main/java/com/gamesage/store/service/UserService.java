@@ -13,7 +13,7 @@ public class UserService {
     }
 
     public User findById(final Integer id) {
-        return this.repository.findById(id).orElseThrow(
+        return repository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException(String.format("User with login " + id + " is not found")));
     }
 }
