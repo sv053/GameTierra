@@ -21,9 +21,9 @@ import static org.mockito.Mockito.when;
 class GameServiceTest {
 
     @Mock
-    GameRepository repository;
+    private GameRepository repository;
     @InjectMocks
-    GameService gameService;
+    private GameService gameService;
 
     @Test
     void buyGame_Success_ReturnsTrue() {

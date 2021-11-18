@@ -18,9 +18,9 @@ import static org.mockito.Mockito.when;
 class UserServiceTest {
 
     @Mock
-    UserRepository repository;
+    private UserRepository repository;
     @InjectMocks
-    UserService userService;
+    private UserService userService;
 
     @Test
     void findByLogin_Success_RightUserIsFound() {
