@@ -8,13 +8,18 @@ import java.util.stream.Collectors;
 
 public class GameRepository implements Repository<Game, Integer> {
 
-    private List<Game> games;
+    private final List<Game> games;
     private int gameIdCounter = 1;
-    private Map<Integer, Game> allGamesById;
+    private final Map<Integer, Game> allGamesById;
 
     public GameRepository() {
         games = new ArrayList<>();
         allGamesById = new HashMap<>();
+    }
+
+    @Override
+    public Optional<Game> findById(Integer key) {
+        return Optional.ofNullable(allGamesById.get(key));
     }
 
     public List<Game> getAll() {
@@ -37,18 +42,12 @@ public class GameRepository implements Repository<Game, Integer> {
         game.setId(gameIdCounter++);
     }
 
-    private Map<Integer, Game> addGamesToMap(List<Game> gamesToAdd) {
+    private void addGamesToMap(List<Game> gamesToAdd) {
         Map<Integer, Game> mapForNewGames = gamesToAdd.stream()
                 .collect(
                         Collectors.toMap(Game::getId, Function.identity(),
                                 (oldValue, newValue) -> (newValue)));
         allGamesById.putAll(mapForNewGames);
-        return allGamesById;
-    }
-
-    @Override
-    public Optional<Game> findById(Integer key) {
-        return Optional.ofNullable(allGamesById.get(key));
     }
 }
 

@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class GameServiceIntegrationTest {
 
     @Test
-    void buyGame_Success_CheckingCorrectComputingOfTheNewBalance() {
+    void buyGame_Success_BalanceUpdated() {
         GameRepository repository = new GameRepository();
         Game game = new Game(null, "mistery island", BigDecimal.ONE);
         List<Game> games = new ArrayList<>();
@@ -39,7 +39,7 @@ class GameServiceIntegrationTest {
     }
 
     @Test
-    void buyGame_Fail_PriceIsHigherThanBalance_CheckIfTheBalanceIsTheSameAsBeforeTheIntent() {
+    void buyGame_Fail_PriceIsHigherThanBalance_BalanceUnchanged() {
         GameRepository repository = new GameRepository();
         repository.createAll(SampleData.GAMES);
         GameService gameService = new GameService(repository);
@@ -75,13 +75,13 @@ class GameServiceIntegrationTest {
         GameRepository repository = new GameRepository();
         repository.createAll(SampleData.GAMES);
         GameService gameService = new GameService(repository);
-        int gameId = repository.getAll().size();
-        Game game = repository.getAll().get(gameId - 1);
+
+        Game game = repository.getAll().get(0);
 
         User user = new User(1, "", SampleData.TIERS.get(1), game.getPrice());
         user.addGame(game);
 
-        assertFalse(gameService.buyGame(gameId, user));
+        assertFalse(gameService.buyGame(game.getId(), user));
     }
 
     @Test
@@ -95,8 +95,7 @@ class GameServiceIntegrationTest {
     void findById_Success_TheRightGameIsFound() {
         GameRepository repository = new GameRepository();
         Game gameToSearch = new Game(null, "mistery island", BigDecimal.ONE);
-        List<Game> games = new ArrayList<>();
-        games.add(gameToSearch);
+        List<Game> games = List.of(gameToSearch);
         repository.createAll(games);
         GameService gameService = new GameService(repository);
 

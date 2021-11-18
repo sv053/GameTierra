@@ -8,12 +8,17 @@ import java.util.stream.Collectors;
 
 public class UserRepository implements Repository<User, Integer> {
 
-    private List<User> users;
-    private Map<Integer, User> allUsersById;
+    private final List<User> users;
+    private final Map<Integer, User> allUsersById;
 
     public UserRepository() {
         users = new ArrayList<>();
         allUsersById = new HashMap<>();
+    }
+
+    @Override
+    public Optional<User> findById(Integer id) {
+        return Optional.ofNullable(allUsersById.get(id));
     }
 
     @Override
@@ -33,11 +38,6 @@ public class UserRepository implements Repository<User, Integer> {
                         Collectors.toMap(User::getId, Function.identity(),
                                 (oldValue, newValue) -> (newValue)));
         allUsersById.putAll(mapForNewUsers);
-    }
-
-    @Override
-    public Optional<User> findById(Integer id) {
-        return Optional.ofNullable(allUsersById.get(id));
     }
 }
 

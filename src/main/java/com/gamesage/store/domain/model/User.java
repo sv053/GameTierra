@@ -8,10 +8,10 @@ import java.util.Set;
 
 public class User {
 
-    private Set<Game> games;
-    private String login;
+    private final Set<Game> games;
+    private final String login;
     private Integer id;
-    private Tier tier;
+    private final Tier tier;
     private BigDecimal balance;
 
     public User(Integer id, String login, Tier tier, BigDecimal balance) {
@@ -75,8 +75,7 @@ public class User {
 
         User user = (User) o;
 
-        if (!Objects.equals(login, user.login)) return false;
-        return id != null ? id.equals(user.id) : user.id == null;
+        return Objects.equals(login, user.login) && Objects.equals(id, user.id);
     }
 
     @Override

@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 public class GameService {
 
-    private Repository<Game, Integer> repository;
+    private final Repository<Game, Integer> repository;
 
     public GameService(Repository<Game, Integer> repository) {
         this.repository = repository;

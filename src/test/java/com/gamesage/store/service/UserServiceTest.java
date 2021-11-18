@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 class UserServiceTest {
 
     private UserRepository repository = mock(UserRepository.class);
+    private UserService userService = new UserService(repository);
 
     @Test
     void findByLogin_Success_RightUserIsFound() {
@@ -22,8 +23,6 @@ class UserServiceTest {
 
         when(repository.findById(userId)).thenReturn(Optional.of(user));
 
-        UserService userService = new UserService(repository);
-
         assertEquals(user, userService.findById(userId));
     }
 
@@ -31,8 +30,6 @@ class UserServiceTest {
     void findByLogin_Fail_UserNotFound_Exception() {
         Integer userId = 2;
         when(repository.findById(userId)).thenReturn(Optional.empty());
-
-        UserService userService = new UserService(repository);
 
         assertThrows(IllegalArgumentException.class, () -> userService.findById(userId));
     }

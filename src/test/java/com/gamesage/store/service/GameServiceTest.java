@@ -17,14 +17,13 @@ import static org.mockito.Mockito.when;
 class GameServiceTest {
 
     private GameRepository repository = mock(GameRepository.class);
+    private GameService gameService = new GameService(repository);
 
     @Test
-    void buyGame_Success_MethodReturnsTrue() {
+    void buyGame_Success_ReturnsTrue() {
         int gameId = 1;
         Game game = new Game(gameId, "lago", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
-
-        GameService gameService = new GameService(repository);
 
         User user = new User(1, null, new Tier("", 18), BigDecimal.TEN);
 
@@ -32,12 +31,10 @@ class GameServiceTest {
     }
 
     @Test
-    void buyGame_Success_CheckCorrectComputingOfTheNewBalance() {
+    void buyGame_Success_BalanceUpdated() {
         int gameId = 1;
         Game game = new Game(gameId, "mar", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
-
-        GameService gameService = new GameService(repository);
 
         BigDecimal initBalance = BigDecimal.valueOf(156.82);
         User user = new User(1, "", new Tier("", 18), initBalance);
@@ -53,12 +50,10 @@ class GameServiceTest {
     }
 
     @Test
-    void buyGame_Fail_WhenPriceIsHigherThanBalance_CheckIfTheBalanceIsTheSameAsBeforeTheIntent() {
+    void buyGame_Fail_WhenPriceIsHigherThanBalance_BalanceUnchanged() {
         int gameId = 1;
         Game game = new Game(gameId, "addedGame", BigDecimal.TEN);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
-
-        GameService gameService = new GameService(repository);
 
         BigDecimal initBalance = BigDecimal.ONE;
         User user = new User(1, "lark", new Tier("", 15), initBalance);
@@ -74,8 +69,6 @@ class GameServiceTest {
         Game game = new Game(gameId, "rio", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
-        GameService gameService = new GameService(repository);
-
         User user = new User(null, "", new Tier(null, .0), BigDecimal.ZERO);
 
         assertFalse(gameService.buyGame(gameId, user));
@@ -86,8 +79,6 @@ class GameServiceTest {
         int gameId = 1;
         Game game = new Game(gameId, "isla", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
-
-        GameService gameService = new GameService(repository);
 
         User user = new User(5, null, null, BigDecimal.TEN);
         user.addGame(game);
@@ -101,8 +92,6 @@ class GameServiceTest {
         Game game = new Game(gameId, "fabula", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
-        GameService gameService = new GameService(repository);
-
         assertEquals(game, gameService.findById(gameId));
     }
 
@@ -110,24 +99,15 @@ class GameServiceTest {
     void findById_Fail_TheGameIsNotFound_Exception() {
         int gameId = 1;
         when(repository.findById(gameId)).thenReturn(Optional.empty());
-        GameService gameService = new GameService(repository);
 
-        assertThrows(IllegalArgumentException.class, () -> gameService.findById(gameId));
-        try {
-            gameService.findById(gameId);
-        } catch (IllegalArgumentException e) {
-            assertEquals("Game with id " + gameId + " not found",
-                    e.getMessage());
-            return;
-        }
-        fail("Expected validation exception was not thrown");
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> gameService.findById(gameId));
+        assertEquals("Game with id 1 not found", e.getMessage());
     }
 
     @Test
-    void calculateCashback_Success_CheckCorrectComputingOfTheCashback() {
+    void calculateCashback_Success_CheckCashback() {
         GameRepository repository = mock(GameRepository.class);
         Game game = new Game(1, "fabula", BigDecimal.ONE);
-        GameService gameService = new GameService(repository);
 
         User user = new User(7, "marvel", new Tier("", 5.), BigDecimal.TEN);
 
