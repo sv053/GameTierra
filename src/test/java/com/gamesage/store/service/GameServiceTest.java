@@ -16,8 +16,8 @@ import static org.mockito.Mockito.when;
 
 class GameServiceTest {
 
-    private GameRepository repository = mock(GameRepository.class);
-    private GameService gameService = new GameService(repository);
+    private final GameRepository repository = mock(GameRepository.class);
+    private final GameService gameService = new GameService(repository);
 
     @Test
     void buyGame_Success_ReturnsTrue() {
@@ -106,7 +106,6 @@ class GameServiceTest {
 
     @Test
     void calculateCashback_Success_CheckCashback() {
-        GameRepository repository = mock(GameRepository.class);
         Game game = new Game(1, "fabula", BigDecimal.ONE);
 
         User user = new User(7, "marvel", new Tier("", 5.), BigDecimal.TEN);

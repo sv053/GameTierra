@@ -4,7 +4,7 @@ package com.gamesage.store.domain.model;
 public class Tier {
 
     private final String level;
-    private double cashbackPercentage;
+    private final double cashbackPercentage;
 
     public Tier(String level, double cashbackPercentage) {
         this.level = level;

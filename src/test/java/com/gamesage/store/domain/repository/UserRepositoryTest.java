@@ -25,7 +25,6 @@ class UserRepositoryTest {
         repository.createAll(users);
         Optional<User> foundUser = repository.findById(user.getId());
 
-        assertTrue(foundUser.isPresent());
         assertEquals(Optional.of(user), foundUser);
     }
 

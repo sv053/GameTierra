@@ -8,9 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,8 +18,7 @@ class GameServiceIntegrationTest {
     void buyGame_Success_BalanceUpdated() {
         GameRepository repository = new GameRepository();
         Game game = new Game(null, "mistery island", BigDecimal.ONE);
-        List<Game> games = new ArrayList<>();
-        games.add(game);
+        List<Game> games = List.of(game);
         repository.createAll(games);
         GameService gameService = new GameService(repository);
 
@@ -41,33 +38,28 @@ class GameServiceIntegrationTest {
     @Test
     void buyGame_Fail_PriceIsHigherThanBalance_BalanceUnchanged() {
         GameRepository repository = new GameRepository();
-        repository.createAll(SampleData.GAMES);
+        Game game = new Game(null, BigDecimal.ONE);
+        repository.createAll(List.of(game));
         GameService gameService = new GameService(repository);
 
-        BigDecimal initBalance = BigDecimal.valueOf(156.82);
+        BigDecimal initBalance = BigDecimal.ZERO;
         User user = new User(1, "lark", SampleData.TIERS.get(1), initBalance);
 
-        Optional<Game> findGameResult = repository.getAll().stream()
-                .filter(g -> g.getPrice().compareTo(initBalance) > 0).findFirst();
-        if (findGameResult.isPresent()) {
-            gameService.buyGame(findGameResult.get().getId(), user);
-        }
+        gameService.buyGame(game.getId(), user);
+
         assertEquals(initBalance, user.getBalance());
     }
 
     @Test
     void buyGame_Success_ReturnsTrue() {
-        BigDecimal initBalance = BigDecimal.valueOf(156.82);
-        User user = new User(1, "", SampleData.TIERS.get(1), initBalance);
-
         GameRepository repository = new GameRepository();
-        repository.createAll(SampleData.GAMES);
+        Game game = SampleData.GAMES.get(0);
+        repository.createAll(List.of(game));
         GameService gameService = new GameService(repository);
-        Optional<Game> game = repository.getAll().stream().findFirst();
 
-        if (game.isPresent()) {
-            assertTrue(gameService.buyGame(game.get().getId(), user));
-        }
+        User user = new User(1, "", SampleData.TIERS.get(1), game.getPrice());
+
+        assertTrue(gameService.buyGame(game.getId(), user));
     }
 
     @Test
@@ -95,8 +87,7 @@ class GameServiceIntegrationTest {
     void findById_Success_TheRightGameIsFound() {
         GameRepository repository = new GameRepository();
         Game gameToSearch = new Game(null, "mistery island", BigDecimal.ONE);
-        List<Game> games = List.of(gameToSearch);
-        repository.createAll(games);
+        repository.createAll(List.of(gameToSearch));
         GameService gameService = new GameService(repository);
 
         assertEquals(gameToSearch, gameService.findById(gameToSearch.getId()));

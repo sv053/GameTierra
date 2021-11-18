@@ -13,8 +13,8 @@ import static org.mockito.Mockito.when;
 
 class UserServiceTest {
 
-    private UserRepository repository = mock(UserRepository.class);
-    private UserService userService = new UserService(repository);
+    private final UserRepository repository = mock(UserRepository.class);
+    private final UserService userService = new UserService(repository);
 
     @Test
     void findByLogin_Success_RightUserIsFound() {

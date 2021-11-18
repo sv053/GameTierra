@@ -28,7 +28,6 @@ class GameRepositoryTest {
         Game game = games.get(0);
         Optional<Game> foundGame = repository.findById(game.getId());
 
-        assertTrue(foundGame.isPresent());
         assertEquals(Optional.of(game), foundGame);
     }
 
