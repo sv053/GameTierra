@@ -5,19 +5,25 @@ import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.GameRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class GameServiceTest {
 
-    private final GameRepository repository = mock(GameRepository.class);
-    private final GameService gameService = new GameService(repository);
+    @Mock
+    GameRepository repository;
+    @InjectMocks
+    GameService gameService;
 
     @Test
     void buyGame_Success_ReturnsTrue() {
@@ -41,10 +47,8 @@ class GameServiceTest {
 
         gameService.buyGame(gameId, user);
 
-        BigDecimal cashback = game.getPrice().multiply(BigDecimal.valueOf
-                (user.getTier().getCashbackPercentage()));
-        BigDecimal expectedBalance = initBalance.subtract(game.getPrice()).add(cashback)
-                .setScale(2, RoundingMode.HALF_UP);
+        BigDecimal cashback = game.getPrice().multiply(BigDecimal.valueOf(user.getTier().getCashbackPercentage()));
+        BigDecimal expectedBalance = initBalance.subtract(game.getPrice()).add(cashback).setScale(2, RoundingMode.HALF_UP);
 
         assertEquals(expectedBalance, user.getBalance());
     }
