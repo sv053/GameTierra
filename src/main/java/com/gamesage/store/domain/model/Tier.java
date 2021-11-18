@@ -1,13 +1,14 @@
-package com.gamesage.store.model;
+package com.gamesage.store.domain.model;
 
 
 public class Tier {
+
     private final String level;
     private final double cashbackPercentage;
 
-    public Tier(String level, double cashback) {
+    public Tier(String level, double cashbackPercentage) {
         this.level = level;
-        this.cashbackPercentage = cashback;
+        this.cashbackPercentage = cashbackPercentage;
     }
 
     public String getLevel() {
@@ -15,7 +16,7 @@ public class Tier {
     }
 
     public double getCashbackPercentage() {
-        return cashbackPercentage;
+        return cashbackPercentage * .01;
     }
 }
 

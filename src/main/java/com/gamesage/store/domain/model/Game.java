@@ -1,26 +1,30 @@
-package com.gamesage.store.model;
+package com.gamesage.store.domain.model;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
 public class Game {
-    private static int idCounter = 1;
-    private final int id;
+
+    private Integer id;
     private final String name;
     private final BigDecimal price;
 
     public Game(String name, BigDecimal price) {
-        this(idCounter++, name, price);
+        this(null, name, price);
     }
 
-    public Game(int id, String name, BigDecimal price) {
+    public Game(Integer id, String name, BigDecimal price) {
         this.id = id;
         this.name = name;
         this.price = price;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public BigDecimal getPrice() {
@@ -36,13 +40,14 @@ public class Game {
         if (this == o) return true;
         if (!(o instanceof Game)) return false;
 
-        return id == ((Game) o).id &&
-                Objects.equals(name, ((Game) o).name);
+        Game game = (Game) o;
+        return Objects.equals(id, game.id) &&
+                Objects.equals(name, game.name);
     }
 
     @Override
     public int hashCode() {
-        int result = Integer.hashCode(id);
+        int result = id.hashCode();
         result = 31 * result + name.hashCode();
         return result;
     }
