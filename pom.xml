@@ -24,13 +24,14 @@
         <mockito-junit-jupiter.version>2.23.0</mockito-junit-jupiter.version>
         <spring-boot-starter-test.version>2.5.6</spring-boot-starter-test.version>
         <slf4j-api.version>1.8.0-beta4</slf4j-api.version>
+        <spring-context.version>5.3.13</spring-context.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>5.3.13</version>
+            <version>${spring-context.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
