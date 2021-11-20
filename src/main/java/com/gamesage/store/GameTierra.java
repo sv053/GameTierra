@@ -13,7 +13,7 @@ public class GameTierra {
     public static void main(String[] args) {
         ApplicationContext applicationContext = SpringApplication.run(GameTierra.class, args);
 
-        GameTierra.logger.error("Projects beans are: ");
+        GameTierra.logger.error("Project beans are: ");
 
         for (var s : applicationContext.getBeanDefinitionNames()) {
             GameTierra.logger.info(s);
