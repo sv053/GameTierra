@@ -2,6 +2,7 @@ package com.gamesage.store.domain.repository;
 
 import com.gamesage.store.domain.model.User;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +10,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SpringBootTest(classes = UserRepository.class)
 class UserRepositoryTest {
 
     @Test
@@ -32,10 +34,7 @@ class UserRepositoryTest {
     void createAll() {
         UserRepository repository = new UserRepository();
 
-        List<User> users = List.of(
-                new User(6, "addedUser1", null, null),
-                new User(7, "addedUser2", null, null)
-        );
+        List<User> users = List.of(new User(6, "addedUser1", null, null), new User(7, "addedUser2", null, null));
         repository.createAll(users);
 
         assertEquals(users.size(), repository.getAll().size());

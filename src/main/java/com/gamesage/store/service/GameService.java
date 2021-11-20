@@ -4,21 +4,25 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.Repository;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
+@Component
 public class GameService {
 
-    private final Repository<Game, Integer> repository;
+    //    private final Repository<Game, Integer> repository;
+    private Repository<Game, Integer> repository;
+
+    public GameService() {
+    }
 
     public GameService(Repository<Game, Integer> repository) {
         this.repository = repository;
     }
 
     public Game findById(int id) {
-        return repository.findById(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(String.format("Game with id %s not found", id)));
+        return repository.findById(id).orElseThrow(() -> new IllegalArgumentException(String.format("Game with id %s not found", id)));
     }
 
     public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {

@@ -1,13 +1,19 @@
 package com.gamesage.store.domain.model;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+@SpringBootTest(classes = GameTest.class)
 class GameTest {
+
+    Logger logger = Logger.getLogger(String.valueOf(GameTest.class));
+    Logger logger1 = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     @Test
     void testEquals_SameIdsSameNames() {

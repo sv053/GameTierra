@@ -5,6 +5,7 @@ import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.GameRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest(classes = GameService.class)
 class GameServiceIntegrationTest {
 
     @Test
@@ -27,10 +29,8 @@ class GameServiceIntegrationTest {
 
         gameService.buyGame(game.getId(), user);
 
-        BigDecimal cashback = game.getPrice().multiply(BigDecimal.valueOf
-                (user.getTier().getCashbackPercentage()));
-        BigDecimal expectedBalance = initBalance.subtract(game.getPrice()).add(cashback)
-                .setScale(2, RoundingMode.HALF_UP);
+        BigDecimal cashback = game.getPrice().multiply(BigDecimal.valueOf(user.getTier().getCashbackPercentage()));
+        BigDecimal expectedBalance = initBalance.subtract(game.getPrice()).add(cashback).setScale(2, RoundingMode.HALF_UP);
 
         assertEquals(expectedBalance, user.getBalance());
     }

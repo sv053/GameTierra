@@ -2,6 +2,7 @@ package com.gamesage.store.domain.repository;
 
 import com.gamesage.store.domain.model.Game;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +10,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SpringBootTest(classes = GameRepository.class)
 class GameRepositoryTest {
 
     @Test
@@ -20,10 +22,7 @@ class GameRepositoryTest {
     @Test
     void findGame_Success() {
         GameRepository repository = new GameRepository();
-        List<Game> games = List.of(
-                new Game("addedGame1", null),
-                new Game("addedGame2", null)
-        );
+        List<Game> games = List.of(new Game("addedGame1", null), new Game("addedGame2", null));
         repository.createAll(games);
         Game game = games.get(0);
         Optional<Game> foundGame = repository.findById(game.getId());
@@ -35,10 +34,7 @@ class GameRepositoryTest {
     void createAll() {
         GameRepository repository = new GameRepository();
 
-        List<Game> games = List.of(
-                new Game("addedGame1", null),
-                new Game("addedGame2", null)
-        );
+        List<Game> games = List.of(new Game("addedGame1", null), new Game("addedGame2", null));
         repository.createAll(games);
 
         assertEquals(games.size(), repository.getAll().size());

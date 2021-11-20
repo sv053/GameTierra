@@ -1,13 +1,19 @@
 package com.gamesage.store.domain.model;
 
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.util.Objects;
 
+@Component
 public class Game {
 
     private Integer id;
-    private final String name;
-    private final BigDecimal price;
+    private String name;
+    private BigDecimal price;
+
+    public Game() {
+    }
 
     public Game(String name, BigDecimal price) {
         this(null, name, price);
@@ -41,8 +47,7 @@ public class Game {
         if (!(o instanceof Game)) return false;
 
         Game game = (Game) o;
-        return Objects.equals(id, game.id) &&
-                Objects.equals(name, game.name);
+        return Objects.equals(id, game.id) && Objects.equals(name, game.name);
     }
 
     @Override
@@ -54,11 +59,7 @@ public class Game {
 
     @Override
     public String toString() {
-        return "Game{" +
-                "id='" + id + '\'' +
-                "name='" + name + '\'' +
-                ", price=$" + price +
-                '}' + '\n';
+        return "Game{" + "id='" + id + '\'' + "name='" + name + '\'' + ", price=$" + price + '}' + '\n';
     }
 }
 

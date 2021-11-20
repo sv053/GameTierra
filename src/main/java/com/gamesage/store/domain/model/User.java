@@ -1,18 +1,24 @@
 package com.gamesage.store.domain.model;
 
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+@Component
 public class User {
 
-    private final Set<Game> games;
-    private final String login;
+    private Set<Game> games;
+    private String login;
     private Integer id;
-    private final Tier tier;
+    private Tier tier;
     private BigDecimal balance;
+
+    public User() {
+    }
 
     public User(Integer id, String login, Tier tier, BigDecimal balance) {
         this.id = id;
@@ -87,12 +93,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                " tier=" + tier.getLevel() +
-                ", cashback=" + tier.getCashbackPercentage() * 100 + "%" +
-                ", balance=$" + balance +
-                ", games=\\n" + getGames() +
-                '}';
+        return "User{" + " tier=" + tier.getLevel() + ", cashback=" + tier.getCashbackPercentage() * 100 + "%" + ", balance=$" + balance + ", games=\\n" + getGames() + '}';
     }
 }
 
