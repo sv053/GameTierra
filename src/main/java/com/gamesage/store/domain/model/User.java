@@ -8,17 +8,11 @@ import java.util.Set;
 
 public class User {
 
-    private Set<Game> games;
+    private final Set<Game> games;
     private final String login;
     private Integer id;
     private final Tier tier;
     private BigDecimal balance;
-
-    public User() {
-        login = "";
-        tier = null;
-    }
-
 
     public User(Integer id, String login, Tier tier, BigDecimal balance) {
         this.id = id;
@@ -93,7 +87,11 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" + " tier=" + tier.getLevel() + ", cashback=" + tier.getCashbackPercentage() * 100 + "%" + ", balance=$" + balance + ", games=\\n" + getGames() + '}';
+        return "User{" + " tier=" + tier.getLevel()
+                + ", cashback=" + tier.getCashbackPercentage() * 100 + "%"
+                + ", balance=$" + balance
+                + ", games=\\n" + getGames()
+                + '}';
     }
 }
 

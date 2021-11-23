@@ -9,10 +9,6 @@ public class Game {
     private final String name;
     private BigDecimal price;
 
-    public Game() {
-        name = "";
-    }
-
     public Game(String name, BigDecimal price) {
         this(null, name, price);
     }
@@ -57,7 +53,10 @@ public class Game {
 
     @Override
     public String toString() {
-        return "Game{" + "id='" + id + '\'' + "name='" + name + '\'' + ", price=$" + price + '}' + '\n';
+        return "Game{" + "id='" + id
+                + '\'' + "name='" + name
+                + '\'' + ", price=$" + price
+                + '}' + '\n';
     }
 }
 
