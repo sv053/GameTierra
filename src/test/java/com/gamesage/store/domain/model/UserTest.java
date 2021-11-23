@@ -2,13 +2,11 @@ package com.gamesage.store.domain.model;
 
 import com.gamesage.store.domain.data.sample.SampleData;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(classes = UserTest.class)
 class UserTest {
 
     @Test

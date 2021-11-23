@@ -18,37 +18,28 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <junit-jupiter.version>5.7.2</junit-jupiter.version>
         <surefire.version>3.0.0-M5</surefire.version>
-        <mockito-core.version>4.0.0</mockito-core.version>
-        <mockito-junit-jupiter.version>2.23.0</mockito-junit-jupiter.version>
         <spring-boot-starter-test.version>2.5.6</spring-boot-starter-test.version>
+        <spring-boot-starter.version>2.6.0</spring-boot-starter.version>
         <slf4j-api.version>1.8.0-beta4</slf4j-api.version>
         <spring-context.version>5.3.13</spring-context.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring-context.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
+            <artifactId>spring-boot-starter</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
             </exclusions>
-            <version>${spring-boot-starter-test.version}</version>
-            <scope>test</scope>
+            <version>${spring-boot-starter.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
-            <version>${spring-boot-starter-test.version}</version>
+            <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -61,15 +52,8 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot-starter-test.version}</version>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
     </build>
 
 </project>

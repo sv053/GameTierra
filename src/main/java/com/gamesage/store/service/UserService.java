@@ -1,16 +1,18 @@
 package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.Repository;
+import com.gamesage.store.domain.repository.IRepository;
+import com.gamesage.store.domain.repository.UserRepository;
 
+//@Service
 public class UserService {
-    //    private final Repository<User, Integer> repository;
-    private Repository<User, Integer> repository;
+    private final IRepository<User, Integer> repository;
 
     public UserService() {
+        repository = new UserRepository();
     }
 
-    public UserService(Repository<User, Integer> repository) {
+    public UserService(IRepository<User, Integer> repository) {
         this.repository = repository;
     }
 

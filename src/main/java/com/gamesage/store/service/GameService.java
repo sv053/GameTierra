@@ -3,21 +3,20 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.Repository;
-import org.springframework.stereotype.Component;
+import com.gamesage.store.domain.repository.GameRepository;
+import com.gamesage.store.domain.repository.IRepository;
 
 import java.math.BigDecimal;
 
-@Component
 public class GameService {
 
-    //    private final Repository<Game, Integer> repository;
-    private Repository<Game, Integer> repository;
+    private final IRepository<Game, Integer> repository;
 
     public GameService() {
+        repository = new GameRepository();
     }
 
-    public GameService(Repository<Game, Integer> repository) {
+    public GameService(IRepository<Game, Integer> repository) {
         this.repository = repository;
     }
 

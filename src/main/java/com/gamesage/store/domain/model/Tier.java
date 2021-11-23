@@ -1,14 +1,14 @@
 package com.gamesage.store.domain.model;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class Tier {
 
-    private String level;
-    private double cashbackPercentage;
+    private final String level;
+    private final double cashbackPercentage;
 
     public Tier() {
+
+        level = "";
+        cashbackPercentage = .0d;
     }
 
     public Tier(String level, double cashbackPercentage) {

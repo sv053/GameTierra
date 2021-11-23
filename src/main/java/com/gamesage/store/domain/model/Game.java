@@ -1,18 +1,16 @@
 package com.gamesage.store.domain.model;
 
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.util.Objects;
 
-@Component
 public class Game {
 
     private Integer id;
-    private String name;
+    private final String name;
     private BigDecimal price;
 
     public Game() {
+        name = "";
     }
 
     public Game(String name, BigDecimal price) {

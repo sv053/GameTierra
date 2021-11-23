@@ -1,24 +1,24 @@
 package com.gamesage.store.domain.model;
 
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-@Component
 public class User {
 
     private Set<Game> games;
-    private String login;
+    private final String login;
     private Integer id;
-    private Tier tier;
+    private final Tier tier;
     private BigDecimal balance;
 
     public User() {
+        login = "";
+        tier = null;
     }
+
 
     public User(Integer id, String login, Tier tier, BigDecimal balance) {
         this.id = id;
