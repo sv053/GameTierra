@@ -29,14 +29,12 @@ class GameServiceIntegrationTest {
 
         gameService.buyGame(game.getId(), user);
 
-        BigDecimal cashback =
-                game.getPrice()
-                        .multiply(BigDecimal.valueOf(user.getTier().getCashbackPercentage()));
-        BigDecimal expectedBalance =
-                initBalance
-                        .subtract(game.getPrice())
-                        .add(cashback)
-                        .setScale(2, RoundingMode.HALF_UP);
+        BigDecimal cashback = game.getPrice()
+                .multiply(BigDecimal.valueOf(user.getTier().getCashbackPercentage()));
+        BigDecimal expectedBalance = initBalance
+                .subtract(game.getPrice())
+                .add(cashback)
+                .setScale(2, RoundingMode.HALF_UP);
 
         assertEquals(expectedBalance, user.getBalance());
     }
