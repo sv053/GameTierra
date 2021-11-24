@@ -2,7 +2,6 @@ package com.gamesage.store.domain.repository;
 
 import com.gamesage.store.domain.model.User;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +9,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(classes = UserRepository.class)
 class UserRepositoryTest {
 
     @Test
@@ -21,9 +19,9 @@ class UserRepositoryTest {
 
     @Test
     void findUser_Success() {
-        UserRepository repository = new UserRepository();
         User user = new User(8, "thunder", null, null);
         List<User> users = List.of(user);
+        UserRepository repository = new UserRepository();
         repository.createAll(users);
         Optional<User> foundUser = repository.findById(user.getId());
 
@@ -32,9 +30,10 @@ class UserRepositoryTest {
 
     @Test
     void createAll() {
+        List<User> users = List.of(
+                new User(6, "addedUser1", null, null),
+                new User(7, "addedUser2", null, null));
         UserRepository repository = new UserRepository();
-
-        List<User> users = List.of(new User(6, "addedUser1", null, null), new User(7, "addedUser2", null, null));
         repository.createAll(users);
 
         assertEquals(users.size(), repository.getAll().size());

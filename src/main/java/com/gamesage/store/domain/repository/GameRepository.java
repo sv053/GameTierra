@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class GameRepository implements IRepository<Game, Integer> {
+public class GameRepository implements Repository<Game, Integer> {
 
     private final List<Game> games;
     private int gameIdCounter = 1;

@@ -46,8 +46,11 @@ class GameServiceTest {
 
         gameService.buyGame(gameId, user);
 
-        BigDecimal cashback = game.getPrice().multiply(BigDecimal.valueOf(user.getTier().getCashbackPercentage()));
-        BigDecimal expectedBalance = initBalance.subtract(game.getPrice()).add(cashback).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal cashback = game.getPrice()
+                .multiply(BigDecimal.valueOf(user.getTier().getCashbackPercentage()));
+        BigDecimal expectedBalance = initBalance.subtract(game.getPrice())
+                .add(cashback)
+                .setScale(2, RoundingMode.HALF_UP);
 
         assertEquals(expectedBalance, user.getBalance());
     }
@@ -103,7 +106,8 @@ class GameServiceTest {
         int gameId = 1;
         when(repository.findById(gameId)).thenReturn(Optional.empty());
 
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> gameService.findById(gameId));
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class, () -> gameService.findById(gameId));
         assertEquals("Game with id 1 not found", e.getMessage());
     }
 
