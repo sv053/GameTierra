@@ -48,7 +48,8 @@ class GameServiceTest {
 
         BigDecimal cashback = game.getPrice()
                 .multiply(BigDecimal.valueOf(user.getTier().getCashbackPercentage()));
-        BigDecimal expectedBalance = initBalance.subtract(game.getPrice())
+        BigDecimal expectedBalance = initBalance
+                .subtract(game.getPrice())
                 .add(cashback)
                 .setScale(2, RoundingMode.HALF_UP);
 
