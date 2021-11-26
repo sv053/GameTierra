@@ -5,8 +5,11 @@ import com.gamesage.store.domain.model.Game;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Repository;
 
-public class GameRepository implements Repository<Game, Integer> {
+
+@Repository
+public class GameRepository implements CustomRepository<Game, Integer> {
 
     private final List<Game> games;
     private int gameIdCounter = 1;

@@ -3,8 +3,8 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.GameRepository;
-import com.gamesage.store.domain.repository.Repository;
+import com.gamesage.store.domain.repository.CustomRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -12,18 +12,17 @@ import java.math.BigDecimal;
 @Service
 public class GameService {
 
-    private final Repository<Game, Integer> repository;
+    @Autowired
+    CustomRepository<Game, Integer> customRepository;
 
-    public GameService() {
-        repository = new GameRepository();
-    }
+    public GameService(){}
 
-    public GameService(Repository<Game, Integer> repository) {
-        this.repository = repository;
+    public GameService(CustomRepository<Game, Integer> customRepository) {
+        this.customRepository = customRepository;
     }
 
     public Game findById(int id) {
-        return repository
+        return customRepository
                 .findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Game with id %s not found", id)));
     }

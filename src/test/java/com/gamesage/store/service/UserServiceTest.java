@@ -3,8 +3,10 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
@@ -13,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = UserService.class)
+@ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
     @Mock

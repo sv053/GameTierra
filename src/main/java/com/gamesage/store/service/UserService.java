@@ -1,24 +1,22 @@
 package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.Repository;
-import com.gamesage.store.domain.repository.UserRepository;
+import com.gamesage.store.domain.repository.CustomRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
-    private final Repository<User, Integer> repository;
 
-    public UserService() {
-        repository = new UserRepository();
-    }
+    @Autowired
+    private CustomRepository<User, Integer> customRepository;
 
-    public UserService(Repository<User, Integer> repository) {
-        this.repository = repository;
+    public UserService(CustomRepository<User, Integer> customRepository) {
+        this.customRepository = customRepository;
     }
 
     public User findById(Integer id) {
-        return repository
+        return customRepository
                 .findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("User with login %s is not found", id)));
     }

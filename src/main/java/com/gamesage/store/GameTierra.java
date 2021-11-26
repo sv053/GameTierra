@@ -11,7 +11,7 @@ public class GameTierra {
     private static final Logger logger = LoggerFactory.getLogger(GameTierra.class);
 
     public static void main(String[] args) {
-        ApplicationContext applicationContext = SpringApplication.run(GameTierra.class, null);
+        ApplicationContext applicationContext = SpringApplication.run(GameTierra.class, args);
 
         GameTierra.logger.info("Project beans are: ");
 

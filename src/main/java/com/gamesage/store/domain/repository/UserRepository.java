@@ -1,12 +1,14 @@
 package com.gamesage.store.domain.repository;
 
 import com.gamesage.store.domain.model.User;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class UserRepository implements Repository<User, Integer> {
+@Repository
+public class UserRepository implements CustomRepository<User, Integer> {
 
     private final List<User> users;
     private final Map<Integer, User> allUsersById;

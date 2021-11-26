@@ -2,7 +2,6 @@ package com.gamesage.store.domain.repository;
 
 import com.gamesage.store.domain.model.Game;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,8 +9,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(classes = GameRepository.class)
-class GameRepositoryTest {
+//@SpringBootTest(classes = GameRepository.class)
+class GameCustomRepositoryTest {
 
     @Test
     void findGame_NotFound() {

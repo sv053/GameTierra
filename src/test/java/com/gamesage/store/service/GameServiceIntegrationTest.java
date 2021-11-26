@@ -5,7 +5,9 @@ import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.GameRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -14,10 +16,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = GameService.class)
+//@ContextConfiguration(locations = {"classpath*:spring/GameTierra.java"})
 class GameServiceIntegrationTest {
+
+    @Autowired
+    GameRepository repository;
 
     @Test
     void buyGame_Success_BalanceUpdated() {
+
         GameRepository repository = new GameRepository();
         Game game = new Game(null, "mistery island", BigDecimal.ONE);
         List<Game> games = List.of(game);
