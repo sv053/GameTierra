@@ -7,7 +7,7 @@ public class Game {
 
     private Integer id;
     private final String name;
-    private BigDecimal price;
+    private final BigDecimal price;
 
     public Game(String name, BigDecimal price) {
         this(null, name, price);

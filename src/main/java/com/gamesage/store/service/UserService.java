@@ -7,8 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-
-    private Repository<User, Integer> repository;
+    private final Repository<User, Integer> repository;
 
     public UserService(Repository<User, Integer> repository) {
         this.repository = repository;
