@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-    @Autowired
+
     private Repository<User, Integer> repository;
 
     public UserService(Repository<User, Integer> repository) {

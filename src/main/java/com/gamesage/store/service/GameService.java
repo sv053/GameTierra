@@ -13,11 +13,7 @@ import java.math.BigDecimal;
 @Service
 public class GameService {
 
-    private Repository<Game, Integer> repository;
-
-    public GameService(){
-        repository = new GameRepository();
-    }
+    private final Repository<Game, Integer> repository;
 
     public GameService(Repository<Game, Integer> repository) {
         this.repository = repository;
