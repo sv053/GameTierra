@@ -2,7 +2,6 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.Repository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
