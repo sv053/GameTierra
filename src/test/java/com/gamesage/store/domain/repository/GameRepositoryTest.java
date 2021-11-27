@@ -9,8 +9,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-//@SpringBootTest(classes = GameRepository.class)
-class GameCustomRepositoryTest {
+class GameRepositoryTest {
 
     @Test
     void findGame_NotFound() {

@@ -5,9 +5,9 @@ import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.GameRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -15,8 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(classes = GameService.class)
-//@ContextConfiguration(locations = {"classpath*:spring/GameTierra.java"})
+@ExtendWith(MockitoExtension.class)
 class GameServiceIntegrationTest {
 
     @Autowired
@@ -25,7 +24,6 @@ class GameServiceIntegrationTest {
     @Test
     void buyGame_Success_BalanceUpdated() {
 
-        GameRepository repository = new GameRepository();
         Game game = new Game(null, "mistery island", BigDecimal.ONE);
         List<Game> games = List.of(game);
         repository.createAll(games);
@@ -48,7 +46,6 @@ class GameServiceIntegrationTest {
 
     @Test
     void buyGame_Fail_PriceIsHigherThanBalance_BalanceUnchanged() {
-        GameRepository repository = new GameRepository();
         Game game = new Game(null, BigDecimal.ONE);
         repository.createAll(List.of(game));
         GameService gameService = new GameService(repository);
@@ -63,7 +60,6 @@ class GameServiceIntegrationTest {
 
     @Test
     void buyGame_Success_ReturnsTrue() {
-        GameRepository repository = new GameRepository();
         Game game = SampleData.GAMES.get(0);
         repository.createAll(List.of(game));
         GameService gameService = new GameService(repository);
@@ -75,7 +71,6 @@ class GameServiceIntegrationTest {
 
     @Test
     void buyGame_Fail_CannotBuyAlreadyOwned_ReturnsFalse() {
-        GameRepository repository = new GameRepository();
         repository.createAll(SampleData.GAMES);
         GameService gameService = new GameService(repository);
 
@@ -89,14 +84,12 @@ class GameServiceIntegrationTest {
 
     @Test
     void findById_Fail_TheGameIsNotFound_Exception() {
-        GameRepository repository = new GameRepository();
         GameService gameService = new GameService(repository);
         assertThrows(IllegalArgumentException.class, () -> gameService.findById(1213313));
     }
 
     @Test
     void findById_Success_TheRightGameIsFound() {
-        GameRepository repository = new GameRepository();
         Game gameToSearch = new Game(null, "mistery island", BigDecimal.ONE);
         repository.createAll(List.of(gameToSearch));
         GameService gameService = new GameService(repository);
