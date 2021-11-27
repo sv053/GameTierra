@@ -13,12 +13,12 @@ public class GameTierra {
     public static void main(String[] args) {
         ApplicationContext applicationContext = SpringApplication.run(GameTierra.class, args);
 
-        GameTierra.logger.info("Project beans are: ");
+        logger.info("Project beans are: ");
 
         for (var s : applicationContext.getBeanDefinitionNames()) {
-            GameTierra.logger.info(s);
+            logger.info(s);
         }
-        GameTierra.logger.info("That's it");
+        logger.info("That's it");
     }
 }
 
