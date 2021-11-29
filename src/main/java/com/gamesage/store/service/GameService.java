@@ -7,6 +7,7 @@ import com.gamesage.store.domain.repository.Repository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class GameService {
@@ -21,6 +22,13 @@ public class GameService {
         return repository
                 .findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Game with id %s not found", id)));
+    }
+
+    public List<Game> findAll(List<Game> games){
+        if(!repository.getAll().contains(games.get(0))){
+            repository.createAll(games);
+        }
+        return repository.getAll();
     }
 
     public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
