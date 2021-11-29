@@ -41,8 +41,7 @@ public class Game {
         if (!(o instanceof Game)) return false;
 
         Game game = (Game) o;
-        return Objects.equals(id, game.id) &&
-                Objects.equals(name, game.name);
+        return Objects.equals(id, game.id) && Objects.equals(name, game.name);
     }
 
     @Override
@@ -54,11 +53,10 @@ public class Game {
 
     @Override
     public String toString() {
-        return "Game{" +
-                "id='" + id + '\'' +
-                "name='" + name + '\'' +
-                ", price=$" + price +
-                '}' + '\n';
+        return "Game{" + "id='" + id
+                + '\'' + "name='" + name
+                + '\'' + ", price=$" + price
+                + '}' + '\n';
     }
 }
 

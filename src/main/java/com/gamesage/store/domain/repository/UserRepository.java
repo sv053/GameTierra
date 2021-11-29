@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@org.springframework.stereotype.Repository
 public class UserRepository implements Repository<User, Integer> {
 
     private final List<User> users;

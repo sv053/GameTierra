@@ -1,6 +1,5 @@
 package com.gamesage.store.domain.model;
 
-
 public class Tier {
 
     private final String level;
