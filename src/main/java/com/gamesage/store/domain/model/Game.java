@@ -9,10 +9,6 @@ public class Game {
     private final String name;
     private final BigDecimal price;
 
-    public Game(String name, BigDecimal price) {
-        this(null, name, price);
-    }
-
     public Game(Integer id, String name, BigDecimal price) {
         this.id = id;
         this.name = name;

@@ -1,6 +1,5 @@
 package com.gamesage.store.domain.repository;
 
-import com.gamesage.store.domain.data.sample.SampleData;
 import com.gamesage.store.domain.model.User;
 
 import java.util.*;
@@ -26,6 +25,11 @@ public class UserRepository implements Repository<User, Integer> {
     @Override
     public List<User> getAll() {
         return users;
+    }
+
+    public void createUser(User user){
+        users.add(user);
+        addUsersToMap(List.of(user));
     }
 
     @Override

@@ -2,37 +2,55 @@ package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.data.sample.SampleData;
 import com.gamesage.store.domain.model.Game;
-import com.gamesage.store.service.GameService;
+import com.gamesage.store.domain.repository.GameRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/games")
 public class GameController {
 
-    private final GameService gameService;
+    private final GameRepository gameRepository;
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public GameController(GameService gameService) {
-        this.gameService = gameService;
+    public GameController(GameRepository gameRepository) {
+        this.gameRepository = gameRepository;
     }
 
-    @GetMapping("/findGame")
+    @PostMapping("/createGames")
+    public List<Game> createGames(@RequestBody List<Game> gamesToSave){
+        gameRepository.createAll(gamesToSave);
+        gamesToSave.stream().forEach(u -> logger.info(u.toString()));
+        return gamesToSave;
+    }
+
+    @PostMapping("/createGame")
+    public Game createGame(@RequestBody Game gameToSave){
+        gameRepository.createAll(List.of(gameToSave));
+        logger.info("game "+ gameToSave+ " was added to list");
+        return gameToSave;
+    }
+
+    @PostMapping("/findGame")
     public Game findGameById(@RequestParam Integer id) {
-        gameService.findAll(SampleData.GAMES);
-        Game game = gameService.findById(id);
-        logger.info("Game is found: " + game);
-        return game;
+        Optional<Game> game = gameRepository.findById(id);
+        if(game.isPresent()){
+            logger.info("Game is found: " + game.get());
+        }else {
+            logger.error("Game with id "+ id + " is found: " );
+        }
+        return game.get();
     }
 
-    @GetMapping("/createGames")
-    public List<Game> createGames(){
-        List<Game> games = gameService.findAll(SampleData.GAMES);
+    @GetMapping("/findAllGames")
+    public List<Game> findGames(){
+        List<Game> games = gameRepository.getAll();
         games.stream().forEach(u -> logger.info(u.toString()));
-        return games;
+        return SampleData.GAMES;
     }
 }
 

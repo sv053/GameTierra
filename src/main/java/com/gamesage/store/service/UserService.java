@@ -1,6 +1,5 @@
 package com.gamesage.store.service;
 
-import com.gamesage.store.domain.data.sample.SampleData;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.Repository;
 import org.springframework.stereotype.Service;

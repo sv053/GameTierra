@@ -21,8 +21,8 @@ class GameRepositoryTest {
     void findGame_Success() {
         GameRepository repository = new GameRepository();
         List<Game> games = List.of(
-                new Game("addedGame1", null),
-                new Game("addedGame2", null));
+                new Game(null,"addedGame1", null),
+                new Game(null,"addedGame2", null));
         repository.createAll(games);
         Game game = games.get(0);
         Optional<Game> foundGame = repository.findById(game.getId());
@@ -35,8 +35,8 @@ class GameRepositoryTest {
         GameRepository repository = new GameRepository();
 
         List<Game> games = List.of(
-                new Game("addedGame1", null),
-                new Game("addedGame2", null));
+                new Game(null,"addedGame1", null),
+                new Game(null,"addedGame2", null));
         repository.createAll(games);
 
         assertEquals(games.size(), repository.getAll().size());

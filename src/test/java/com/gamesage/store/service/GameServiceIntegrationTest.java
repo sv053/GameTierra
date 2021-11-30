@@ -45,7 +45,7 @@ class GameServiceIntegrationTest {
 
     @Test
     void buyGame_Fail_PriceIsHigherThanBalance_BalanceUnchanged() {
-        Game game = new Game(null, BigDecimal.ONE);
+        Game game = new Game(null, null, BigDecimal.ONE);
         repository.createAll(List.of(game));
         GameService gameService = new GameService(repository);
 

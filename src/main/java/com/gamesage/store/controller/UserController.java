@@ -1,8 +1,7 @@
 package com.gamesage.store.controller;
 
-import com.gamesage.store.domain.data.sample.SampleData;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.service.UserService;
+import com.gamesage.store.domain.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -13,26 +12,33 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public UserController(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    @GetMapping("/findUser")
+    @PostMapping("/findUser")
     public User findUserById(@RequestParam Integer id) {
-        userService.findAll(SampleData.USERS);
-        User user = userService.findById(id);
+        User user = null;
+        if(userRepository.findById(id).isPresent()){
+            user = userRepository.findById(id).get();
+        }
         logger.info("User is found: " + user);
         return user;
     }
 
-    @GetMapping("/createUsers")
-    public List<User> createUsers(){
-        List<User> users = userService.findAll(SampleData.USERS);
-        users.stream().forEach(u -> logger.info(u.toString()));
-        return userService.findAll(SampleData.USERS);
+    @GetMapping("/findAllUsers")
+    public List<User> findAllUsers() {
+        logger.info("User is found: ");
+        return userRepository.getAll();
+    }
+
+    @PostMapping("/createUser")
+    public void createUser(@RequestBody User user){
+        userRepository.createUser(user);
+        logger.info("added" + user.toString());
     }
 }
 
