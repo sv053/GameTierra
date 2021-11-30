@@ -28,13 +28,6 @@ public class GameController {
         return gamesToSave;
     }
 
-    @PostMapping("/createGame")
-    public Game createGame(@RequestBody Game gameToSave){
-        gameRepository.createAll(List.of(gameToSave));
-        logger.info("game "+ gameToSave+ " was added to list");
-        return gameToSave;
-    }
-
     @PostMapping("/findGame")
     public Game findGameById(@RequestParam Integer id) {
         Optional<Game> game = gameRepository.findById(id);
@@ -50,7 +43,7 @@ public class GameController {
     public List<Game> findGames(){
         List<Game> games = gameRepository.getAll();
         games.stream().forEach(u -> logger.info(u.toString()));
-        return SampleData.GAMES;
+        return games;
     }
 }
 

@@ -31,8 +31,9 @@ public class UserController {
 
     @GetMapping("/findAllUsers")
     public List<User> findAllUsers() {
-        logger.info("User is found: ");
-        return userRepository.getAll();
+        List<User> users = userRepository.getAll();
+        users.stream().forEach(u -> logger.info(u.toString()));
+        return users;
     }
 
     @PostMapping("/createUser")
