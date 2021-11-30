@@ -1,7 +1,7 @@
 package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.UserRepository;
+import com.gamesage.store.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -12,34 +12,32 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserRepository userRepository;
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @PostMapping("/findUser")
-    public User findUserById(@RequestParam Integer id) {
-        User user = null;
-        if(userRepository.findById(id).isPresent()){
-            user = userRepository.findById(id).get();
-        }
-        logger.info("User is found: " + user);
+    @PostMapping("/read/{id}")
+    public User findUserById(@PathVariable Integer id) {
+        User user = userService.findById(id);
+        UserController.logger.info("User: " + user);
         return user;
     }
 
-    @GetMapping("/findAllUsers")
+    @GetMapping("/read")
     public List<User> findAllUsers() {
-        List<User> users = userRepository.getAll();
-        users.stream().forEach(u -> logger.info(u.toString()));
+        List<User> users = userService.findAll();
+        UserController.logger.info("There are " + users.size() + " users");
         return users;
     }
 
-    @PostMapping("/createUser")
-    public void createUser(@RequestBody User user){
-        userRepository.createUser(user);
-        logger.info("added" + user.toString());
+    @PostMapping("/createOne")
+    public User createUser(@RequestBody User user){
+        userService.createAll(List.of(user));
+        UserController.logger.info(user + " was added");
+        return user;
     }
 }
 

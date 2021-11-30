@@ -1,48 +1,42 @@
 package com.gamesage.store.controller;
 
-import com.gamesage.store.domain.data.sample.SampleData;
 import com.gamesage.store.domain.model.Game;
-import com.gamesage.store.domain.repository.GameRepository;
+import com.gamesage.store.service.GameService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/games")
 public class GameController {
 
-    private final GameRepository gameRepository;
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final GameService gameService;
+    private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
-    public GameController(GameRepository gameRepository) {
-        this.gameRepository = gameRepository;
+    public GameController(GameService gameService) {
+        this.gameService = gameService;
     }
 
-    @PostMapping("/createGames")
+    @PostMapping("/create")
     public List<Game> createGames(@RequestBody List<Game> gamesToSave){
-        gameRepository.createAll(gamesToSave);
-        gamesToSave.stream().forEach(u -> logger.info(u.toString()));
-        return gamesToSave;
+        gameService.createAll(gamesToSave);
+        GameController.logger.info(gamesToSave.size() + " games were added");
+        return gameService.findAll();
     }
 
-    @PostMapping("/findGame")
-    public Game findGameById(@RequestParam Integer id) {
-        Optional<Game> game = gameRepository.findById(id);
-        if(game.isPresent()){
-            logger.info("Game is found: " + game.get());
-        }else {
-            logger.error("Game with id "+ id + " is found: " );
-        }
-        return game.get();
+    @PostMapping("/read/{id}")
+    public Game findGameById(@PathVariable Integer id) {
+        Game game = gameService.findById(id);
+        GameController.logger.info("Game with id "+ id + " : " + game);
+        return game;
     }
 
-    @GetMapping("/findAllGames")
+    @GetMapping("/read")
     public List<Game> findGames(){
-        List<Game> games = gameRepository.getAll();
-        games.stream().forEach(u -> logger.info(u.toString()));
+        List<Game> games = gameService.findAll();
+        GameController.logger.info(games.size() + " games");
         return games;
     }
 }

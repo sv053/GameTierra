@@ -25,7 +25,7 @@ class GameServiceIntegrationTest {
 
         Game game = new Game(null, "mistery island", BigDecimal.ONE);
         List<Game> games = List.of(game);
-        repository.createAll(games);
+        repository.create(games);
         GameService gameService = new GameService(repository);
 
         BigDecimal initBalance = game.getPrice();
@@ -46,7 +46,7 @@ class GameServiceIntegrationTest {
     @Test
     void buyGame_Fail_PriceIsHigherThanBalance_BalanceUnchanged() {
         Game game = new Game(null, null, BigDecimal.ONE);
-        repository.createAll(List.of(game));
+        repository.create(List.of(game));
         GameService gameService = new GameService(repository);
 
         BigDecimal initBalance = BigDecimal.ZERO;
@@ -60,7 +60,7 @@ class GameServiceIntegrationTest {
     @Test
     void buyGame_Success_ReturnsTrue() {
         Game game = SampleData.GAMES.get(0);
-        repository.createAll(List.of(game));
+        repository.create(List.of(game));
         GameService gameService = new GameService(repository);
 
         User user = new User(1, "", SampleData.TIERS.get(1), game.getPrice());
@@ -70,10 +70,10 @@ class GameServiceIntegrationTest {
 
     @Test
     void buyGame_Fail_CannotBuyAlreadyOwned_ReturnsFalse() {
-        repository.createAll(SampleData.GAMES);
+        repository.create(SampleData.GAMES);
         GameService gameService = new GameService(repository);
 
-        Game game = repository.getAll().get(0);
+        Game game = repository.find().get(0);
 
         User user = new User(1, "", SampleData.TIERS.get(1), game.getPrice());
         user.addGame(game);
@@ -90,7 +90,7 @@ class GameServiceIntegrationTest {
     @Test
     void findById_Success_TheRightGameIsFound() {
         Game gameToSearch = new Game(null, "mistery island", BigDecimal.ONE);
-        repository.createAll(List.of(gameToSearch));
+        repository.create(List.of(gameToSearch));
         GameService gameService = new GameService(repository);
 
         assertEquals(gameToSearch, gameService.findById(gameToSearch.getId()));

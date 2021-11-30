@@ -1,13 +1,25 @@
 package com.gamesage.store.domain.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class Game {
+@JsonDeserialize(as = Game.class)
+public class Game{
 
     private Integer id;
     private final String name;
     private final BigDecimal price;
+
+    public Game(){
+        name = "";
+        price = null;
+    }
+
+    public Game(String name, BigDecimal price)  {
+        this(null, name, price);
+    }
 
     public Game(Integer id, String name, BigDecimal price) {
         this.id = id;

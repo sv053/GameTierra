@@ -1,5 +1,6 @@
 package com.gamesage.store.domain.repository;
 
+import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 
 import java.util.*;
@@ -11,6 +12,7 @@ public class UserRepository implements Repository<User, Integer> {
 
     private final List<User> users;
     private final Map<Integer, User> allUsersById;
+    private int idCounter = 1;
 
     public UserRepository() {
         users = new ArrayList<>();
@@ -23,19 +25,31 @@ public class UserRepository implements Repository<User, Integer> {
     }
 
     @Override
-    public List<User> getAll() {
+    public List<User> find() {
         return users;
     }
 
     public void createUser(User user){
-        users.add(user);
+        users.add(assignId(user));
         addUsersToMap(List.of(user));
     }
 
     @Override
-    public void createAll(List<User> usersToAdd) {
-        users.addAll(usersToAdd);
-        addUsersToMap(usersToAdd);
+    public List<User> create(List<User> usersToAdd){
+        List<User> usersToAddWithId = assignIdToAll(usersToAdd);
+        users.addAll(usersToAddWithId);
+        addUsersToMap(usersToAddWithId);
+        return usersToAddWithId;
+    }
+
+    private List<User> assignIdToAll(List<User> usersToAddId) {
+        usersToAddId.forEach(this::assignId);
+        return usersToAddId;
+    }
+
+    private User assignId(User user) {
+        user.setId(idCounter++);
+        return user;
     }
 
     private void addUsersToMap(List<User> usersToAdd) {

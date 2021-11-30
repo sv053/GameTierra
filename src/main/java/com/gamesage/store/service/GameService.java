@@ -24,6 +24,14 @@ public class GameService {
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Game with id %s not found", id)));
     }
 
+    public List<Game> findAll(){
+        return repository.find();
+    }
+    
+    public List<Game> createAll(List<Game> gamesToAdd){
+        return repository.create(gamesToAdd);
+    }
+
     public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
         BigDecimal percentage = BigDecimal.valueOf(user.getTier().getCashbackPercentage());
         return gamePrice.multiply(percentage);

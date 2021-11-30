@@ -23,15 +23,16 @@ public class GameRepository implements Repository<Game, Integer>{
         return Optional.ofNullable(allGamesById.get(key));
     }
 
-    public List<Game> getAll() {
+    public List<Game> find() {
         return games;
     }
 
     @Override
-    public void createAll(List<Game> gamesToAdd) {
+    public List<Game> create(List<Game> gamesToAdd) {
         List<Game> gamesToAddWithId = addIdToAll(gamesToAdd);
         games.addAll(gamesToAddWithId);
         addGamesToMap(gamesToAddWithId);
+        return gamesToAddWithId;
     }
 
     private List<Game> addIdToAll(List<Game> gamesToAddId) {
