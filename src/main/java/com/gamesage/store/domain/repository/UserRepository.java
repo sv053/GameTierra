@@ -25,13 +25,16 @@ public class UserRepository implements Repository<User, Integer> {
     }
 
     @Override
-    public List<User> find() {
+    public List<User> findAll() {
         return users;
     }
 
-    public void createUser(User user){
-        users.add(assignId(user));
-        addUsersToMap(List.of(user));
+    @Override
+    public User createOne(User user){
+        User userWithId = assignId(user);
+        users.add(userWithId);
+        allUsersById.put(userWithId.getId(), userWithId);
+        return userWithId;
     }
 
     @Override

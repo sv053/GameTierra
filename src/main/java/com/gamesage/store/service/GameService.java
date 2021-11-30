@@ -25,7 +25,7 @@ public class GameService {
     }
 
     public List<Game> findAll(){
-        return repository.find();
+        return repository.findAll();
     }
     
     public List<Game> createAll(List<Game> gamesToAdd){

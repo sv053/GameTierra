@@ -23,7 +23,7 @@ class GameServiceIntegrationTest {
     @Test
     void buyGame_Success_BalanceUpdated() {
 
-        Game game = new Game(null, "mistery island", BigDecimal.ONE);
+        Game game = new Game("mistery island", BigDecimal.ONE);
         List<Game> games = List.of(game);
         repository.create(games);
         GameService gameService = new GameService(repository);
@@ -45,7 +45,7 @@ class GameServiceIntegrationTest {
 
     @Test
     void buyGame_Fail_PriceIsHigherThanBalance_BalanceUnchanged() {
-        Game game = new Game(null, null, BigDecimal.ONE);
+        Game game = new Game(null, BigDecimal.ONE);
         repository.create(List.of(game));
         GameService gameService = new GameService(repository);
 
@@ -73,7 +73,7 @@ class GameServiceIntegrationTest {
         repository.create(SampleData.GAMES);
         GameService gameService = new GameService(repository);
 
-        Game game = repository.find().get(0);
+        Game game = repository.findAll().get(0);
 
         User user = new User(1, "", SampleData.TIERS.get(1), game.getPrice());
         user.addGame(game);
@@ -89,7 +89,7 @@ class GameServiceIntegrationTest {
 
     @Test
     void findById_Success_TheRightGameIsFound() {
-        Game gameToSearch = new Game(null, "mistery island", BigDecimal.ONE);
+        Game gameToSearch = new Game("mistery island", BigDecimal.ONE);
         repository.create(List.of(gameToSearch));
         GameService gameService = new GameService(repository);
 

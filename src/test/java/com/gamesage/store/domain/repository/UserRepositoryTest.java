@@ -36,8 +36,8 @@ class UserRepositoryTest {
         UserRepository repository = new UserRepository();
         repository.create(users);
 
-        assertEquals(users.size(), repository.find().size());
-        assertTrue(repository.find().containsAll(users));
+        assertEquals(users.size(), repository.findAll().size());
+        assertTrue(repository.findAll().containsAll(users));
     }
 }
 

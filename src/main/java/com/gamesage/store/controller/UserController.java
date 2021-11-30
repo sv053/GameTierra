@@ -13,30 +13,32 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    @PostMapping("/read/{id}")
+    @GetMapping("/{id}")
     public User findUserById(@PathVariable Integer id) {
         User user = userService.findById(id);
-        UserController.logger.info("User: " + user);
         return user;
     }
 
-    @GetMapping("/read")
+    @GetMapping("/")
     public List<User> findAllUsers() {
         List<User> users = userService.findAll();
-        UserController.logger.info("There are " + users.size() + " users");
         return users;
     }
 
-    @PostMapping("/createOne")
-    public User createUser(@RequestBody User user){
-        userService.createAll(List.of(user));
-        UserController.logger.info(user + " was added");
+    @PostMapping("/userslist")
+    public List<User> createUsers(@RequestBody List<User> users){
+        userService.create(users);
+        return users;
+    }
+
+    @PostMapping("/")
+    public User createOne(@RequestBody User user){
+        userService.createOne(user);
         return user;
     }
 }

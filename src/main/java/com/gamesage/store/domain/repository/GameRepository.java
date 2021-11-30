@@ -23,8 +23,16 @@ public class GameRepository implements Repository<Game, Integer>{
         return Optional.ofNullable(allGamesById.get(key));
     }
 
-    public List<Game> find() {
+    public List<Game> findAll() {
         return games;
+    }
+
+    @Override
+    public Game createOne(Game gameToAdd) {
+        Game gameToAddWithId = setGameId(gameToAdd);
+        games.add(gameToAddWithId);
+        allGamesById.put(gameToAddWithId.getId(), gameToAddWithId);
+        return gameToAddWithId;
     }
 
     @Override
@@ -40,8 +48,9 @@ public class GameRepository implements Repository<Game, Integer>{
         return gamesToAddId;
     }
 
-    private void setGameId(Game game) {
+    private Game setGameId(Game game) {
         game.setId(gameIdCounter++);
+        return game;
     }
 
     private void addGamesToMap(List<Game> gamesToAdd) {

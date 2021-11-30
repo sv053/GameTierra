@@ -13,30 +13,26 @@ import java.util.List;
 public class GameController {
 
     private final GameService gameService;
-    private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
     public GameController(GameService gameService) {
         this.gameService = gameService;
     }
 
-    @PostMapping("/create")
+    @PostMapping("/")
     public List<Game> createGames(@RequestBody List<Game> gamesToSave){
         gameService.createAll(gamesToSave);
-        GameController.logger.info(gamesToSave.size() + " games were added");
         return gameService.findAll();
     }
 
-    @PostMapping("/read/{id}")
+    @GetMapping("/{id}")
     public Game findGameById(@PathVariable Integer id) {
         Game game = gameService.findById(id);
-        GameController.logger.info("Game with id "+ id + " : " + game);
         return game;
     }
 
-    @GetMapping("/read")
+    @GetMapping("/")
     public List<Game> findGames(){
         List<Game> games = gameService.findAll();
-        GameController.logger.info(games.size() + " games");
         return games;
     }
 }
