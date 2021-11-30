@@ -2,8 +2,6 @@ package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
