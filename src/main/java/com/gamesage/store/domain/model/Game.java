@@ -2,26 +2,24 @@ package com.gamesage.store.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class Game{
+public class Game {
 
-    private Integer id;
     private final String name;
     private final BigDecimal price;
-    static final long serialVersionUID = 1L;
+    private Integer id;
 
-    public Game(String name, BigDecimal price)  {
+    public Game(String name, BigDecimal price) {
         this(null, name, price);
     }
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public Game(@JsonProperty("id") Integer id,
-                @JsonProperty("name")String name,
-                @JsonProperty("price")BigDecimal price) {
+                @JsonProperty("name") String name,
+                @JsonProperty("price") BigDecimal price) {
         this.id = id;
         this.name = name;
         this.price = price;

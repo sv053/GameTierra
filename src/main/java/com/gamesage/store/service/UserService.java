@@ -18,18 +18,15 @@ public class UserService {
     public User findById(Integer id) {
         return repository
                 .findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("User with login %s is not found", id)));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("User with login %s is not found", id)));
     }
 
-    public List<User> create(List<User> usersToAdd){
-        return repository.create(usersToAdd);
-    }
-
-    public User createOne(User userToAdd){
+    public User createOne(User userToAdd) {
         return repository.createOne(userToAdd);
     }
 
-    public List<User> findAll(){
+    public List<User> findAll() {
         return repository.findAll();
     }
 }

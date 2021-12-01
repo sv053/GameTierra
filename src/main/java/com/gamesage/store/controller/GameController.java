@@ -16,22 +16,19 @@ public class GameController {
         this.gameService = gameService;
     }
 
-    @PostMapping("/")
-    public List<Game> createGames(@RequestBody List<Game> gamesToSave){
-        gameService.createAll(gamesToSave);
-        return gameService.findAll();
+    @PostMapping("")
+    public List<Game> createGames(@RequestBody List<Game> gamesToSave) {
+        return gameService.createAll(gamesToSave);
     }
 
     @GetMapping("/{id}")
     public Game findGameById(@PathVariable Integer id) {
-        Game game = gameService.findById(id);
-        return game;
+        return gameService.findById(id);
     }
 
-    @GetMapping("/")
-    public List<Game> findGames(){
-        List<Game> games = gameService.findAll();
-        return games;
+    @GetMapping("")
+    public List<Game> findAllGames() {
+        return gameService.findAll();
     }
 }
 

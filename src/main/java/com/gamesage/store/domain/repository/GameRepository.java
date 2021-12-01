@@ -7,11 +7,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Repository
-public class GameRepository implements Repository<Game, Integer>{
+public class GameRepository implements AddManyRepository<Game, Integer> {
 
     private final List<Game> games;
-    private int gameIdCounter = 1;
     private final Map<Integer, Game> allGamesById;
+    private int gameIdCounter = 1;
 
     public GameRepository() {
         games = new ArrayList<>();
@@ -20,7 +20,8 @@ public class GameRepository implements Repository<Game, Integer>{
 
     @Override
     public Optional<Game> findById(Integer key) {
-        return Optional.ofNullable(allGamesById.get(key));
+        return Optional
+                .ofNullable(allGamesById.get(key));
     }
 
     public List<Game> findAll() {
@@ -29,7 +30,7 @@ public class GameRepository implements Repository<Game, Integer>{
 
     @Override
     public Game createOne(Game gameToAdd) {
-        Game gameToAddWithId = setGameId(gameToAdd);
+        Game gameToAddWithId = assignGameId(gameToAdd);
         games.add(gameToAddWithId);
         allGamesById.put(gameToAddWithId.getId(), gameToAddWithId);
         return gameToAddWithId;
@@ -44,11 +45,11 @@ public class GameRepository implements Repository<Game, Integer>{
     }
 
     private List<Game> addIdToAll(List<Game> gamesToAddId) {
-        gamesToAddId.forEach(this::setGameId);
+        gamesToAddId.forEach(this::assignGameId);
         return gamesToAddId;
     }
 
-    private Game setGameId(Game game) {
+    private Game assignGameId(Game game) {
         game.setId(gameIdCounter++);
         return game;
     }

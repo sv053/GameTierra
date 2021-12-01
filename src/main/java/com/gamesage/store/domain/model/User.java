@@ -10,8 +10,8 @@ public class User {
 
     private final Set<Game> games;
     private final String login;
-    private Integer id;
     private final Tier tier;
+    private Integer id;
     private BigDecimal balance;
 
     public User(Integer id, String login, Tier tier, BigDecimal balance) {

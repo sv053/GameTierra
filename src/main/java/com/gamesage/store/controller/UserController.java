@@ -22,20 +22,14 @@ public class UserController {
         return user;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public List<User> findAllUsers() {
         List<User> users = userService.findAll();
         return users;
     }
 
-    @PostMapping("/userslist")
-    public List<User> createUsers(@RequestBody List<User> users){
-        userService.create(users);
-        return users;
-    }
-
-    @PostMapping("/")
-    public User createOne(@RequestBody User user){
+    @PostMapping("")
+    public User createOne(@RequestBody User user) {
         userService.createOne(user);
         return user;
     }
