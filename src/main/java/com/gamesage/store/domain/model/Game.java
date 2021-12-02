@@ -1,5 +1,8 @@
 package com.gamesage.store.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -13,7 +16,10 @@ public class Game {
         this(null, name, price);
     }
 
-    public Game(Integer id, String name, BigDecimal price) {
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+    public Game(@JsonProperty("id") Integer id,
+                @JsonProperty("name") String name,
+                @JsonProperty("price") BigDecimal price) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -54,7 +60,7 @@ public class Game {
     @Override
     public String toString() {
         return "Game{" + "id='" + id
-                + '\'' + "name='" + name
+                + '\'' + ", name='" + name
                 + '\'' + ", price=$" + price
                 + '}' + '\n';
     }

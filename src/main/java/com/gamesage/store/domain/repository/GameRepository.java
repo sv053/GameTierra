@@ -7,11 +7,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Repository
-public class GameRepository implements Repository<Game, Integer> {
+public class GameRepository implements CreateManyRepository<Game, Integer> {
 
     private final List<Game> games;
-    private int gameIdCounter = 1;
     private final Map<Integer, Game> allGamesById;
+    private int gameIdCounter = 1;
 
     public GameRepository() {
         games = new ArrayList<>();
@@ -23,24 +23,34 @@ public class GameRepository implements Repository<Game, Integer> {
         return Optional.ofNullable(allGamesById.get(key));
     }
 
-    public List<Game> getAll() {
+    public List<Game> findAll() {
         return games;
     }
 
     @Override
-    public void createAll(List<Game> gamesToAdd) {
+    public Game createOne(Game gameToAdd) {
+        Game gameToAddWithId = assignGameId(gameToAdd);
+        games.add(gameToAddWithId);
+        allGamesById.put(gameToAddWithId.getId(), gameToAddWithId);
+        return gameToAddWithId;
+    }
+
+    @Override
+    public List<Game> create(List<Game> gamesToAdd) {
         List<Game> gamesToAddWithId = addIdToAll(gamesToAdd);
         games.addAll(gamesToAddWithId);
         addGamesToMap(gamesToAddWithId);
+        return gamesToAddWithId;
     }
 
     private List<Game> addIdToAll(List<Game> gamesToAddId) {
-        gamesToAddId.forEach(this::setGameId);
+        gamesToAddId.forEach(this::assignGameId);
         return gamesToAddId;
     }
 
-    private void setGameId(Game game) {
+    private Game assignGameId(Game game) {
         game.setId(gameIdCounter++);
+        return game;
     }
 
     private void addGamesToMap(List<Game> gamesToAdd) {

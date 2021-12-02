@@ -20,24 +20,11 @@ class UserRepositoryTest {
     @Test
     void findUser_Success() {
         User user = new User(8, "thunder", null, null);
-        List<User> users = List.of(user);
         UserRepository repository = new UserRepository();
-        repository.createAll(users);
+        repository.createOne(user);
         Optional<User> foundUser = repository.findById(user.getId());
 
         assertEquals(Optional.of(user), foundUser);
-    }
-
-    @Test
-    void createAll() {
-        List<User> users = List.of(
-                new User(6, "addedUser1", null, null),
-                new User(7, "addedUser2", null, null));
-        UserRepository repository = new UserRepository();
-        repository.createAll(users);
-
-        assertEquals(users.size(), repository.getAll().size());
-        assertTrue(repository.getAll().containsAll(users));
     }
 }
 

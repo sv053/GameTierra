@@ -23,7 +23,7 @@ class GameRepositoryTest {
         List<Game> games = List.of(
                 new Game("addedGame1", null),
                 new Game("addedGame2", null));
-        repository.createAll(games);
+        repository.create(games);
         Game game = games.get(0);
         Optional<Game> foundGame = repository.findById(game.getId());
 
@@ -37,10 +37,12 @@ class GameRepositoryTest {
         List<Game> games = List.of(
                 new Game("addedGame1", null),
                 new Game("addedGame2", null));
-        repository.createAll(games);
+        repository.create(games);
 
-        assertEquals(games.size(), repository.getAll().size());
-        assertTrue(repository.getAll().containsAll(games));
+        var createdGames = repository.findAll();
+
+        assertEquals(games.size(), createdGames.size());
+        assertTrue(createdGames.containsAll(games));
     }
 }
 

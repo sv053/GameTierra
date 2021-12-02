@@ -3,14 +3,13 @@ package com.gamesage.store.domain.repository;
 import com.gamesage.store.domain.model.User;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Repository
 public class UserRepository implements Repository<User, Integer> {
 
     private final List<User> users;
     private final Map<Integer, User> allUsersById;
+    private int idCounter = 1;
 
     public UserRepository() {
         users = new ArrayList<>();
@@ -23,22 +22,21 @@ public class UserRepository implements Repository<User, Integer> {
     }
 
     @Override
-    public List<User> getAll() {
+    public List<User> findAll() {
         return users;
     }
 
     @Override
-    public void createAll(List<User> usersToAdd) {
-        users.addAll(usersToAdd);
-        addUsersToMap(usersToAdd);
+    public User createOne(User user) {
+        User userWithId = assignId(user);
+        users.add(userWithId);
+        allUsersById.put(userWithId.getId(), userWithId);
+        return userWithId;
     }
 
-    private void addUsersToMap(List<User> usersToAdd) {
-        Map<Integer, User> mapForNewUsers = usersToAdd.stream()
-                .collect(
-                        Collectors.toMap(User::getId, Function.identity(),
-                                (oldValue, newValue) -> (newValue)));
-        allUsersById.putAll(mapForNewUsers);
+    private User assignId(User user) {
+        user.setId(idCounter++);
+        return user;
     }
 }
 

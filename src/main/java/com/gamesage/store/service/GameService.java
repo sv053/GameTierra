@@ -3,24 +3,34 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.Repository;
+import com.gamesage.store.domain.repository.CreateManyRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class GameService {
 
-    private final Repository<Game, Integer> repository;
+    private final CreateManyRepository<Game, Integer> repository;
 
-    public GameService(Repository<Game, Integer> repository) {
+    public GameService(CreateManyRepository<Game, Integer> repository) {
         this.repository = repository;
     }
 
     public Game findById(int id) {
         return repository
                 .findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("Game with id %s not found", id)));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("Game with id %s not found", id)));
+    }
+
+    public List<Game> findAll() {
+        return repository.findAll();
+    }
+
+    public List<Game> createAll(List<Game> gamesToAdd) {
+        return repository.create(gamesToAdd);
     }
 
     public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {

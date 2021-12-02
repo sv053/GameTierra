@@ -33,7 +33,9 @@ public final class SampleData {
                 new Tier("PLATINUM", 30.d));
 
         USERS = List.of(
-                new User(1, "terral", TIERS.get(3), BigDecimal.valueOf(100))
+                new User(1, "terral", SampleData.TIERS.get(3), BigDecimal.valueOf(100)),
+                new User(2, "tierra", SampleData.TIERS.get(2), BigDecimal.valueOf(777)),
+                new User(3, "turron", SampleData.TIERS.get(1), BigDecimal.valueOf(888))
         );
     }
 

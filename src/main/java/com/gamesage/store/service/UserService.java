@@ -4,6 +4,8 @@ import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.Repository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -16,7 +18,16 @@ public class UserService {
     public User findById(Integer id) {
         return repository
                 .findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("User with login %s is not found", id)));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("User with login %s is not found", id)));
+    }
+
+    public User createOne(User userToAdd) {
+        return repository.createOne(userToAdd);
+    }
+
+    public List<User> findAll() {
+        return repository.findAll();
     }
 }
 
