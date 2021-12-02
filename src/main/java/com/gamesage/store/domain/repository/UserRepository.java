@@ -18,8 +18,7 @@ public class UserRepository implements Repository<User, Integer> {
 
     @Override
     public Optional<User> findById(Integer id) {
-        return Optional
-                .ofNullable(allUsersById.get(id));
+        return Optional.ofNullable(allUsersById.get(id));
     }
 
     @Override

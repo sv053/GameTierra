@@ -7,7 +7,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Repository
-public class GameRepository implements AddManyRepository<Game, Integer> {
+public class GameRepository implements CreateManyRepository<Game, Integer> {
 
     private final List<Game> games;
     private final Map<Integer, Game> allGamesById;
@@ -20,8 +20,7 @@ public class GameRepository implements AddManyRepository<Game, Integer> {
 
     @Override
     public Optional<Game> findById(Integer key) {
-        return Optional
-                .ofNullable(allGamesById.get(key));
+        return Optional.ofNullable(allGamesById.get(key));
     }
 
     public List<Game> findAll() {

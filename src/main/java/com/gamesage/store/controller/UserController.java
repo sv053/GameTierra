@@ -18,20 +18,17 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User findUserById(@PathVariable Integer id) {
-        User user = userService.findById(id);
-        return user;
+        return userService.findById(id);
     }
 
-    @GetMapping("")
+    @GetMapping
     public List<User> findAllUsers() {
-        List<User> users = userService.findAll();
-        return users;
+        return userService.findAll();
     }
 
-    @PostMapping("")
+    @PostMapping
     public User createOne(@RequestBody User user) {
-        userService.createOne(user);
-        return user;
+        return userService.createOne(user);
     }
 }
 

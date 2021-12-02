@@ -39,7 +39,10 @@ class GameRepositoryTest {
                 new Game("addedGame2", null));
         repository.create(games);
 
-        assertTrue(repository.findAll().containsAll(games));
+        var createdGames = repository.findAll();
+
+        assertEquals(games.size(), createdGames.size());
+        assertTrue(createdGames.containsAll(games));
     }
 }
 

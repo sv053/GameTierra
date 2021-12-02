@@ -3,18 +3,18 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.AddManyRepository;
+import com.gamesage.store.domain.repository.CreateManyRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Service
-public class GameService{
+public class GameService {
 
-    private final AddManyRepository<Game, Integer> repository;
+    private final CreateManyRepository<Game, Integer> repository;
 
-    public GameService(AddManyRepository<Game, Integer> repository) {
+    public GameService(CreateManyRepository<Game, Integer> repository) {
         this.repository = repository;
     }
 

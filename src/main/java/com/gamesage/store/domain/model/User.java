@@ -8,11 +8,11 @@ import java.util.Set;
 
 public class User {
 
-    private final Set<Game> games;
+    private Integer id;
     private final String login;
     private final Tier tier;
-    private Integer id;
     private BigDecimal balance;
+    private final Set<Game> games;
 
     public User(Integer id, String login, Tier tier, BigDecimal balance) {
         this.id = id;

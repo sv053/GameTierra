@@ -8,9 +8,9 @@ import java.util.Objects;
 
 public class Game {
 
+    private Integer id;
     private final String name;
     private final BigDecimal price;
-    private Integer id;
 
     public Game(String name, BigDecimal price) {
         this(null, name, price);
@@ -60,7 +60,7 @@ public class Game {
     @Override
     public String toString() {
         return "Game{" + "id='" + id
-                + '\'' + "name='" + name
+                + '\'' + ", name='" + name
                 + '\'' + ", price=$" + price
                 + '}' + '\n';
     }
