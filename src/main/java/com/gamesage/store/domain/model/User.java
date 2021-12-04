@@ -1,5 +1,8 @@
 package com.gamesage.store.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashSet;
@@ -14,7 +17,11 @@ public class User {
     private BigDecimal balance;
     private final Set<Game> games;
 
-    public User(Integer id, String login, Tier tier, BigDecimal balance) {
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+    public User(@JsonProperty("id") Integer id,
+                @JsonProperty("login") String login,
+                @JsonProperty("tier") Tier tier,
+                @JsonProperty("balance") BigDecimal balance) {
         this.id = id;
         this.login = login;
         this.tier = tier;
