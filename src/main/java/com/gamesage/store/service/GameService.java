@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GameService {
@@ -18,11 +19,8 @@ public class GameService {
         this.repository = repository;
     }
 
-    public Game findById(int id) {
-        return repository
-                .findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        String.format("Game with id %s not found", id)));
+    public Optional<Game> findById(int id) {
+        return repository.findById(id);
     }
 
     public List<Game> findAll() {
@@ -38,8 +36,13 @@ public class GameService {
         return gamePrice.multiply(percentage);
     }
 
+    public Game fetchGame(int id){
+        return findById(id).orElseThrow(() -> new IllegalArgumentException(
+                String.format("Game with id %s not found", id)));
+    }
+
     public boolean buyGame(int gameId, User user) {
-        Game game = findById(gameId);
+        Game game = fetchGame(gameId);
         BigDecimal price = game.getPrice();
         if (user.canPay(price) && (!user.hasGame(game))) {
             BigDecimal cashback = calculateCashback(price, user);

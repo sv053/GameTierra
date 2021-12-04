@@ -1,10 +1,12 @@
 package com.gamesage.store.service;
 
+import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -15,11 +17,13 @@ public class UserService {
         this.repository = repository;
     }
 
-    public User findById(Integer id) {
-        return repository
-                .findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        String.format("User with login %s is not found", id)));
+    public Optional<User> findById(Integer id) {
+        return repository.findById(id);
+    }
+
+    public User fetchUser(int id){
+        return findById(id).orElseThrow(() -> new IllegalArgumentException(
+                        String.format("User with id %s not found", id)));
     }
 
     public User createOne(User userToAdd) {

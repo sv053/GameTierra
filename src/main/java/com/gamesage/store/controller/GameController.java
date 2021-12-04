@@ -2,7 +2,9 @@ package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.service.GameService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -18,7 +20,8 @@ public class GameController {
 
     @GetMapping("/{id}")
     public Game findGameById(@PathVariable Integer id) {
-        return gameService.findById(id);
+        return gameService.findById(id).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Game " + id + " is not found"));
     }
 
     @GetMapping
