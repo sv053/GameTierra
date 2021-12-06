@@ -3,6 +3,7 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.Repository;
+import com.gamesage.store.exception.userexception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class UserService {
 
     public User findById(int id){
         return repository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException(
+                () -> new UserNotFoundException(
                         String.format("User with id %s not found", id)));
     }
 
