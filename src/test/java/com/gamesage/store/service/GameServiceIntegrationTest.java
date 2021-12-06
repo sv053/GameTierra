@@ -84,7 +84,7 @@ class GameServiceIntegrationTest {
     @Test
     void findById_Fail_TheGameIsNotFound_Exception() {
         GameService gameService = new GameService(repository);
-        assertThrows(IllegalArgumentException.class, () -> gameService.fetchGame(1213313));
+        assertThrows(IllegalArgumentException.class, () -> gameService.findById(1213313));
     }
 
     @Test
@@ -93,7 +93,7 @@ class GameServiceIntegrationTest {
         repository.create(List.of(gameToSearch));
         GameService gameService = new GameService(repository);
 
-        assertEquals(gameToSearch, gameService.fetchGame(gameToSearch.getId()));
+        assertEquals(gameToSearch, gameService.findById(gameToSearch.getId()));
     }
 }
 

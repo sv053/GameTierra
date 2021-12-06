@@ -21,8 +21,7 @@ public class GameController {
 
     @GetMapping("/{id}")
     public Game findGameById(@PathVariable Integer id) {
-        return gameService.findById(id).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "Game " + id + " is not found"));
+        return gameService.findById(id);
     }
 
     @GetMapping

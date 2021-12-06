@@ -29,7 +29,7 @@ class UserServiceTest {
 
         when(repository.findById(userId)).thenReturn(Optional.of(user));
 
-        assertEquals(user, userService.fetchUser(userId));
+        assertEquals(user, userService.findById(userId));
     }
 
     @Test
@@ -37,7 +37,7 @@ class UserServiceTest {
         Integer userId = 2;
         when(repository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> userService.fetchUser(userId));
+        assertThrows(IllegalArgumentException.class, () -> userService.findById(userId));
     }
 }
 

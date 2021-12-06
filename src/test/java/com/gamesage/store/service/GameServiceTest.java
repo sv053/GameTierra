@@ -100,7 +100,7 @@ class GameServiceTest {
         Game game = new Game(gameId, "fabula", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
-        assertEquals(game, gameService.fetchGame(gameId));
+        assertEquals(game, gameService.findById(gameId));
     }
 
     @Test
@@ -109,7 +109,7 @@ class GameServiceTest {
         when(repository.findById(gameId)).thenReturn(Optional.empty());
 
         IllegalArgumentException e = assertThrows(
-                IllegalArgumentException.class, () -> gameService.fetchGame(gameId));
+                IllegalArgumentException.class, () -> gameService.findById(gameId));
         assertEquals("Game with id 1 not found", e.getMessage());
     }
 

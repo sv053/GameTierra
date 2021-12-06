@@ -17,12 +17,13 @@ public class UserService {
         this.repository = repository;
     }
 
-    public Optional<User> findById(Integer id) {
-        return repository.findById(id);
-    }
+//    public Optional<User> findById(Integer id) {
+//        return repository.findById(id);
+//    }
 
-    public User fetchUser(int id){
-        return findById(id).orElseThrow(() -> new IllegalArgumentException(
+    public User findById(int id){
+        return repository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException(
                         String.format("User with id %s not found", id)));
     }
 

@@ -19,9 +19,9 @@ public class GameService {
         this.repository = repository;
     }
 
-    public Optional<Game> findById(int id) {
-        return repository.findById(id);
-    }
+//    public Optional<Game> findById(int id) {
+//        return repository.findById(id);
+//    }
 
     public List<Game> findAll() {
         return repository.findAll();
@@ -36,13 +36,14 @@ public class GameService {
         return gamePrice.multiply(percentage);
     }
 
-    public Game fetchGame(int id){
-        return findById(id).orElseThrow(() -> new IllegalArgumentException(
-                String.format("Game with id %s not found", id)));
+    public Game findById(int id){
+        return repository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException(
+                    String.format("Game with id %s not found", id)));
     }
 
     public boolean buyGame(int gameId, User user) {
-        Game game = fetchGame(gameId);
+        Game game = findById(gameId);
         BigDecimal price = game.getPrice();
         if (user.canPay(price) && (!user.hasGame(game))) {
             BigDecimal cashback = calculateCashback(price, user);
