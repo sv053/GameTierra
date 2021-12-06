@@ -9,9 +9,5 @@ public class UserNotFoundException extends IllegalArgumentException{
     public UserNotFoundException(int id){
         super(String.format("Game with id %s not found", id));
     }
-
-    public UserNotFoundException(String s) {
-        super(s);
-    }
 }
 
