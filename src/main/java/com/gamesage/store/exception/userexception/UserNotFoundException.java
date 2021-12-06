@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class UserNotFoundException extends IllegalArgumentException{
 
     public UserNotFoundException(int id){
-        super(String.format("Game with id %s not found", id));
+        super(String.format("User with id %s not found", id));
     }
 }
 

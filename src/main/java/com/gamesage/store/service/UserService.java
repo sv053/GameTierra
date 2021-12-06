@@ -17,17 +17,16 @@ public class UserService {
     }
 
     public User findById(int id){
-        return repository.findById(id).orElseThrow(
-                () -> new UserNotFoundException(
-                        String.format("User with id %s not found", id)));
+        return repository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    public List<User> findAll() {
+        return repository.findAll();
     }
 
     public User createOne(User userToAdd) {
         return repository.createOne(userToAdd);
     }
 
-    public List<User> findAll() {
-        return repository.findAll();
-    }
 }
 

@@ -4,6 +4,7 @@ import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.GameRepository;
+import com.gamesage.store.exception.gameexception.GameNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -108,8 +109,8 @@ class GameServiceTest {
         int gameId = 1;
         when(repository.findById(gameId)).thenReturn(Optional.empty());
 
-        IllegalArgumentException e = assertThrows(
-                IllegalArgumentException.class, () -> gameService.findById(gameId));
+        GameNotFoundException e = assertThrows(
+                GameNotFoundException.class, () -> gameService.findById(gameId));
         assertEquals("Game with id 1 not found", e.getMessage());
     }
 

@@ -2,6 +2,7 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.UserRepository;
+import com.gamesage.store.exception.userexception.UserNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,7 +38,7 @@ class UserServiceTest {
         Integer userId = 2;
         when(repository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> userService.findById(userId));
+        assertThrows(UserNotFoundException.class, () -> userService.findById(userId));
     }
 }
 
