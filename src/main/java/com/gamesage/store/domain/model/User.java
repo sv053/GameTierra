@@ -14,10 +14,7 @@ public class User {
     private Integer id;
     private BigDecimal balance;
 
-    public User(Integer id,
-                String login,
-                Tier tier,
-                BigDecimal balance) {
+    public User(Integer id, String login, Tier tier, BigDecimal balance) {
         this.id = id;
         this.login = login;
         this.tier = tier;

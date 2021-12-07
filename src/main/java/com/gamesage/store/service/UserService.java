@@ -2,7 +2,7 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.Repository;
-import com.gamesage.store.exception.EntryNotFoundException;
+import com.gamesage.store.exception.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class UserService {
     }
 
     public User findById(int id) {
-        return repository.findById(id).orElseThrow(() -> new EntryNotFoundException(id));
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
     }
 
     public List<User> findAll() {
