@@ -4,6 +4,7 @@ import com.gamesage.store.domain.data.SampleData;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.GameRepository;
+import com.gamesage.store.exception.EntryNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -82,9 +83,9 @@ class GameServiceIntegrationTest {
     }
 
     @Test
-    void findById_Fail_TheGameIsNotFound_Exception() {
+    void findGame_Fail_TheGameIsNotFound_Exception() {
         GameService gameService = new GameService(repository);
-        assertThrows(IllegalArgumentException.class, () -> gameService.findById(1213313));
+        assertThrows(EntryNotFoundException.class, () -> gameService.findById(1213313));
     }
 
     @Test

@@ -8,9 +8,9 @@ import java.util.Objects;
 
 public class Game {
 
-    private Integer id;
     private final String name;
     private final BigDecimal price;
+    private Integer id;
 
     public Game(String name, BigDecimal price) {
         this(null, name, price);

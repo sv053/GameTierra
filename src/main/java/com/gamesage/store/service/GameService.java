@@ -4,7 +4,7 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.CreateManyRepository;
-import com.gamesage.store.exception.gameexception.GameNotFoundException;
+import com.gamesage.store.exception.EntryNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,8 +19,8 @@ public class GameService {
         this.repository = repository;
     }
 
-    public Game findById(int id){
-        return repository.findById(id).orElseThrow(() -> new GameNotFoundException(id));
+    public Game findById(int id) {
+        return repository.findById(id).orElseThrow(() -> new EntryNotFoundException(id));
     }
 
     public List<Game> findAll() {

@@ -2,7 +2,7 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.UserRepository;
-import com.gamesage.store.exception.userexception.UserNotFoundException;
+import com.gamesage.store.exception.EntryNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,7 +24,7 @@ class UserServiceTest {
     private UserService userService;
 
     @Test
-    void findByLogin_Success_RightUserIsFound() {
+    void findUser_Success_RightUserIsFound() {
         Integer userId = 5;
         User user = new User(userId, null, null, null);
 
@@ -34,11 +34,11 @@ class UserServiceTest {
     }
 
     @Test
-    void findByLogin_Fail_UserNotFound_Exception() {
+    void findUser_Fail_NotFound_Exception() {
         Integer userId = 2;
         when(repository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> userService.findById(userId));
+        assertThrows(EntryNotFoundException.class, () -> userService.findById(userId));
     }
 }
 

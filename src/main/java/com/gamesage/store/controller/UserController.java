@@ -2,16 +2,14 @@ package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 
 @RestController
 @RequestMapping("/users")
-public class UserController{
+public class UserController {
 
     private final UserService userService;
 
@@ -20,7 +18,7 @@ public class UserController{
     }
 
     @GetMapping("/{id}")
-    public User findUserById (@PathVariable Integer id){
+    public User findUserById(@PathVariable Integer id) {
         return userService.findById(id);
     }
 

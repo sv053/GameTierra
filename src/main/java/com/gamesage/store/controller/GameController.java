@@ -2,9 +2,7 @@ package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.service.GameService;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
