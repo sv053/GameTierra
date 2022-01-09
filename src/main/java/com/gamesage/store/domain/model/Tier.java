@@ -5,7 +5,8 @@ public class Tier {
     private final String level;
     private final double cashbackPercentage;
 
-    public Tier(String level, double cashbackPercentage) {
+    public Tier(String level,
+                double cashbackPercentage) {
         this.level = level;
         this.cashbackPercentage = cashbackPercentage;
     }
