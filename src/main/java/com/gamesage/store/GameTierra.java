@@ -22,10 +22,6 @@ public class GameTierra {
             connection = DriverManager.getConnection("jdbc:sqlite:aceofgames.db");
             if (connection != null) {
                 logger.info("Database is connected");
-            } else {
-                for (StackTraceElement el : Thread.currentThread().getStackTrace()) {
-                    logger.error(el.getMethodName());
-                }
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage());
