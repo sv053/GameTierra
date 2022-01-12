@@ -16,10 +16,7 @@ public class GameTierra {
     public static void main(String[] args) {
         SpringApplication.run(GameTierra.class);
 
-        Connection connection = null;
-
-        try {
-            connection = DriverManager.getConnection("jdbc:sqlite:aceofgames.db");
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:aceofgames.db")) {
             if (connection != null) {
                 logger.info("Database is connected");
             }
