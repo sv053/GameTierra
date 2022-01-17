@@ -1,34 +1,34 @@
 BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS "game"
 (
-    "gameId" INTEGER,
+    "id" INTEGER,
     "name"   TEXT NOT NULL CHECK ("name" != ''),
-    "price"  REAL CHECK ("price" > 0 AND "price" < 100000),
-    PRIMARY KEY ("gameId" AUTOINCREMENT)
+    "price"  REAL,
+    PRIMARY KEY ("id" AUTOINCREMENT)
 );
 CREATE TABLE IF NOT EXISTS "tier"
 (
-    "tierId"     INTEGER,
+    "id"     INTEGER,
     "level"      TEXT NOT NULL CHECK ("level" != ''),
-    "percentage" REAL CHECK ("percentage" > 0 AND "percentage" < 1),
-    PRIMARY KEY ("tierId" AUTOINCREMENT)
+    "percentage" REAL,
+    PRIMARY KEY ("id" AUTOINCREMENT)
 );
 CREATE TABLE IF NOT EXISTS "user"
 (
-    "userId"  INTEGER,
+    "id"  INTEGER,
     "login"   TEXT NOT NULL CHECK ("login" != ''),
-    "balance" REAL CHECK ("balance" > 0 AND "balance" < 100000),
+    "balance" REAL,
     "tierId"  INTEGER,
-    PRIMARY KEY ("userId" AUTOINCREMENT),
-    CONSTRAINT "tier_fk" FOREIGN KEY ("tierId") REFERENCES "tier" ("tierId") ON DELETE CASCADE
+    PRIMARY KEY ("id" AUTOINCREMENT),
+    CONSTRAINT "tier_fk" FOREIGN KEY ("id") REFERENCES "tier" ("id")
 );
 CREATE TABLE IF NOT EXISTS "user_game"
 (
-    "user_gameId" INTEGER,
-    "userId"      INTEGER,
-    "gameId"      INTEGER,
-    PRIMARY KEY ("user_gameId" AUTOINCREMENT),
-    CONSTRAINT "user_fk" FOREIGN KEY ("userId") REFERENCES "user" ("userId") ON DELETE CASCADE,
-    CONSTRAINT "game_fk" FOREIGN KEY ("gameId") REFERENCES "game" ("gameId") ON DELETE CASCADE
+    "id" INTEGER,
+    "user_id"      INTEGER,
+    "game_id"      INTEGER,
+    PRIMARY KEY ("id" AUTOINCREMENT),
+    CONSTRAINT "user_fk" FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE,
+    CONSTRAINT "game_fk" FOREIGN KEY ("game_id") REFERENCES "game" ("id") ON DELETE CASCADE
 );
 COMMIT;
