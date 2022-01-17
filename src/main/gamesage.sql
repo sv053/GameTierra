@@ -18,9 +18,9 @@ CREATE TABLE IF NOT EXISTS "user"
     "id"  INTEGER,
     "login"   TEXT NOT NULL CHECK ("login" != ''),
     "balance" REAL,
-    "tierId"  INTEGER,
+    "tier_id"  INTEGER,
     PRIMARY KEY ("id" AUTOINCREMENT),
-    CONSTRAINT "tier_fk" FOREIGN KEY ("id") REFERENCES "tier" ("id")
+    CONSTRAINT "tier_fk" FOREIGN KEY ("tier_id") REFERENCES "tier" ("id")
 );
 CREATE TABLE IF NOT EXISTS "user_game"
 (
