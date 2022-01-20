@@ -32,7 +32,7 @@ class GameServiceTest {
         Game game = new Game(gameId, "lago", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
-        User user = new User(1, null, new Tier("", 18), BigDecimal.TEN);
+        User user = new User(1, null, new Tier(1,"", 18), BigDecimal.TEN);
 
         assertTrue(gameService.buyGame(gameId, user));
     }
@@ -44,7 +44,7 @@ class GameServiceTest {
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
         BigDecimal initBalance = BigDecimal.valueOf(156.82);
-        User user = new User(1, "", new Tier("", 18), initBalance);
+        User user = new User(1, "", new Tier(2,"", 18), initBalance);
 
         gameService.buyGame(gameId, user);
 
@@ -65,7 +65,7 @@ class GameServiceTest {
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
         BigDecimal initBalance = BigDecimal.ONE;
-        User user = new User(1, "lark", new Tier("", 15), initBalance);
+        User user = new User(1, "lark", new Tier(3, "", 15), initBalance);
 
         gameService.buyGame(gameId, user);
 
@@ -78,7 +78,7 @@ class GameServiceTest {
         Game game = new Game(gameId, "rio", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
-        User user = new User(null, "", new Tier(null, .0), BigDecimal.ZERO);
+        User user = new User(null, "", new Tier(4,null, .0), BigDecimal.ZERO);
 
         assertFalse(gameService.buyGame(gameId, user));
     }
@@ -118,7 +118,7 @@ class GameServiceTest {
     void calculateCashback_Success_CheckCashback() {
         Game game = new Game(1, "fabula", BigDecimal.ONE);
 
-        User user = new User(7, "marvel", new Tier("", 5.), BigDecimal.TEN);
+        User user = new User(7, "marvel", new Tier(1,"", 5.), BigDecimal.TEN);
 
         BigDecimal cashbackPercentage = BigDecimal.valueOf(user.getTier().getCashbackPercentage());
         BigDecimal expectedCashback = game.getPrice().multiply(cashbackPercentage);
