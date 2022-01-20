@@ -26,11 +26,11 @@ public final class SampleData {
                 new Game("A_NEW_ONE", RandomBigDecimal.getAndFormatRandomBigDecimal()));
 
         TIERS = List.of(
-                new Tier(1,"FREE", 0.d),
-                new Tier(2,"BRONZE", 5.d),
-                new Tier(3,"SILVER", 10.d),
-                new Tier(4,"GOLD", 20.d),
-                new Tier(5,"PLATINUM", 30.d));
+                new Tier("FREE", 0.d),
+                new Tier("BRONZE", 5.d),
+                new Tier("SILVER", 10.d),
+                new Tier("GOLD", 20.d),
+                new Tier("PLATINUM", 30.d));
 
         USERS = List.of(
                 new User(1, "terral", SampleData.TIERS.get(3), BigDecimal.valueOf(100)),
