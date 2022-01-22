@@ -4,9 +4,11 @@ import com.gamesage.store.domain.data.SampleData;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.GameRepository;
+import com.gamesage.store.domain.repository.db.DbGameRepository;
 import com.gamesage.store.exception.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
@@ -18,8 +20,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(classes = GameRepository.class)
 class GameServiceIntegrationTest {
 
+
     @Autowired
-    private GameRepository repository;
+    private DbGameRepository repository;
 
     @Test
     void buyGame_Success_BalanceUpdated() {
