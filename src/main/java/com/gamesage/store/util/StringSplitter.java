@@ -1,4 +1,4 @@
-package com.gamesage.store.domain.repository.db;
+package com.gamesage.store.util;
 
 import java.util.Arrays;
 import java.util.List;

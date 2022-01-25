@@ -1,48 +1,42 @@
 package com.gamesage.store.domain.repository.db;
 
+import com.gamesage.store.GameTierra;
+import com.gamesage.store.dao.DbInitializer;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.repository.GameRepository;
-import com.gamesage.store.util.RandomBigDecimal;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Repository
 public class DbGameRepository extends GameRepository {
 
+    private JdbcTemplate jdbcTemplate;
+    private DbInitializer dbInitializer;
+
+    public DbGameRepository(JdbcTemplate jdbcTemplate) {
+
+        this.jdbcTemplate = jdbcTemplate;
+        dbInitializer = new DbInitializer(this.jdbcTemplate);
+        Locale.setDefault(Locale.US);
+    }
+
     @Override
     public List<Game> create(List<Game> gamesToAdd) {
-        try (final Connection connection = DbConnector.getConnection("jdbc:sqlite:gamesage.db")) {
-            Class.forName("org.sqlite.JDBC");
 
-            String sqlCommand = "INSERT INTO game (id, name, price) \n" +
-                    "VALUES (1, \"GRAND_THEFT_AUTO\", 32.2),\n" +
-                    "(2, \"FORZA_HORIZON\", 71.73),\n" +
-                    "(3, \"ASSASSIN_S_CREED\", 29.83),\n" +
-                    "(4, \"DOOM_ETERNAL\", 43.87),\n" +
-                    "(5, \"RED_DEAD_REDEMPTION\", 98.3),\n" +
-                    "(6, \"THE_WITCHER\", 18.7),\n" +
-                    "(7, \"THE_LAST_OF_US\", 158.3)";
-
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(sqlCommand);
-        } catch (SQLException | ClassNotFoundException e) {
+        for (Game game : gamesToAdd){
+            String sqlCommand = String.format(
+                    "INSERT INTO game " +
+                    "VALUES (%d, \' %s \', %,.2f)\n",
+                    game.getId(), game.getName(), game.getPrice());
+            jdbcTemplate.execute(sqlCommand);
         }
-        return List.of(
-                new Game("THE_WITCHER", BigDecimal.valueOf(17.28d)),
-                new Game("GRAND_THEFT_AUTO", RandomBigDecimal.getAndFormatRandomBigDecimal()),
-                new Game("RED_DEAD_REDEMPTION", RandomBigDecimal.getAndFormatRandomBigDecimal()),
-                new Game("SKYRIM", BigDecimal.valueOf(87.88d)),
-                new Game("FORZA_HORIZON", RandomBigDecimal.getAndFormatRandomBigDecimal()),
-                new Game("DOOM_ETERNAL", BigDecimal.valueOf(635.48d)),
-                new Game("ASSASSIN_S_CREED", RandomBigDecimal.getAndFormatRandomBigDecimal()),
-                new Game("A_NEW_ONE", RandomBigDecimal.getAndFormatRandomBigDecimal()));
+        return gamesToAdd;
     }
 
     @Override
@@ -50,21 +44,14 @@ public class DbGameRepository extends GameRepository {
 
         List<Game> retrievedGames = new ArrayList<>();
 
-        try (final Connection connection = DbConnector.getConnection("jdbc:sqlite:gamesage.db")) {
-            Class.forName("org.sqlite.JDBC");
+        List<Game> results = (List<Game>) jdbcTemplate.query(
+                "select * from game"
+                , new Object[] { "aGame" },
+                (RowMapper<Game>) (rs, rowNum) -> new Game(rs.getInt("id"), rs.getString("name"),
+                        BigDecimal.valueOf(rs.getDouble("price"))));
 
-            String sqlCommand = "SELECT * FROM game";
-
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(sqlCommand);
-
-            while (resultSet.next()) {
-                retrievedGames.add(new Game(resultSet.getInt(1),
-                        resultSet.getString(2),
-                        BigDecimal.valueOf(resultSet.getDouble(3))));
-            }
-            super.create(retrievedGames);
-        } catch (SQLException | ClassNotFoundException e) {
+        for (Game game : results) {
+            GameTierra.logger.warn(String.valueOf(game));
         }
         return retrievedGames;
     }

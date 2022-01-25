@@ -1,12 +1,13 @@
 package com.gamesage.store.domain.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class User {
+public class User implements Serializable {
 
     private final String login;
     private final Tier tier;

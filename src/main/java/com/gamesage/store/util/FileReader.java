@@ -1,4 +1,4 @@
-package com.gamesage.store.domain.repository.db;
+package com.gamesage.store.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
