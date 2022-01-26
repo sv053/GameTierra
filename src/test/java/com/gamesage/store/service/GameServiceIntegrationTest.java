@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(classes = GameRepository.class)
 class GameServiceIntegrationTest {
 
-
+    @Qualifier("gameRepository")
     @Autowired
-    private DbGameRepository repository;
+    private GameRepository repository;
 
     @Test
     void buyGame_Success_BalanceUpdated() {

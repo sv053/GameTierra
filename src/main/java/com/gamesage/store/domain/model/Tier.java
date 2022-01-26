@@ -1,8 +1,6 @@
 package com.gamesage.store.domain.model;
 
-import java.io.Serializable;
-
-public class Tier implements Serializable {
+public class Tier {
 
     private Integer id;
     private final String name;

@@ -1,41 +1,44 @@
 package com.gamesage.store.domain.repository.db;
 
 import com.gamesage.store.GameTierra;
-import com.gamesage.store.dao.DbInitializer;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.repository.GameRepository;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 @Repository
 public class DbGameRepository extends GameRepository {
 
-    private JdbcTemplate jdbcTemplate;
-    private DbInitializer dbInitializer;
+    private DataSourceInit dataSourceInit;
 
-    public DbGameRepository(JdbcTemplate jdbcTemplate) {
+    public DbGameRepository(DataSourceInit dataSourceInit) {
 
-        this.jdbcTemplate = jdbcTemplate;
-        dbInitializer = new DbInitializer(this.jdbcTemplate);
+        this.dataSourceInit = dataSourceInit;
+
         Locale.setDefault(Locale.US);
     }
 
     @Override
     public List<Game> create(List<Game> gamesToAdd) {
 
+        StringBuilder sqlCommand = new StringBuilder();
+        sqlCommand.append("INSERT INTO game VALUES ");
         for (Game game : gamesToAdd){
-            String sqlCommand = String.format(
-                    "INSERT INTO game " +
-                    "VALUES (%d, \' %s \', %,.2f)\n",
+            String value = String.format("(%d, \' %s \', %,.2f)\n",
                     game.getId(), game.getName(), game.getPrice());
-            jdbcTemplate.execute(sqlCommand);
+            sqlCommand.append(value);
+            if(!gamesToAdd.get(gamesToAdd.size()-1).equals(game))
+                sqlCommand.append(",");
         }
+        dataSourceInit.getJdbcTemplate().execute(sqlCommand.toString());
+
+        super.create(gamesToAdd);
         return gamesToAdd;
     }
 
@@ -44,15 +47,13 @@ public class DbGameRepository extends GameRepository {
 
         List<Game> retrievedGames = new ArrayList<>();
 
-        List<Game> results = (List<Game>) jdbcTemplate.query(
-                "select * from game"
+        List<Game> results = (List<Game>) dataSourceInit.getJdbcTemplate().query(
+                "SELECT * FROM game"
                 , new Object[] { "aGame" },
                 (RowMapper<Game>) (rs, rowNum) -> new Game(rs.getInt("id"), rs.getString("name"),
                         BigDecimal.valueOf(rs.getDouble("price"))));
 
-        for (Game game : results) {
-            GameTierra.logger.warn(String.valueOf(game));
-        }
+        Arrays.asList(results).forEach(g -> GameTierra.logger.info(g.toString()));
         return retrievedGames;
     }
 }
