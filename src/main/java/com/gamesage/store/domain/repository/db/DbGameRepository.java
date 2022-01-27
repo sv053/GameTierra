@@ -3,20 +3,22 @@ package com.gamesage.store.domain.repository.db;
 import com.gamesage.store.GameTierra;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.repository.CreateManyRepository;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.util.*;
 
 @Repository
 public class DbGameRepository implements CreateManyRepository<Game, Integer> {
 
-    private DataSourceInit dataSourceInit;
+    private JdbcTemplate jdbcTemplate;
 
-    public DbGameRepository(DataSourceInit dataSourceInit) {
+    public DbGameRepository(JdbcTemplate jdbcTemplate, DataSource dataSource) {
 
-        this.dataSourceInit = dataSourceInit;
+        this.jdbcTemplate = jdbcTemplate;
 
         Locale.setDefault(Locale.US);
     }
@@ -30,9 +32,9 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
     public List<Game> findAll() {
         List<Game> retrievedGames = new ArrayList<>();
 
-        List<Game> results = (List<Game>) dataSourceInit.getJdbcTemplate().query(
+        List<Game> results = (List<Game>) jdbcTemplate.query(
                 "SELECT * FROM game"
-                , new Object[] { "aGame" },
+                , new Object[] { "Game" },
                 (RowMapper<Game>) (rs, rowNum) -> new Game(rs.getInt("id"), rs.getString("name"),
                         BigDecimal.valueOf(rs.getDouble("price"))));
 
@@ -45,8 +47,8 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
         StringBuilder sqlCommand = new StringBuilder();
         sqlCommand.append("INSERT INTO game VALUES ");
         sqlCommand.append(String.format("(%d, \' %s \', %,.2f)\n",
-                gameToAdd.getId(), gameToAdd.getName(), gameToAdd.getPrice());
-        dataSourceInit.getJdbcTemplate().execute(sqlCommand.toString());
+                gameToAdd.getId(), gameToAdd.getName(), gameToAdd.getPrice()));
+        jdbcTemplate.execute(sqlCommand.toString());
 
         return gameToAdd;
     }
@@ -62,7 +64,7 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
             if(!gamesToAdd.get(gamesToAdd.size()-1).equals(game))
                 sqlCommand.append(",");
         }
-        dataSourceInit.getJdbcTemplate().execute(sqlCommand.toString());
+        jdbcTemplate.execute(sqlCommand.toString());
 
         return gamesToAdd;
     }
