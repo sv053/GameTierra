@@ -2,7 +2,6 @@ package com.gamesage.store.domain.repository;
 
 import com.gamesage.store.domain.model.User;
 
-import java.lang.annotation.Annotation;
 import java.util.*;
 
 @org.springframework.stereotype.Repository

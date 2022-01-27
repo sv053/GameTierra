@@ -9,7 +9,7 @@ import java.util.Set;
 public class User {
 
     private final String login;
-    private Tier tier;
+    private final Tier tier;
     private final Set<Game> games;
     private Integer id;
     private BigDecimal balance;
@@ -18,13 +18,6 @@ public class User {
         this.id = id;
         this.login = login;
         this.tier = tier;
-        this.balance = balance;
-        games = new HashSet<>();
-    }
-
-    public User(Integer id, String login, BigDecimal balance) {
-        this.id = id;
-        this.login = login;
         this.balance = balance;
         games = new HashSet<>();
     }
