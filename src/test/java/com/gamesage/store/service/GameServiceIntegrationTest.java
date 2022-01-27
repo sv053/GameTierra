@@ -20,16 +20,16 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(classes = GameRepository.class)
 class GameServiceIntegrationTest {
 
-    @Qualifier("gameRepository")
+   // @Qualifier("gameRepository")
     @Autowired
-    private GameRepository repository;
+    private DbGameRepository repository;
 
     @Test
     void buyGame_Success_BalanceUpdated() {
 
         Game game = new Game("mistery island", BigDecimal.ONE);
         List<Game> games = List.of(game);
-        repository.create(games);
+        repository.insertAll(games);
         GameService gameService = new GameService(repository);
 
         BigDecimal initBalance = game.getPrice();
@@ -50,7 +50,7 @@ class GameServiceIntegrationTest {
     @Test
     void buyGame_Fail_PriceIsHigherThanBalance_BalanceUnchanged() {
         Game game = new Game(null, BigDecimal.ONE);
-        repository.create(List.of(game));
+        repository.insertAll(List.of(game));
         GameService gameService = new GameService(repository);
 
         BigDecimal initBalance = BigDecimal.ZERO;
@@ -64,7 +64,7 @@ class GameServiceIntegrationTest {
     @Test
     void buyGame_Success_ReturnsTrue() {
         Game game = SampleData.GAMES.get(0);
-        repository.create(List.of(game));
+        repository.insertAll(List.of(game));
         GameService gameService = new GameService(repository);
 
         User user = new User(1, "", SampleData.TIERS.get(1), game.getPrice());
@@ -74,7 +74,7 @@ class GameServiceIntegrationTest {
 
     @Test
     void buyGame_Fail_CannotBuyAlreadyOwned_ReturnsFalse() {
-        repository.create(SampleData.GAMES);
+        repository.insertAll(SampleData.GAMES);
         GameService gameService = new GameService(repository);
 
         Game game = repository.findAll().get(0);
@@ -94,7 +94,7 @@ class GameServiceIntegrationTest {
     @Test
     void findById_Success_TheRightGameIsFound() {
         Game gameToSearch = new Game("mistery island", BigDecimal.ONE);
-        repository.create(List.of(gameToSearch));
+        repository.insertAll(List.of(gameToSearch));
         GameService gameService = new GameService(repository);
 
         assertEquals(gameToSearch, gameService.findById(gameToSearch.getId()));

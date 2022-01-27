@@ -2,18 +2,15 @@ package com.gamesage.store.domain.repository.db;
 
 import com.gamesage.store.GameTierra;
 import com.gamesage.store.domain.model.Game;
-import com.gamesage.store.domain.repository.GameRepository;
+import com.gamesage.store.domain.repository.DbRepository;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Repository
-public class DbGameRepository extends GameRepository {
+public class DbGameRepository implements DbRepository<Game, Integer> {
 
     private DataSourceInit dataSourceInit;
 
@@ -25,7 +22,7 @@ public class DbGameRepository extends GameRepository {
     }
 
     @Override
-    public List<Game> create(List<Game> gamesToAdd) {
+    public List<Game> insertAll(List<Game> gamesToAdd) {
 
         StringBuilder sqlCommand = new StringBuilder();
         sqlCommand.append("INSERT INTO game VALUES ");
@@ -38,12 +35,10 @@ public class DbGameRepository extends GameRepository {
         }
         dataSourceInit.getJdbcTemplate().execute(sqlCommand.toString());
 
-        super.create(gamesToAdd);
         return gamesToAdd;
     }
 
-    @Override
-    public List<Game> findAll() {
+    public List<Game> retrieveAll() {
 
         List<Game> retrievedGames = new ArrayList<>();
 
@@ -55,6 +50,21 @@ public class DbGameRepository extends GameRepository {
 
         Arrays.asList(results).forEach(g -> GameTierra.logger.info(g.toString()));
         return retrievedGames;
+    }
+
+    @Override
+    public Optional<Game> findById(Integer id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<Game> findAll() {
+        return null;
+    }
+
+    @Override
+    public Game createOne(Game item) {
+        return null;
     }
 }
 
