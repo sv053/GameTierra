@@ -12,6 +12,10 @@ public class Tier {
         this.cashbackPercentage = cashbackPercentage;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
     public String getLevel() {
         return name;
     }

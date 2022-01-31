@@ -3,12 +3,14 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.CreateManyRepository;
-import com.gamesage.store.exception.EntityNotFoundException;
+import com.gamesage.store.exception.EmptyResultDataAccessException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class GameService {
@@ -20,7 +22,13 @@ public class GameService {
     }
 
     public Game findById(int id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+        Optional<Game> game = null;
+        try{
+            game = repository.findById(id);
+        }catch (org.springframework.dao.EmptyResultDataAccessException | NoSuchElementException e){
+            throw new EmptyResultDataAccessException(id);
+        }
+        return game.get();
     }
 
     public List<Game> findAll() {

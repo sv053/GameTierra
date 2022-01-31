@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -109,9 +110,7 @@ class GameServiceTest {
         int gameId = 1;
         when(repository.findById(gameId)).thenReturn(Optional.empty());
 
-        EntityNotFoundException e = assertThrows(
-                EntityNotFoundException.class, () -> gameService.findById(gameId));
-        assertEquals("Entity with id 1 not found", e.getMessage());
+        assertThrows(NoSuchElementException.class, () -> gameService.findById(gameId));
     }
 
     @Test
