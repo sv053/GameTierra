@@ -38,8 +38,8 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
             result = (Game) jdbcTemplate.queryForObject(
                     "SELECT * FROM game WHERE ID = " + id
                     , gameRowMapper);
-        }catch (EmptyResultDataAccessException e){
-            throw  new EntityNotFoundException(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new EntityNotFoundException(id);
         }
         return Optional.ofNullable(result);
     }
@@ -50,35 +50,38 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
         List<Game> results = jdbcTemplate.query(
                 "SELECT * FROM game "
                 , gameRowMapper);
-        if(results.isEmpty()) GameTierra.logger.warn("table GAME is empty");
+        if (results.isEmpty()) GameTierra.logger.warn("table GAME is empty");
 
         return results;
     }
 
     @Override
     public Game createOne(Game gameToAdd) {
+
         String query = "INSERT INTO game VALUES ";
-            jdbcTemplate.execute(query,new PreparedStatementCallback<Boolean>(){
-                @Override
-                public Boolean doInPreparedStatement(PreparedStatement ps) throws SQLException {
-                    ps.setInt(1,gameToAdd.getId());
-                    ps.setString(2,gameToAdd.getName());
-                    ps.setBigDecimal(3, gameToAdd.getPrice());
-                    return ps.execute();
-                }
-            });
+        jdbcTemplate.execute(query, new PreparedStatementCallback<Boolean>() {
+            @Override
+            public Boolean doInPreparedStatement(PreparedStatement ps) throws SQLException {
+                ps.setInt(1, gameToAdd.getId());
+                ps.setString(2, gameToAdd.getName());
+                ps.setBigDecimal(3, gameToAdd.getPrice());
+                return ps.execute();
+            }
+        });
         return gameToAdd;
     }
 
     @Override
     public List<Game> create(List<Game> gamesToAdd) {
-        for (Game game : gamesToAdd){
+
+        for (Game game : gamesToAdd) {
             createOne(game);
         }
         return gamesToAdd;
     }
 
 }
+
 @Service
 class GameRowMapper implements RowMapper<Game> {
 

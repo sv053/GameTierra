@@ -2,17 +2,19 @@ package com.gamesage.store.domain.model;
 
 public class Tier {
 
-    private Integer id;
     private final String name;
     private final double cashbackPercentage;
+    private Integer id;
 
     public Tier(Integer id, String name, double cashbackPercentage) {
+
         this.id = id;
         this.name = name;
         this.cashbackPercentage = cashbackPercentage;
     }
 
     public Integer getId() {
+
         return id;
     }
 

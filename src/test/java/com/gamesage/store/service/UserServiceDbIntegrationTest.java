@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Rollback
-
 class UserServiceDbIntegrationTest {
 
     @Autowired
@@ -27,7 +26,6 @@ class UserServiceDbIntegrationTest {
     JdbcTemplate jdbcTemplate;
 
     @Test
-
     void findById_Success() {
 
         List<User> users = userService.findAll();
@@ -43,14 +41,15 @@ class UserServiceDbIntegrationTest {
 
         List<User> users = userService.findAll();
         assertAll(
-                ()-> assertEquals(0, JdbcTestUtils.countRowsInTableWhere(
-                        jdbcTemplate, "user", "id = 77777" )),
-                ()-> assertThrows(EntityNotFoundException.class, () -> userService.findById(77777))
+                () -> assertEquals(0, JdbcTestUtils.countRowsInTableWhere(
+                        jdbcTemplate, "user", "id = 77777")),
+                () -> assertThrows(EntityNotFoundException.class, () -> userService.findById(77777))
         );
     }
 
     @Test
     void findAll_Success() {
+
         assertEquals(JdbcTestUtils.countRowsInTable(jdbcTemplate, "user"), userService.findAll().size());
     }
 
@@ -59,7 +58,7 @@ class UserServiceDbIntegrationTest {
 
         JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "user", "id = 99999999");
         User user = new User(99999999, "loco", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN );
+                3, "SILVER", 10.d), BigDecimal.TEN);
         userService.createOne(user);
         List<User> users = userService.findAll();
         assertTrue(users.contains(user));
@@ -68,7 +67,7 @@ class UserServiceDbIntegrationTest {
     @Test
     void createUser_Fail() {
 
-        User user = new User(1, "anjana", new Tier(3, "SILVER", 10.0), BigDecimal.TEN );
+        User user = new User(1, "anjana", new Tier(3, "SILVER", 10.0), BigDecimal.TEN);
         assertThrows(DuplicateKeyException.class, () -> userService.createOne(user));
     }
 }

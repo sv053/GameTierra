@@ -32,6 +32,7 @@ public class DbUserRepository implements Repository<User, Integer> {
 
     @Override
     public Optional<User> findById(Integer id) {
+
         User user = null;
         try {
             user = jdbcTemplate.queryForObject(
@@ -39,9 +40,9 @@ public class DbUserRepository implements Repository<User, Integer> {
                             "LEFT JOIN tier " +
                             "on user.tier_id = tier.id " +
                             "WHERE user.id = " + id,
-                    userRowMapper
+                        userRowMapper
             );
-        }catch (EmptyResultDataAccessException e){
+        } catch (EmptyResultDataAccessException e) {
         }
         return Optional.ofNullable(user);
     }
@@ -53,7 +54,7 @@ public class DbUserRepository implements Repository<User, Integer> {
                 "SELECT * FROM user " +
                         "LEFT JOIN tier " +
                         "on user.tier_id = tier.id",
-                userRowMapper
+                    userRowMapper
         );
         return users;
     }
@@ -73,30 +74,31 @@ public class DbUserRepository implements Repository<User, Integer> {
                     return ps.execute();
                 }
             });
-        }catch (DuplicateKeyException e){
+        } catch (DuplicateKeyException e) {
             throw new DuplicateKeyException("Unique index or primary key violation");
         }
         return userToAdd;
     }
 }
-    @Service
-    class UserRowMapper implements RowMapper<User> {
 
-        @Override
-        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+@Service
+class UserRowMapper implements RowMapper<User> {
 
-            Tier tier = new Tier(
-                    rs.getInt(5),
-                    rs.getString(6),
-                    rs.getDouble(7)
-            );
-            User user = new User(
-                    rs.getInt("id"),
-                    rs.getString(2),
-                    tier,
-                    rs.getBigDecimal("balance"));
+    @Override
+    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-            return user;
+        Tier tier = new Tier(
+                rs.getInt(5),
+                rs.getString(6),
+                rs.getDouble(7)
+        );
+        User user = new User(
+                rs.getInt("id"),
+                rs.getString(2),
+                tier,
+                rs.getBigDecimal("balance"));
+
+        return user;
     }
 }
 

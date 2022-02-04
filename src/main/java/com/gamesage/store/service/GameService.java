@@ -18,14 +18,16 @@ public class GameService {
     private final CreateManyRepository<Game, Integer> repository;
 
     public GameService(@Qualifier("dbGameRepository") CreateManyRepository<Game, Integer> repository) {
+
         this.repository = repository;
     }
 
     public Game findById(int id) {
+
         Optional<Game> game = null;
-        try{
+        try {
             game = repository.findById(id);
-        }catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             throw new EntityNotFoundException(id);
         }
         return game.get();
@@ -40,11 +42,13 @@ public class GameService {
     }
 
     public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
+
         BigDecimal percentage = BigDecimal.valueOf(user.getTier().getCashbackPercentage());
         return gamePrice.multiply(percentage);
     }
 
     public boolean buyGame(int gameId, User user) {
+
         Game game = findById(gameId);
         BigDecimal price = game.getPrice();
         if (user.canPay(price) && (!user.hasGame(game))) {

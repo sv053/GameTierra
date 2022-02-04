@@ -4,7 +4,6 @@ import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.GameRepository;
-import com.gamesage.store.exception.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
