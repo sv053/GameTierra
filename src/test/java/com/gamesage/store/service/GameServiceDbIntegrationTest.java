@@ -1,11 +1,9 @@
 package com.gamesage.store.service;
 
-import com.gamesage.store.GameTierra;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.db.DbGameRepository;
-import com.gamesage.store.exception.EmptyResultDataAccessException;
+import com.gamesage.store.exception.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +13,7 @@ import java.math.RoundingMode;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(classes= {DbGameRepository.class, GameTierra.class})
+@SpringBootTest
 class GameServiceDbIntegrationTest {
 
     @Autowired
@@ -24,10 +22,10 @@ class GameServiceDbIntegrationTest {
     @Test
     void buyGame_Success_BalanceUpdated() {
 
-        Game game = gameService.findById(101);
+        Game game = gameService.findAll().get(0);
 
         BigDecimal initBalance = game.getPrice();
-        User user = new User(1, null, new Tier(null, null, 10d), initBalance);
+        User user = new User(null, "user1", new Tier(null, null, 10d), initBalance);
 
         gameService.buyGame(game.getId(), user);
 
@@ -44,7 +42,7 @@ class GameServiceDbIntegrationTest {
     @Test
     void buyGame_Fail_PriceIsHigherThanBalance_BalanceUnchanged() {
 
-        Game game = gameService.findById(101);
+        Game game = gameService.findAll().get(0);
 
         BigDecimal initBalance = BigDecimal.ZERO;
         User user = new User(1, null, new Tier(null, null, 10d), initBalance);
@@ -57,7 +55,7 @@ class GameServiceDbIntegrationTest {
     @Test
     void buyGame_Success_ReturnsTrue() {
 
-        Game game = gameService.findById(101);
+        Game game = gameService.findAll().get(0);
         User user = new User(1, null, new Tier(null, null, 10d), game.getPrice());
 
         assertTrue(gameService.buyGame(game.getId(), user));
@@ -66,8 +64,8 @@ class GameServiceDbIntegrationTest {
     @Test
     void buyGame_Fail_CannotBuyAlreadyOwned_ReturnsFalse() {
 
-        Game game = gameService.findById(101);
-        User user = new User(1, null, new Tier(null, null, 10d), game.getPrice());
+        Game game = gameService.findAll().get(0);
+        User user = new User(null, null, new Tier(null, null, 10d), game.getPrice());
         user.addGame(game);
 
         assertFalse(gameService.buyGame(game.getId(), user));
@@ -76,12 +74,12 @@ class GameServiceDbIntegrationTest {
     @Test
     void findById_Fail_TheGameIsNotFound_Exception() {
 
-        assertThrows(EmptyResultDataAccessException.class, () -> gameService.findById(1213313));
+        assertThrows(EntityNotFoundException.class, () -> gameService.findById(1213313));
     }
 
     @Test
     void findById_Success_TheRightGameIsFound() {   // remove this?
-        Game game = gameService.findById(101);
+        Game game = gameService.findAll().get(0);
 
         assertEquals(game, gameService.findById(game.getId())); // doesn't make any sense
     }

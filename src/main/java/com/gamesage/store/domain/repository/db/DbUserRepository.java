@@ -3,92 +3,100 @@ package com.gamesage.store.domain.repository.db;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.Repository;
-import com.gamesage.store.exception.EmptyResultDataAccessException;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 @org.springframework.stereotype.Repository
 public class DbUserRepository implements Repository<User, Integer> {
 
     private JdbcTemplate jdbcTemplate;
-    private List<User> users;
+    private UserRowMapper userRowMapper;
 
-    public DbUserRepository(JdbcTemplate jdbcTemplate) {
+    public DbUserRepository(JdbcTemplate jdbcTemplate, UserRowMapper userRowMapper) {
 
         this.jdbcTemplate = jdbcTemplate;
-        users = new ArrayList<>();
+        this.userRowMapper = userRowMapper;
         Locale.setDefault(Locale.US);
     }
 
     @Override
-    public Optional<User> findById(Integer id) throws EmptyResultDataAccessException {
-
-        UserRowCallbackHandler rowCallbackHandler = new UserRowCallbackHandler();
-        jdbcTemplate.query(
-                "SELECT * FROM user " +
-                        "LEFT JOIN tier " +
-                        "on user.tier_id = tier.id " +
-                        "WHERE user.id = ? ",
-                rowCallbackHandler,
-                id
-        );
-        User user = new ArrayList<>(rowCallbackHandler.getUsers()).get(0);
+    public Optional<User> findById(Integer id) {
+        User user = null;
+        try {
+            user = jdbcTemplate.queryForObject(
+                    "SELECT * FROM user " +
+                            "LEFT JOIN tier " +
+                            "on user.tier_id = tier.id " +
+                            "WHERE user.id = " + id,
+                    userRowMapper
+            );
+        }catch (EmptyResultDataAccessException e){
+        }
         return Optional.ofNullable(user);
     }
 
     @Override
     public List<User> findAll() {
 
-        UserRowCallbackHandler rowCallbackHandler = new UserRowCallbackHandler();
-        jdbcTemplate.query(
+        List<User> users = jdbcTemplate.query(
                 "SELECT * FROM user " +
                         "LEFT JOIN tier " +
                         "on user.tier_id = tier.id",
-                rowCallbackHandler
+                userRowMapper
         );
-        return new ArrayList<>(rowCallbackHandler.getUsers());
+        return users;
     }
 
     @Override
     public User createOne(User userToAdd) {
-        StringBuilder sqlCommand = new StringBuilder();
-        sqlCommand.append("INSERT INTO user VALUES ");
-        sqlCommand.append(String.format("(%d, \' %s \', %d, %,.2f)\n",
-                userToAdd.getId(), userToAdd.getLogin(), userToAdd.getTier().getId(), userToAdd.getBalance()));
-        jdbcTemplate.execute(sqlCommand.toString());
 
+        String query = "insert into user values(?,?,?,?)";
+        try {
+            jdbcTemplate.execute(query, new PreparedStatementCallback<Boolean>() {
+                @Override
+                public Boolean doInPreparedStatement(PreparedStatement ps) throws SQLException {
+                    ps.setInt(1, userToAdd.getId());
+                    ps.setString(2, userToAdd.getLogin());
+                    ps.setBigDecimal(3, userToAdd.getBalance());
+                    ps.setInt(4, userToAdd.getTier().getId());
+                    return ps.execute();
+                }
+            });
+        }catch (DuplicateKeyException e){
+            throw new DuplicateKeyException("Unique index or primary key violation");
+        }
         return userToAdd;
     }
+}
+    @Service
+    class UserRowMapper implements RowMapper<User> {
 
-    class UserRowCallbackHandler implements RowCallbackHandler {
-        private Collection<User> users = new ArrayList<>();
-        private User currentUser = null;
-        private Tier tier = null;
+        @Override
+        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-        public Collection<User> getUsers() {
-            return users;
-        }
+            Tier tier = new Tier(
+                    rs.getInt(5),
+                    rs.getString(6),
+                    rs.getDouble(7)
+            );
+            User user = new User(
+                    rs.getInt("id"),
+                    rs.getString(2),
+                    tier,
+                    rs.getBigDecimal("balance"));
 
-        public void processRow(ResultSet rs) throws SQLException {
-            int userId = rs.getInt("id");
-            if (currentUser == null || userId != currentUser.getId()) {
-
-                Integer id = rs.getInt(userId);
-                String login = rs.getString("login");
-                BigDecimal balance = rs.getBigDecimal("balance");
-                tier = new Tier(rs.getInt("tier_id"),
-                        rs.getString("name"),
-                        rs.getDouble("percentage"));
-
-                currentUser = new User(id, login, tier, balance);
-                users.add(currentUser);
-            }
-        }
+            return user;
     }
 }
 

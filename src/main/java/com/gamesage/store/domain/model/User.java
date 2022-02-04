@@ -87,8 +87,10 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" + " tier=" + tier.getLevel()
-                + ", cashback=" + tier.getCashbackPercentage() * 100 + "%"
+        return "User{"
+                + "login=" + login
+                + ", tier=" + tier.getLevel()
+                + ", cashback=" + tier.getCashbackPercentage() * 100 + "%}"
                 + ", balance=$" + balance
                 + ", games=\\n" + getGames()
                 + '}';

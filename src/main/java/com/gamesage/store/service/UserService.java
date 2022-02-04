@@ -28,6 +28,5 @@ public class UserService {
     public User createOne(User userToAdd) {
         return repository.createOne(userToAdd);
     }
-
 }
 
