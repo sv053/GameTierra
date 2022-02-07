@@ -43,7 +43,6 @@ public class Game {
 
     @Override
     public boolean equals(Object o) {
-
         if (this == o) return true;
         if (!(o instanceof Game)) return false;
 
@@ -53,7 +52,6 @@ public class Game {
 
     @Override
     public int hashCode() {
-
         int result = id.hashCode();
         result = 31 * result + name.hashCode();
         return result;
@@ -61,7 +59,6 @@ public class Game {
 
     @Override
     public String toString() {
-
         return "Game{" + "id='" + id
                 + '\'' + ", name='" + name
                 + '\'' + ", price=$" + price

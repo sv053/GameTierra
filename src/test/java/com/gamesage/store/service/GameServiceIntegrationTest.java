@@ -10,8 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.SQLException;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -84,7 +84,7 @@ class GameServiceIntegrationTest {
     @Test
     void findById_Fail_TheGameIsNotFound_Exception() {
         GameService gameService = new GameService(repository);
-        assertThrows(NoSuchElementException.class, () -> gameService.findById(1213313));
+        assertThrows(SQLException.class, () -> gameService.findById(1213313));
     }
 
     @Test
@@ -93,6 +93,9 @@ class GameServiceIntegrationTest {
         repository.create(List.of(gameToSearch));
         GameService gameService = new GameService(repository);
 
-        assertEquals(gameToSearch, gameService.findById(gameToSearch.getId()));
+        try {
+            assertEquals(gameToSearch, gameService.findById(gameToSearch.getId()));
+        } catch (SQLException e) {
+        }
     }
 }

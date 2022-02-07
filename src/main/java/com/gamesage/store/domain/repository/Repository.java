@@ -1,6 +1,6 @@
 package com.gamesage.store.domain.repository;
 
-
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +10,6 @@ public interface Repository<T, K> {
 
     List<T> findAll();
 
-    T createOne(T item);
+    T createOne(T item) throws SQLException;
 }
 

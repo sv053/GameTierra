@@ -1,99 +1,86 @@
 package com.gamesage.store.domain.repository.db;
 
-import com.gamesage.store.GameTierra;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.repository.CreateManyRepository;
-import com.gamesage.store.exception.EntityNotFoundException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
-@org.springframework.stereotype.Repository
+@Repository
 public class DbGameRepository implements CreateManyRepository<Game, Integer> {
 
-    private JdbcTemplate jdbcTemplate;
-    private GameRowMapper gameRowMapper;
+    private final JdbcTemplate jdbcTemplate;
+    private final RowMapper<Game> gameRowMapper;
 
     public DbGameRepository(JdbcTemplate jdbcTemplate, GameRowMapper gameRowMapper) {
-
         this.jdbcTemplate = jdbcTemplate;
         this.gameRowMapper = gameRowMapper;
-        Locale.setDefault(Locale.US);
     }
 
     @Override
     public Optional<Game> findById(Integer id) {
-
-        Game result = null;
+        Optional<Game> result;
         try {
-            result = (Game) jdbcTemplate.queryForObject(
-                    "SELECT * FROM game WHERE ID = " + id
-                    , gameRowMapper);
-        } catch (EmptyResultDataAccessException e) {
-            throw new EntityNotFoundException(id);
+            result = Optional.ofNullable(jdbcTemplate.queryForObject(
+                    "SELECT * FROM game WHERE ID = ?"
+                    , gameRowMapper
+                    , id));
+        } catch (Exception e) {
+            return Optional.empty();
         }
-        return Optional.ofNullable(result);
+        return result;
     }
 
     @Override
     public List<Game> findAll() {
-
         List<Game> results = jdbcTemplate.query(
                 "SELECT * FROM game "
                 , gameRowMapper);
-        if (results.isEmpty()) GameTierra.logger.warn("table GAME is empty");
 
         return results;
     }
 
     @Override
-    public Game createOne(Game gameToAdd) {
+    @Transactional
+    public Game createOne(Game gameToAdd) throws SQLException {
+        jdbcTemplate.update("INSERT INTO game VALUES(?,?,?) ",
+                gameToAdd.getId(),
+                gameToAdd.getName(),
+                gameToAdd.getPrice());
 
-        String query = "INSERT INTO game VALUES ";
-        jdbcTemplate.execute(query, new PreparedStatementCallback<Boolean>() {
-            @Override
-            public Boolean doInPreparedStatement(PreparedStatement ps) throws SQLException {
-                ps.setInt(1, gameToAdd.getId());
-                ps.setString(2, gameToAdd.getName());
-                ps.setBigDecimal(3, gameToAdd.getPrice());
-                return ps.execute();
-            }
-        });
-        return gameToAdd;
-    }
-
-    @Override
-    public List<Game> create(List<Game> gamesToAdd) {
-
-        for (Game game : gamesToAdd) {
-            createOne(game);
-        }
-        return gamesToAdd;
-    }
-
-}
-
-@Service
-class GameRowMapper implements RowMapper<Game> {
-
-    @Override
-    public Game mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-        Game game = new Game(
-                rs.getInt("id"),
-                rs.getString("name"),
-                rs.getBigDecimal("price"));
-
+        Game game = findById(gameToAdd.getId())
+                .orElseThrow(SQLException::new);
         return game;
+    }
+
+    @Override
+    @Transactional
+    public List<Game> create(List<Game> gamesToAdd) throws SQLException {
+        List<Game> games = new ArrayList<>();
+        for (Game game : gamesToAdd) {
+            games.add(createOne(game));
+        }
+        return games;
+    }
+
+    @Component
+    static class GameRowMapper implements RowMapper<Game> {
+
+        @Override
+        public Game mapRow(ResultSet rs, int rowNum) throws SQLException {
+            return new Game(
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    rs.getBigDecimal("price"));
+        }
     }
 }
 

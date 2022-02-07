@@ -12,7 +12,6 @@ public class UserRepository implements Repository<User, Integer> {
     private int idCounter = 1;
 
     public UserRepository() {
-
         users = new ArrayList<>();
         allUsersById = new HashMap<>();
     }
@@ -29,7 +28,6 @@ public class UserRepository implements Repository<User, Integer> {
 
     @Override
     public User createOne(User user) {
-
         User userWithId = assignId(user);
         users.add(userWithId);
         allUsersById.put(userWithId.getId(), userWithId);
@@ -37,7 +35,6 @@ public class UserRepository implements Repository<User, Integer> {
     }
 
     private User assignId(User user) {
-
         user.setId(idCounter++);
         return user;
     }

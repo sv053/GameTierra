@@ -12,6 +12,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,7 +28,6 @@ class UserServiceDbIntegrationTest {
 
     @Test
     void findById_Success() {
-
         List<User> users = userService.findAll();
         User user = users.get(0);
 
@@ -38,7 +38,6 @@ class UserServiceDbIntegrationTest {
 
     @Test
     void findById_Failure() {
-
         List<User> users = userService.findAll();
         assertAll(
                 () -> assertEquals(0, JdbcTestUtils.countRowsInTableWhere(
@@ -49,24 +48,25 @@ class UserServiceDbIntegrationTest {
 
     @Test
     void findAll_Success() {
-
         assertEquals(JdbcTestUtils.countRowsInTable(jdbcTemplate, "user"), userService.findAll().size());
     }
 
     @Test
     void createUser_Success() {
-
-        JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "user", "id = 99999999");
         User user = new User(99999999, "loco", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
-        userService.createOne(user);
-        List<User> users = userService.findAll();
-        assertTrue(users.contains(user));
+        try {
+            userService.createOne(user);
+            List<User> users = userService.findAll();
+            assertTrue(users.contains(user));
+            JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "user", "id = 99999999");
+        } catch (SQLException e) {
+            assertThrows(SQLException.class, () -> userService.createOne(user));
+        }
     }
 
     @Test
     void createUser_Fail() {
-
         User user = new User(1, "anjana", new Tier(3, "SILVER", 10.0), BigDecimal.TEN);
         assertThrows(DuplicateKeyException.class, () -> userService.createOne(user));
     }

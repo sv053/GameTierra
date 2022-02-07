@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.NoSuchElementException;
+import java.sql.SQLException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -101,7 +101,11 @@ class GameServiceTest {
         Game game = new Game(gameId, "fabula", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
-        assertEquals(game, gameService.findById(gameId));
+        try {
+            assertEquals(game, gameService.findById(gameId));
+        } catch (SQLException e) {
+
+        }
     }
 
     @Test
@@ -109,7 +113,7 @@ class GameServiceTest {
         int gameId = 1;
         when(repository.findById(gameId)).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchElementException.class, () -> gameService.findById(gameId));
+        assertThrows(SQLException.class, () -> gameService.findById(gameId));
     }
 
     @Test

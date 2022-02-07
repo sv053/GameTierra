@@ -80,7 +80,6 @@ public class User {
 
     @Override
     public int hashCode() {
-
         int result = login != null ? login.hashCode() : 0;
         result = 31 * result + Integer.hashCode(id);
         return result;
@@ -88,9 +87,9 @@ public class User {
 
     @Override
     public String toString() {
-
         return "User{"
-                + "login=" + login
+                + "id=" + id
+                + ", login=" + login
                 + ", tier=" + tier.getLevel()
                 + ", cashback=" + tier.getCashbackPercentage() * 100 + "%}"
                 + ", balance=$" + balance

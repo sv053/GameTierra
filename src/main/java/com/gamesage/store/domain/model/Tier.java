@@ -7,14 +7,12 @@ public class Tier {
     private Integer id;
 
     public Tier(Integer id, String name, double cashbackPercentage) {
-
         this.id = id;
         this.name = name;
         this.cashbackPercentage = cashbackPercentage;
     }
 
     public Integer getId() {
-
         return id;
     }
 

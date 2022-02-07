@@ -1,12 +1,13 @@
 package com.gamesage.store.domain.repository;
 
 import com.gamesage.store.domain.model.Game;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@org.springframework.stereotype.Repository
+@Repository
 public class GameRepository implements CreateManyRepository<Game, Integer> {
 
     private final List<Game> games;
@@ -14,7 +15,6 @@ public class GameRepository implements CreateManyRepository<Game, Integer> {
     private int gameIdCounter = 1;
 
     public GameRepository() {
-
         games = new ArrayList<>();
         allGamesById = new HashMap<>();
     }
@@ -30,7 +30,6 @@ public class GameRepository implements CreateManyRepository<Game, Integer> {
 
     @Override
     public Game createOne(Game gameToAdd) {
-
         Game gameToAddWithId = assignGameId(gameToAdd);
         games.add(gameToAddWithId);
         allGamesById.put(gameToAddWithId.getId(), gameToAddWithId);
@@ -39,7 +38,6 @@ public class GameRepository implements CreateManyRepository<Game, Integer> {
 
     @Override
     public List<Game> create(List<Game> gamesToAdd) {
-
         List<Game> gamesToAddWithId = addIdToAll(gamesToAdd);
         games.addAll(gamesToAddWithId);
         addGamesToMap(gamesToAddWithId);
@@ -47,19 +45,16 @@ public class GameRepository implements CreateManyRepository<Game, Integer> {
     }
 
     private List<Game> addIdToAll(List<Game> gamesToAddId) {
-
         gamesToAddId.forEach(this::assignGameId);
         return gamesToAddId;
     }
 
     private Game assignGameId(Game game) {
-
         game.setId(gameIdCounter++);
         return game;
     }
 
     private void addGamesToMap(List<Game> gamesToAdd) {
-
         Map<Integer, Game> mapForNewGames = gamesToAdd.stream()
                 .collect(
                         Collectors.toMap(Game::getId, Function.identity(),
