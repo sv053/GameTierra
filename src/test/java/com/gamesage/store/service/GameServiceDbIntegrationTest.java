@@ -3,37 +3,49 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
+import com.gamesage.store.exception.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@Transactional
 class GameServiceDbIntegrationTest {
-
+    @Autowired
     GameService gameService;
+    @Autowired
     JdbcTemplate jdbcTemplate;
+    List<Game> games;
     Game game;
 
-    @Autowired
-    public GameServiceDbIntegrationTest(GameService gameService, JdbcTemplate jdbcTemplate) {
-        this.gameService = gameService;
-        this.jdbcTemplate = jdbcTemplate;
-        this.game = gameService.findAll().get(0);
+    @BeforeEach
+    void init(){
+
+        games = List.of(
+                new Game( "Detroit: Become Human", BigDecimal.TEN),
+                new Game( "Detroit: Become Android", BigDecimal.TEN));
+        List<Game> gameList = gameService.createAll(games);
+        game = gameList.get(0);
     }
 
     @Test
     void buyGame_Success_BalanceUpdated() {
+        game = games.get(0);
+
         BigDecimal initBalance = game.getPrice();
-        User user = new User(null, "user1", new Tier(null, null, 10d), initBalance);
+        User user = new User(null, "bee", new Tier(null, null, 10d), initBalance);
 
         gameService.buyGame(game.getId(), user);
 
@@ -74,46 +86,35 @@ class GameServiceDbIntegrationTest {
 
     @Test
     void findById_Fail_TheGameIsNotFound_Exception() {
-        assertThrows(SQLException.class, () -> gameService.findById(1213313));
+        assertThrows(EntityNotFoundException.class, () -> gameService.findById(1213313));
     }
 
     @Test
     void findById_Success_TheRightGameIsFound() {
-        JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "game", "id = 123");
-        Game game = new Game(123, "Detroit: Become Human", BigDecimal.TEN);
-        try {
-            gameService.createAll(List.of(game));
-            assertEquals(game, gameService.findById(game.getId()));
-        } catch (SQLException e) {
-            assertThrows(SQLException.class, () -> gameService.findById(123));
-        }
+        Game game = new Game( "Detroit: Become Human", BigDecimal.TEN);
+
+        gameService.createOne(game);
+
+        assertEquals(game, gameService.findById(game.getId()));
     }
 
     @Test
     void createAGame_Success() {
-        JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "game", "id = 123");
-        Game game = new Game(123, "Detroit: Become Human", BigDecimal.TEN);
-        try {
-            gameService.createAll(List.of(game));
-            assertTrue(gameService.findAll().contains(game));
-        } catch (SQLException e) {
-            assertThrows(SQLException.class, () -> gameService.createAll(List.of(game)));
-        }
+        Game gameToAdd = new Game( "Detroit: Become Human", BigDecimal.TEN);
+        Game addedGame = gameService.createOne(gameToAdd);
 
+        assertTrue(gameService.findAll().contains(addedGame));
     }
 
     @Test
     void createGames_Success() {
-        JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "game", "id = 99998 OR id = 99999");
         List<Game> games = List.of(
-                new Game(99998, "Detroit: Become Human", BigDecimal.TEN),
-                new Game(99999, "Detroit: Become Android", BigDecimal.TEN));
-        try {
-            gameService.createAll(games);
-            assertTrue(gameService.findAll().containsAll(games));
-        } catch (SQLException e) {
-            assertThrows(SQLException.class, () -> gameService.createAll(games));
-        }
+                new Game( "Detroit: Become Human", BigDecimal.TEN),
+                new Game( "Detroit: Become Android", BigDecimal.TEN));
+
+        List<Game> newGames = gameService.createAll(games);
+
+        assertTrue(gameService.findAll().containsAll(newGames));
     }
 }
 

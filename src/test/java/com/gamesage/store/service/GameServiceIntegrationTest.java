@@ -4,18 +4,18 @@ import com.gamesage.store.domain.data.SampleData;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.GameRepository;
+import com.gamesage.store.exception.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(classes = {GameRepository.class})
+@SpringBootTest
 class GameServiceIntegrationTest {
 
     @Autowired
@@ -84,7 +84,7 @@ class GameServiceIntegrationTest {
     @Test
     void findById_Fail_TheGameIsNotFound_Exception() {
         GameService gameService = new GameService(repository);
-        assertThrows(SQLException.class, () -> gameService.findById(1213313));
+        assertThrows(EntityNotFoundException.class, () -> gameService.findById(1213313));
     }
 
     @Test
@@ -93,10 +93,7 @@ class GameServiceIntegrationTest {
         repository.create(List.of(gameToSearch));
         GameService gameService = new GameService(repository);
 
-        try {
-            assertEquals(gameToSearch, gameService.findById(gameToSearch.getId()));
-        } catch (SQLException e) {
-        }
+        assertEquals(gameToSearch, gameService.findById(gameToSearch.getId()));
     }
 }
 

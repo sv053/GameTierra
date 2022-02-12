@@ -6,9 +6,12 @@ import com.gamesage.store.domain.repository.Repository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -27,10 +30,9 @@ class DbUserRepository implements Repository<User, Integer> {
 
     @Override
     public Optional<User> findById(Integer id) {
-        Optional<User> result;
         try {
-            result = Optional.ofNullable(jdbcTemplate.queryForObject(
-                    "SELECT * FROM user " +
+            return Optional.ofNullable(jdbcTemplate.queryForObject(
+                    "SELECT user.id AS user_id, login, balance, tier_id, level AS tl, tier.percentage AS tp FROM user " +
                             "LEFT JOIN tier " +
                             "on user.tier_id = tier.id " +
                             "WHERE user.id = ?",
@@ -38,15 +40,14 @@ class DbUserRepository implements Repository<User, Integer> {
                     id
             ));
         } catch (EmptyResultDataAccessException e) {
-            result = Optional.empty();
+            return Optional.empty();
         }
-        return result;
     }
 
     @Override
     public List<User> findAll() {
         List<User> users = jdbcTemplate.query(
-                "SELECT * FROM user " +
+                "SELECT user.id AS user_id, login, balance, tier_id, tier.level AS tl, tier.percentage AS tp FROM user " +
                         "LEFT JOIN tier " +
                         "on user.tier_id = tier.id",
                 userRowMapper
@@ -56,15 +57,20 @@ class DbUserRepository implements Repository<User, Integer> {
 
     @Override
     @Transactional
-    public User createOne(User userToAdd) throws SQLException {
-        jdbcTemplate.update("insert into user values(?,?,?,?)",
-                userToAdd.getId(),
-                userToAdd.getLogin(),
-                userToAdd.getBalance(),
-                userToAdd.getTier().getId());
-        return findById(userToAdd.getId()).orElseThrow(SQLException::new);
+    public User createOne(User userToAdd) {
+        String INSERT_MESSAGE = "insert into user (login, balance, tier_id) values ( ?, ?, ?) ";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(con -> {
+            PreparedStatement ps = con.prepareStatement(INSERT_MESSAGE,
+                    new String[]{"id"});
+            ps.setString(1, userToAdd.getLogin());
+            ps.setBigDecimal(2, userToAdd.getBalance());
+            ps.setInt(3, userToAdd.getTier().getId());
+            return ps;
+        }, keyHolder);
+        userToAdd.setId((Integer) keyHolder.getKey());
+        return userToAdd;
     }
-
 
     @Component
     static class UserRowMapper implements RowMapper<User> {
@@ -72,18 +78,15 @@ class DbUserRepository implements Repository<User, Integer> {
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
             Tier tier = new Tier(
-                    rs.getInt(5),
-                    rs.getString(6),
-                    rs.getDouble(7)
+                    rs.getInt("tier_id"),
+                    rs.getString("tl"),
+                    rs.getDouble("tp")
             );
-            User user = new User(
-                    rs.getInt("id"),
-                    rs.getString(2),
+            return new User(
+                    rs.getInt("user_id"),
+                    rs.getString("login"),
                     tier,
                     rs.getBigDecimal("balance"));
-
-            return user;
         }
-    }
-}
+    }}
 

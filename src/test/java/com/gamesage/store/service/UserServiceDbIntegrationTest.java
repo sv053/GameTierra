@@ -3,22 +3,21 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.exception.EntityNotFoundException;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@Rollback
+@Transactional
 class UserServiceDbIntegrationTest {
 
     @Autowired
@@ -28,47 +27,33 @@ class UserServiceDbIntegrationTest {
 
     @Test
     void findById_Success() {
-        List<User> users = userService.findAll();
-        User user = users.get(0);
+        User user = new User(null,"aquamarina", new Tier(
+                3, null, 10.d), BigDecimal.TEN);
 
-        assertEquals(user, userService.findById(user.getId()));
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(
-                jdbcTemplate, "user", "id = " + user.getId()));
+        User userToFind = userService.createOne(user);
+        User foundUser = userService.findById(userToFind.getId());
+
+        assertEquals(userToFind, foundUser);
     }
 
     @Test
     void findById_Failure() {
-        List<User> users = userService.findAll();
-        assertAll(
-                () -> assertEquals(0, JdbcTestUtils.countRowsInTableWhere(
-                        jdbcTemplate, "user", "id = 77777")),
-                () -> assertThrows(EntityNotFoundException.class, () -> userService.findById(77777))
-        );
+        assertAll(() -> assertThrows(EntityNotFoundException.class, () -> userService.findById(77777)));
     }
 
     @Test
     void findAll_Success() {
-        assertEquals(JdbcTestUtils.countRowsInTable(jdbcTemplate, "user"), userService.findAll().size());
+        assertEquals(JdbcTestUtils.countRowsInTable(jdbcTemplate, "user")
+                , userService.findAll().size());
     }
 
     @Test
     void createUser_Success() {
-        User user = new User(99999999, "loco", new Tier(
+        User user = new User(null,"loco", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
-        try {
             userService.createOne(user);
             List<User> users = userService.findAll();
             assertTrue(users.contains(user));
-            JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "user", "id = 99999999");
-        } catch (SQLException e) {
-            assertThrows(SQLException.class, () -> userService.createOne(user));
-        }
-    }
-
-    @Test
-    void createUser_Fail() {
-        User user = new User(1, "anjana", new Tier(3, "SILVER", 10.0), BigDecimal.TEN);
-        assertThrows(DuplicateKeyException.class, () -> userService.createOne(user));
     }
 }
 

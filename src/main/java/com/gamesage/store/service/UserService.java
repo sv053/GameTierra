@@ -6,7 +6,6 @@ import com.gamesage.store.exception.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @Service
@@ -26,7 +25,7 @@ public class UserService {
         return repository.findAll();
     }
 
-    public User createOne(User userToAdd) throws SQLException {
+    public User createOne(User userToAdd) {
         return repository.createOne(userToAdd);
     }
 }

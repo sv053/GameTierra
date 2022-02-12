@@ -4,7 +4,7 @@ public class Tier {
 
     private final String name;
     private final double cashbackPercentage;
-    private Integer id;
+    private final Integer id;
 
     public Tier(Integer id, String name, double cashbackPercentage) {
         this.id = id;

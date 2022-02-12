@@ -4,6 +4,7 @@ import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.GameRepository;
+import com.gamesage.store.exception.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.SQLException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,7 +29,7 @@ class GameServiceTest {
     @Test
     void buyGame_Success_ReturnsTrue() {
         int gameId = 1;
-        Game game = new Game(gameId, "lago", BigDecimal.ONE);
+        Game game = new Game( gameId, "lago", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
         User user = new User(1, null, new Tier(1, "", 18), BigDecimal.TEN);
@@ -61,7 +61,7 @@ class GameServiceTest {
     @Test
     void buyGame_Fail_WhenPriceIsHigherThanBalance_BalanceUnchanged() {
         int gameId = 1;
-        Game game = new Game(gameId, "addedGame", BigDecimal.TEN);
+        Game game = new Game("addedGame", BigDecimal.TEN);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
         BigDecimal initBalance = BigDecimal.ONE;
@@ -75,7 +75,7 @@ class GameServiceTest {
     @Test
     void buyGame_Fail_WhenPriceHigherThanBalance_ReturnsFalse() {
         int gameId = 1;
-        Game game = new Game(gameId, "rio", BigDecimal.ONE);
+        Game game = new Game( "rio", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
         User user = new User(null, "", new Tier(4, null, .0), BigDecimal.ZERO);
@@ -86,7 +86,7 @@ class GameServiceTest {
     @Test
     void buyGame_Fail_CannotBuyAlreadyOwned_ReturnsFalse() {
         int gameId = 1;
-        Game game = new Game(gameId, "isla", BigDecimal.ONE);
+        Game game = new Game( gameId, "isla", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
         User user = new User(5, null, null, BigDecimal.TEN);
@@ -98,14 +98,10 @@ class GameServiceTest {
     @Test
     void findById_Success_TheRightGameIsFound() {
         int gameId = 1;
-        Game game = new Game(gameId, "fabula", BigDecimal.ONE);
+        Game game = new Game( "fabula", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
-        try {
-            assertEquals(game, gameService.findById(gameId));
-        } catch (SQLException e) {
-
-        }
+        assertEquals(game, gameService.findById(gameId));
     }
 
     @Test
@@ -113,12 +109,12 @@ class GameServiceTest {
         int gameId = 1;
         when(repository.findById(gameId)).thenReturn(Optional.empty());
 
-        assertThrows(SQLException.class, () -> gameService.findById(gameId));
+        assertThrows(EntityNotFoundException.class, () -> gameService.findById(gameId));
     }
 
     @Test
     void calculateCashback_Success_CheckCashback() {
-        Game game = new Game(1, "fabula", BigDecimal.ONE);
+        Game game = new Game( "fabula", BigDecimal.ONE);
 
         User user = new User(7, "marvel", new Tier(1, "", 5.), BigDecimal.TEN);
 

@@ -3,11 +3,11 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.CreateManyRepository;
+import com.gamesage.store.exception.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.List;
 
 @Service
@@ -19,16 +19,20 @@ public class GameService {
         this.repository = repository;
     }
 
-    public Game findById(int id) throws SQLException {
-        return repository.findById(id).orElseThrow(SQLException::new);
+    public Game findById(int id) {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
     }
 
     public List<Game> findAll() {
         return repository.findAll();
     }
 
-    public List<Game> createAll(List<Game> gamesToAdd) throws SQLException {
+    public List<Game> createAll(List<Game> gamesToAdd) {
         return repository.create(gamesToAdd);
+    }
+
+    public Game createOne(Game gameToAdd) {
+        return repository.createOne(gameToAdd);
     }
 
     public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
@@ -37,12 +41,7 @@ public class GameService {
     }
 
     public boolean buyGame(int gameId, User user) {
-        Game game;
-        try {
-            game = findById(gameId);
-        } catch (SQLException e) {
-            return false;
-        }
+        Game game = findById(gameId);
         BigDecimal price = game.getPrice();
         if (user.canPay(price) && (!user.hasGame(game))) {
             BigDecimal cashback = calculateCashback(price, user);
