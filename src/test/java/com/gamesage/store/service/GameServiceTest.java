@@ -29,7 +29,7 @@ class GameServiceTest {
     @Test
     void buyGame_Success_ReturnsTrue() {
         int gameId = 1;
-        Game game = new Game( gameId, "lago", BigDecimal.ONE);
+        Game game = new Game(gameId, "lago", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
         User user = new User(1, null, new Tier(1, "", 18), BigDecimal.TEN);
@@ -75,7 +75,7 @@ class GameServiceTest {
     @Test
     void buyGame_Fail_WhenPriceHigherThanBalance_ReturnsFalse() {
         int gameId = 1;
-        Game game = new Game( "rio", BigDecimal.ONE);
+        Game game = new Game("rio", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
         User user = new User(null, "", new Tier(4, null, .0), BigDecimal.ZERO);
@@ -86,7 +86,7 @@ class GameServiceTest {
     @Test
     void buyGame_Fail_CannotBuyAlreadyOwned_ReturnsFalse() {
         int gameId = 1;
-        Game game = new Game( gameId, "isla", BigDecimal.ONE);
+        Game game = new Game(gameId, "isla", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
         User user = new User(5, null, null, BigDecimal.TEN);
@@ -98,7 +98,7 @@ class GameServiceTest {
     @Test
     void findById_Success_TheRightGameIsFound() {
         int gameId = 1;
-        Game game = new Game( "fabula", BigDecimal.ONE);
+        Game game = new Game("fabula", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
         assertEquals(game, gameService.findById(gameId));
@@ -114,7 +114,7 @@ class GameServiceTest {
 
     @Test
     void calculateCashback_Success_CheckCashback() {
-        Game game = new Game( "fabula", BigDecimal.ONE);
+        Game game = new Game("fabula", BigDecimal.ONE);
 
         User user = new User(7, "marvel", new Tier(1, "", 5.), BigDecimal.TEN);
 

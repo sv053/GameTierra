@@ -22,19 +22,22 @@ class DbUserRepository implements Repository<User, Integer> {
 
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> userRowMapper;
+    private final String findUserQuery;
 
     public DbUserRepository(JdbcTemplate jdbcTemplate, UserRowMapper userRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.userRowMapper = userRowMapper;
+        findUserQuery = "SELECT user.id AS user_id, login, balance, " +
+                "tier_id, level AS tl, tier.percentage AS tp FROM user " +
+                "LEFT JOIN tier " +
+                "on user.tier_id = tier.id ";
     }
 
     @Override
     public Optional<User> findById(Integer id) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
-                    "SELECT user.id AS user_id, login, balance, tier_id, level AS tl, tier.percentage AS tp FROM user " +
-                            "LEFT JOIN tier " +
-                            "on user.tier_id = tier.id " +
+                    findUserQuery +
                             "WHERE user.id = ?",
                     userRowMapper,
                     id
@@ -46,13 +49,10 @@ class DbUserRepository implements Repository<User, Integer> {
 
     @Override
     public List<User> findAll() {
-        List<User> users = jdbcTemplate.query(
-                "SELECT user.id AS user_id, login, balance, tier_id, tier.level AS tl, tier.percentage AS tp FROM user " +
-                        "LEFT JOIN tier " +
-                        "on user.tier_id = tier.id",
+        return jdbcTemplate.query(
+                findUserQuery,
                 userRowMapper
         );
-        return users;
     }
 
     @Override
@@ -88,5 +88,6 @@ class DbUserRepository implements Repository<User, Integer> {
                     tier,
                     rs.getBigDecimal("balance"));
         }
-    }}
+    }
+}
 

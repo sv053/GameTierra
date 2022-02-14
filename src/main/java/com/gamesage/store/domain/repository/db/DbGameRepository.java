@@ -45,50 +45,35 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
 
     @Override
     public List<Game> findAll() {
-        List<Game> results = jdbcTemplate.query(
+        return jdbcTemplate.query(
                 "SELECT id, name, price FROM game "
                 , gameRowMapper);
-
-        return results;
     }
 
     @Override
-    @Transactional
     public Game createOne(Game gameToAdd) {
         String INSERT_MESSAGE = "insert into game (name, price) values( ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con
                     .prepareStatement(INSERT_MESSAGE,
-                            new String[]{"id"});
+                            Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, gameToAdd.getName());
             ps.setBigDecimal(2, gameToAdd.getPrice());
             return ps;
         }, keyHolder);
-        gameToAdd.setId((Integer) keyHolder.getKey());
-        return gameToAdd;
+        return new Game(keyHolder.getKeyAs(Integer.TYPE),
+                gameToAdd.getName(),
+                gameToAdd.getPrice());
     }
 
     @Override
     @Transactional
     public List<Game> create(List<Game> gamesToAdd) {
         List<Game> addedGames = new ArrayList<>();
-        String INSERT_MESSAGE = "insert into game (name, price) values( ?, ? ) ";
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-
         Iterator<Game> gameIterator = gamesToAdd.listIterator();
         while (gameIterator.hasNext()) {
-            Game currentGame = gameIterator.next();
-            jdbcTemplate.update(con -> {
-                PreparedStatement ps = con.prepareStatement(INSERT_MESSAGE,
-                        Statement.RETURN_GENERATED_KEYS);
-                ps.setString(1, currentGame.getName());
-                ps.setBigDecimal(2, currentGame.getPrice());
-                ResultSet rs = ps.getGeneratedKeys();
-                return ps;
-            }, keyHolder);
-            currentGame.setId((Integer) keyHolder.getKey());
-            addedGames.add(currentGame);
+            addedGames.add(createOne(gameIterator.next()));
         }
         return addedGames;
     }

@@ -4,18 +4,14 @@ import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.exception.EntityNotFoundException;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,26 +20,16 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 class GameServiceDbIntegrationTest {
     @Autowired
-    GameService gameService;
-    @Autowired
-    JdbcTemplate jdbcTemplate;
-    List<Game> games;
-    Game game;
+    private GameService gameService;
+    private Game game;
 
     @BeforeEach
-    void init(){
-
-        games = List.of(
-                new Game( "Detroit: Become Human", BigDecimal.TEN),
-                new Game( "Detroit: Become Android", BigDecimal.TEN));
-        List<Game> gameList = gameService.createAll(games);
-        game = gameList.get(0);
+    void init() {
+        game = gameService.createOne(new Game("Detroit: Become Human", BigDecimal.TEN));
     }
 
     @Test
     void buyGame_Success_BalanceUpdated() {
-        game = games.get(0);
-
         BigDecimal initBalance = game.getPrice();
         User user = new User(null, "bee", new Tier(null, null, 10d), initBalance);
 
@@ -91,17 +77,12 @@ class GameServiceDbIntegrationTest {
 
     @Test
     void findById_Success_TheRightGameIsFound() {
-        Game game = new Game( "Detroit: Become Human", BigDecimal.TEN);
-
-        gameService.createOne(game);
-
         assertEquals(game, gameService.findById(game.getId()));
     }
 
     @Test
     void createAGame_Success() {
-        Game gameToAdd = new Game( "Detroit: Become Human", BigDecimal.TEN);
-        Game addedGame = gameService.createOne(gameToAdd);
+        Game addedGame = gameService.createOne(game);
 
         assertTrue(gameService.findAll().contains(addedGame));
     }
@@ -109,8 +90,8 @@ class GameServiceDbIntegrationTest {
     @Test
     void createGames_Success() {
         List<Game> games = List.of(
-                new Game( "Detroit: Become Human", BigDecimal.TEN),
-                new Game( "Detroit: Become Android", BigDecimal.TEN));
+                new Game("Detroit: Become Human", BigDecimal.TEN),
+                new Game("Detroit: Become Android", BigDecimal.TEN));
 
         List<Game> newGames = gameService.createAll(games);
 
