@@ -20,7 +20,7 @@ import java.util.Optional;
 @org.springframework.stereotype.Repository
 class DbUserRepository implements Repository<User, Integer> {
 
-    private static final String selectUserQuery = "SELECT user.id AS user_id, login, balance, " +
+    private static final String SELECT_USER_QUERY = "SELECT user.id AS user_id, login, balance, " +
             "tier_id, level AS tl, tier.percentage AS tp FROM user " +
             "LEFT JOIN tier " +
             "on user.tier_id = tier.id ";
@@ -36,7 +36,7 @@ class DbUserRepository implements Repository<User, Integer> {
     public Optional<User> findById(Integer id) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
-                    selectUserQuery +
+                    SELECT_USER_QUERY +
                             "WHERE user.id = ?",
                     userRowMapper,
                     id
@@ -48,7 +48,7 @@ class DbUserRepository implements Repository<User, Integer> {
 
     @Override
     public List<User> findAll() {
-        return jdbcTemplate.query(selectUserQuery, userRowMapper);
+        return jdbcTemplate.query(SELECT_USER_QUERY, userRowMapper);
     }
 
     @Override
@@ -64,8 +64,10 @@ class DbUserRepository implements Repository<User, Integer> {
             ps.setInt(3, userToAdd.getTier().getId());
             return ps;
         }, keyHolder);
-        userToAdd.setId(keyHolder.getKeyAs(Integer.TYPE));
-        return userToAdd;
+        return new User(keyHolder.getKeyAs(Integer.TYPE),
+                userToAdd.getLogin(),
+                userToAdd.getTier(),
+                userToAdd.getBalance());
     }
 
     @Component
