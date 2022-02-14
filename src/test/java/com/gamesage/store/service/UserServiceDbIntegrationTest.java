@@ -57,7 +57,9 @@ class UserServiceDbIntegrationTest {
                 3, "SILVER", 10.d), BigDecimal.TEN);
         userService.createOne(user);
         List<User> users = userService.findAll();
-        assertTrue(users.contains(user));
+        assertAll(
+                () -> assertTrue(users.contains(user)),
+                () -> assertNotNull(user.getId()));
     }
 }
 
