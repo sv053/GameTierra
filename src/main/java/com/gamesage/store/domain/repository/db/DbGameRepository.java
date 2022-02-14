@@ -16,13 +16,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class DbGameRepository implements CreateManyRepository<Game, Integer> {
 
+    private static final String selectGameQuery = "SELECT id, name, price FROM game";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<Game> gameRowMapper;
 
@@ -35,7 +35,7 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
     public Optional<Game> findById(Integer id) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
-                    "SELECT id, name, price FROM game WHERE ID = ?"
+                    selectGameQuery + " WHERE ID = ?"
                     , gameRowMapper
                     , id));
         } catch (EmptyResultDataAccessException e) {
@@ -45,9 +45,7 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
 
     @Override
     public List<Game> findAll() {
-        return jdbcTemplate.query(
-                "SELECT id, name, price FROM game "
-                , gameRowMapper);
+        return jdbcTemplate.query(selectGameQuery, gameRowMapper);
     }
 
     @Override
@@ -71,10 +69,7 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
     @Transactional
     public List<Game> create(List<Game> gamesToAdd) {
         List<Game> addedGames = new ArrayList<>();
-        Iterator<Game> gameIterator = gamesToAdd.listIterator();
-        while (gameIterator.hasNext()) {
-            addedGames.add(createOne(gameIterator.next()));
-        }
+        gamesToAdd.forEach(g -> addedGames.add(createOne(g)));
         return addedGames;
     }
 

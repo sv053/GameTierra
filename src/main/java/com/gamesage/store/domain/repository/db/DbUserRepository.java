@@ -20,24 +20,23 @@ import java.util.Optional;
 @org.springframework.stereotype.Repository
 class DbUserRepository implements Repository<User, Integer> {
 
+    private static final String selectUserQuery = "SELECT user.id AS user_id, login, balance, " +
+            "tier_id, level AS tl, tier.percentage AS tp FROM user " +
+            "LEFT JOIN tier " +
+            "on user.tier_id = tier.id ";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> userRowMapper;
-    private final String findUserQuery;
 
     public DbUserRepository(JdbcTemplate jdbcTemplate, UserRowMapper userRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.userRowMapper = userRowMapper;
-        findUserQuery = "SELECT user.id AS user_id, login, balance, " +
-                "tier_id, level AS tl, tier.percentage AS tp FROM user " +
-                "LEFT JOIN tier " +
-                "on user.tier_id = tier.id ";
     }
 
     @Override
     public Optional<User> findById(Integer id) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
-                    findUserQuery +
+                    selectUserQuery +
                             "WHERE user.id = ?",
                     userRowMapper,
                     id
@@ -49,26 +48,23 @@ class DbUserRepository implements Repository<User, Integer> {
 
     @Override
     public List<User> findAll() {
-        return jdbcTemplate.query(
-                findUserQuery,
-                userRowMapper
-        );
+        return jdbcTemplate.query(selectUserQuery, userRowMapper);
     }
 
     @Override
     @Transactional
     public User createOne(User userToAdd) {
-        String INSERT_MESSAGE = "insert into user (login, balance, tier_id) values ( ?, ?, ?) ";
+        String insertUserQuery = "insert into user (login, balance, tier_id) values ( ?, ?, ?) ";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
-            PreparedStatement ps = con.prepareStatement(INSERT_MESSAGE,
+            PreparedStatement ps = con.prepareStatement(insertUserQuery,
                     new String[]{"id"});
             ps.setString(1, userToAdd.getLogin());
             ps.setBigDecimal(2, userToAdd.getBalance());
             ps.setInt(3, userToAdd.getTier().getId());
             return ps;
         }, keyHolder);
-        userToAdd.setId((Integer) keyHolder.getKey());
+        userToAdd.setId(keyHolder.getKeyAs(Integer.TYPE));
         return userToAdd;
     }
 
