@@ -84,7 +84,9 @@ class GameServiceDbIntegrationTest {
     void createAGame_Success() {
         Game addedGame = gameService.createOne(game);
 
-        assertTrue(gameService.findAll().contains(addedGame));
+        assertAll(
+                () -> assertTrue(gameService.findAll().contains(addedGame)),
+                () -> assertNotNull(addedGame.getId()));
     }
 
     @Test
@@ -96,6 +98,7 @@ class GameServiceDbIntegrationTest {
         List<Game> newGames = gameService.createAll(games);
 
         assertTrue(gameService.findAll().containsAll(newGames));
+        newGames.forEach(g-> assertNotNull(g.getId()));
     }
 }
 

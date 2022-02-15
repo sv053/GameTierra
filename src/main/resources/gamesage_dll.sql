@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS 'game'
     'name'          TEXT NOT NULL CHECK ('name' != ''),
     'price'         REAL,
     PRIMARY KEY ('id' AUTOINCREMENT)
-    );
+);
 
 CREATE TABLE IF NOT EXISTS 'tier'
 (
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS 'tier'
     'level'         TEXT NOT NULL CHECK ('level' != ''),
     'percentage'    REAL,
     PRIMARY KEY ('id' AUTOINCREMENT)
-    );
+);
 
 CREATE TABLE IF NOT EXISTS 'user'
 (
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS 'user'
     'tier_id'       INTEGER,
     PRIMARY KEY ('id' AUTOINCREMENT),
     CONSTRAINT 'tier_fk' FOREIGN KEY ('tier_id') REFERENCES 'tier' ('id')
-    );
+);
 
 CREATE TABLE IF NOT EXISTS 'user_game'
 (
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS 'user_game'
     'game_id'       INTEGER,
     CONSTRAINT 'user_fk' FOREIGN KEY ('user_id') REFERENCES 'user' ('id') ON DELETE CASCADE,
     CONSTRAINT 'game_fk' FOREIGN KEY ('game_id') REFERENCES 'game' ('id') ON DELETE CASCADE
-    );
+);
 
 COMMIT;
 

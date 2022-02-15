@@ -23,6 +23,7 @@ import java.util.Optional;
 public class DbGameRepository implements CreateManyRepository<Game, Integer> {
 
     private static final String SELECT_GAME_QUERY = "SELECT id, name, price FROM game";
+    private static final String INSERT_GAME_QUERY = "INSERT into game (name, price) VALUES (?, ?) ";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<Game> gameRowMapper;
 
@@ -50,19 +51,18 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
 
     @Override
     public Game createOne(Game gameToAdd) {
-        String INSERT_MESSAGE = "insert into game (name, price) values( ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con
-                    .prepareStatement(INSERT_MESSAGE,
+                    .prepareStatement(INSERT_GAME_QUERY,
                             Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, gameToAdd.getName());
             ps.setBigDecimal(2, gameToAdd.getPrice());
             return ps;
         }, keyHolder);
-        return new Game(keyHolder.getKeyAs(Integer.TYPE),
-                gameToAdd.getName(),
-                gameToAdd.getPrice());
+        return new Game(keyHolder.getKeyAs(Integer.class),
+                        gameToAdd.getName(),
+                        gameToAdd.getPrice());
     }
 
     @Override

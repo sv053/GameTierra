@@ -55,11 +55,11 @@ class UserServiceDbIntegrationTest {
     void createUser_Success() {
         User user = new User(null, "loco", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
-        userService.createOne(user);
+        User addedUser = userService.createOne(user);
         List<User> users = userService.findAll();
         assertAll(
-                () -> assertTrue(users.contains(user)),
-                () -> assertNotNull(user.getId()));
+                () -> assertTrue(users.contains(addedUser)),
+                () -> assertNotNull(addedUser.getId()));
     }
 }
 

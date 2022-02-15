@@ -9,7 +9,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,6 +23,7 @@ class DbUserRepository implements Repository<User, Integer> {
             "tier_id, level AS tl, tier.percentage AS tp FROM user " +
             "LEFT JOIN tier " +
             "on user.tier_id = tier.id ";
+    private static final String INSERT_USER_QUERY = "INSERT into user (login, balance, tier_id) VALUES ( ?, ?, ?) ";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> userRowMapper;
 
@@ -52,19 +52,17 @@ class DbUserRepository implements Repository<User, Integer> {
     }
 
     @Override
-    @Transactional
     public User createOne(User userToAdd) {
-        String insertUserQuery = "insert into user (login, balance, tier_id) values ( ?, ?, ?) ";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
-            PreparedStatement ps = con.prepareStatement(insertUserQuery,
+            PreparedStatement ps = con.prepareStatement(INSERT_USER_QUERY,
                     new String[]{"id"});
             ps.setString(1, userToAdd.getLogin());
             ps.setBigDecimal(2, userToAdd.getBalance());
             ps.setInt(3, userToAdd.getTier().getId());
             return ps;
         }, keyHolder);
-        return new User(keyHolder.getKeyAs(Integer.TYPE),
+        return new User(keyHolder.getKeyAs(Integer.class),
                 userToAdd.getLogin(),
                 userToAdd.getTier(),
                 userToAdd.getBalance());
