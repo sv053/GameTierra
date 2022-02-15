@@ -1,12 +1,13 @@
 package com.gamesage.store.domain.repository;
 
 import com.gamesage.store.domain.model.Game;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@org.springframework.stereotype.Repository
+@Repository
 public class GameRepository implements CreateManyRepository<Game, Integer> {
 
     private final List<Game> games;

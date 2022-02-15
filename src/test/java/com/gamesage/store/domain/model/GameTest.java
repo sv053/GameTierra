@@ -11,8 +11,8 @@ class GameTest {
 
     @Test
     void testEquals_SameIdsSameNames() {
-        Game game1 = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
-        Game game2 = new Game(1, "THE_WITCHER", null);
+        Game game1 = new Game(8, "THE_WITCHER", BigDecimal.valueOf(17.28d));
+        Game game2 = new Game(8, "THE_WITCHER", null);
         assertEquals(game1, game2);
     }
 
@@ -25,8 +25,8 @@ class GameTest {
 
     @Test
     void testEquals_DifferentIdsSameNames() {
-        Game game1 = new Game(3, "THE_WITCHER", BigDecimal.valueOf(17.28d));
-        Game game2 = new Game(5, "THE_WITCHER", null);
+        Game game1 = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
+        Game game2 = new Game(2, "THE_WITCHER", null);
         assertNotEquals(game1, game2);
     }
 

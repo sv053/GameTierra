@@ -61,7 +61,7 @@ class GameServiceTest {
     @Test
     void buyGame_Fail_WhenPriceIsHigherThanBalance_BalanceUnchanged() {
         int gameId = 1;
-        Game game = new Game(gameId, "addedGame", BigDecimal.TEN);
+        Game game = new Game("addedGame", BigDecimal.TEN);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
         BigDecimal initBalance = BigDecimal.ONE;
@@ -75,7 +75,7 @@ class GameServiceTest {
     @Test
     void buyGame_Fail_WhenPriceHigherThanBalance_ReturnsFalse() {
         int gameId = 1;
-        Game game = new Game(gameId, "rio", BigDecimal.ONE);
+        Game game = new Game("rio", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
         User user = new User(null, "", new Tier(4, null, .0), BigDecimal.ZERO);
@@ -98,7 +98,7 @@ class GameServiceTest {
     @Test
     void findById_Success_TheRightGameIsFound() {
         int gameId = 1;
-        Game game = new Game(gameId, "fabula", BigDecimal.ONE);
+        Game game = new Game("fabula", BigDecimal.ONE);
         when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
         assertEquals(game, gameService.findById(gameId));
@@ -109,14 +109,12 @@ class GameServiceTest {
         int gameId = 1;
         when(repository.findById(gameId)).thenReturn(Optional.empty());
 
-        EntityNotFoundException e = assertThrows(
-                EntityNotFoundException.class, () -> gameService.findById(gameId));
-        assertEquals("Entity with id 1 not found", e.getMessage());
+        assertThrows(EntityNotFoundException.class, () -> gameService.findById(gameId));
     }
 
     @Test
     void calculateCashback_Success_CheckCashback() {
-        Game game = new Game(1, "fabula", BigDecimal.ONE);
+        Game game = new Game("fabula", BigDecimal.ONE);
 
         User user = new User(7, "marvel", new Tier(1, "", 5.), BigDecimal.TEN);
 

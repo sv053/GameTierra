@@ -12,7 +12,7 @@ class UserTest {
     @Test
     void addGame() {
         User user = new User(null, null, SampleData.TIERS.get(1), BigDecimal.valueOf(87.5));
-        Game game = new Game(4, "SKYRIM", BigDecimal.valueOf(87.88d));
+        Game game = new Game(1, "SKYRIM", BigDecimal.valueOf(87.88d));
 
         assertTrue(user.addGame(game));
         assertTrue(user.getGames().contains(game));
@@ -48,7 +48,7 @@ class UserTest {
 
     @Test
     void hasGame() {
-        Game game = new Game(4, "SKYRIM", BigDecimal.valueOf(87.88d));
+        Game game = new Game(1, "SKYRIM", BigDecimal.valueOf(87.88d));
         User user = new User(null, null, SampleData.TIERS.get(1), BigDecimal.valueOf(123.15d));
         user.addGame(game);
 
@@ -58,7 +58,7 @@ class UserTest {
     @Test
     void doesNotHaveGame() {
         User user = new User(null, null, SampleData.TIERS.get(1), BigDecimal.valueOf(123));
-        Game alienGame = new Game(4, "SKYRIM", BigDecimal.valueOf(87.88d));
+        Game alienGame = new Game(1, "SKYRIM", BigDecimal.valueOf(87.88d));
 
         assertFalse(user.hasGame(alienGame));
     }

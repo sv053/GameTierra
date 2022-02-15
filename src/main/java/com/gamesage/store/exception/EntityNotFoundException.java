@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class EntityNotFoundException extends RuntimeException {
 
     public EntityNotFoundException(int id) {
-        super(String.format("Entity with id %s not found", id));
+        super(String.format("Entity with id %d not found", id));
     }
 }
 
