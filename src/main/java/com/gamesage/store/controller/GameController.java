@@ -38,10 +38,9 @@ public class GameController {
     @GetMapping("/{game_id}/{user_id}")
     public String buyGame(@PathVariable Integer game_id, @PathVariable Integer user_id) {
         User user = userService.findById(user_id);
-        int balanceUpdated = userService.updateBalance(user);
+        int balanceIsUpdated = userService.updateBalance(user);
         boolean gameIsBought = gameService.buyGame(game_id, user);
-        return gameIsBought && balanceUpdated == 1 ? "game is added" : "not added";
+        return gameIsBought && balanceIsUpdated == 1 ? "game is added" : "not added";
     }
-
 }
 
