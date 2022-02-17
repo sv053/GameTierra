@@ -28,8 +28,11 @@ CREATE TABLE IF NOT EXISTS 'user'
 
 CREATE TABLE IF NOT EXISTS 'user_game'
 (
+    'id'            INTEGER,
     'user_id'       INTEGER,
     'game_id'       INTEGER,
+    'order_date'    DATE,
+    PRIMARY KEY ('id' AUTOINCREMENT),
     CONSTRAINT 'user_fk' FOREIGN KEY ('user_id') REFERENCES 'user' ('id') ON DELETE CASCADE,
     CONSTRAINT 'game_fk' FOREIGN KEY ('game_id') REFERENCES 'game' ('id') ON DELETE CASCADE
 );

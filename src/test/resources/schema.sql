@@ -25,9 +25,11 @@ CREATE TABLE IF NOT EXISTS user
 
 CREATE TABLE IF NOT EXISTS user_game
 (
+    id         INTEGER PRIMARY KEY AUTO_INCREMENT,
     user_id    INTEGER,
     game_id    INTEGER,
-    FOREIGN KEY(user_id) REFERENCES user(id) ,
+    order_date DATE,
+    FOREIGN KEY(user_id) REFERENCES user(id),
     FOREIGN KEY(game_id) REFERENCES game(id)
 );
 

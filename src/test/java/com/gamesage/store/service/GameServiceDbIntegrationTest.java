@@ -56,7 +56,7 @@ class GameServiceDbIntegrationTest {
     }
 
     @Test
-    void buyGame_Success_ReturnsTrue() {
+    void buyGame_Success_ReturnsOrder() {
         User user = new User(1, null, new Tier(null, null, 10d), game.getPrice());
 
         assertTrue(gameService.buyGame(game.getId(), user));
@@ -98,7 +98,7 @@ class GameServiceDbIntegrationTest {
         List<Game> newGames = gameService.createAll(games);
 
         assertTrue(gameService.findAll().containsAll(newGames));
-        newGames.forEach(g-> assertNotNull(g.getId()));
+        newGames.forEach(g -> assertNotNull(g.getId()));
     }
 }
 

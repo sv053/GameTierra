@@ -28,5 +28,9 @@ public class UserService {
     public User createOne(User userToAdd) {
         return repository.createOne(userToAdd);
     }
+
+    public int updateBalance(User userToUpdate) {
+        return repository.update(userToUpdate);
+    }
 }
 

@@ -34,6 +34,11 @@ public class UserRepository implements Repository<User, Integer> {
         return userWithId;
     }
 
+    @Override
+    public int update(User item) {
+        return 0;
+    }
+
     private User assignId(User user) {
         user.setId(idCounter++);
         return user;

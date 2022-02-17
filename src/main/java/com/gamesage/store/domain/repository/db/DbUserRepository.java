@@ -24,6 +24,7 @@ class DbUserRepository implements Repository<User, Integer> {
             "LEFT JOIN tier " +
             "on user.tier_id = tier.id ";
     private static final String INSERT_USER_QUERY = "INSERT into user (login, balance, tier_id) VALUES ( ?, ?, ?) ";
+    private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> userRowMapper;
 
@@ -66,6 +67,14 @@ class DbUserRepository implements Repository<User, Integer> {
                 userToAdd.getLogin(),
                 userToAdd.getTier(),
                 userToAdd.getBalance());
+    }
+
+    @Override
+    public int update(User userToUpdate) {
+        return jdbcTemplate.update(INSERT_USER_QUERY
+                        + userToUpdate.getBalance()
+                        + " WHERE id = ? ",
+                userToUpdate.getId());
     }
 
     @Component
