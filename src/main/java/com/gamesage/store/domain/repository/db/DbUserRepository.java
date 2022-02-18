@@ -2,7 +2,7 @@ package com.gamesage.store.domain.repository.db;
 
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.Repository;
+import com.gamesage.store.domain.repository.UpdateRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @org.springframework.stereotype.Repository
-class DbUserRepository implements Repository<User, Integer> {
+public class DbUserRepository implements UpdateRepository<User, Integer> {
 
     private static final String SELECT_USER_QUERY = "SELECT user.id AS user_id, login, balance, " +
             "tier_id, level AS tl, tier.percentage AS tp FROM user " +
@@ -70,11 +70,16 @@ class DbUserRepository implements Repository<User, Integer> {
     }
 
     @Override
-    public int update(User userToUpdate) {
-        return jdbcTemplate.update(INSERT_USER_QUERY
+    public User update(User userToUpdate) {
+        if (jdbcTemplate.update(UPDATE_USER_BALANCE
                         + userToUpdate.getBalance()
                         + " WHERE id = ? ",
-                userToUpdate.getId());
+                userToUpdate.getId()) == 1)
+            return new User(userToUpdate.getId(),
+                    userToUpdate.getLogin(),
+                    userToUpdate.getTier(),
+                    userToUpdate.getBalance());
+        else return null;
     }
 
     @Component

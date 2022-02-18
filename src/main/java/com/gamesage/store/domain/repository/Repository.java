@@ -10,7 +10,5 @@ public interface Repository<T, K> {
     List<T> findAll();
 
     T createOne(T item);
-
-    int update(T item);
 }
 

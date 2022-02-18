@@ -1,7 +1,6 @@
 package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.Game;
-import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.GameService;
 import com.gamesage.store.service.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -33,14 +32,6 @@ public class GameController {
     @PostMapping
     public List<Game> createGames(@RequestBody List<Game> gamesToSave) {
         return gameService.createAll(gamesToSave);
-    }
-
-    @GetMapping("/{game_id}/{user_id}")
-    public String buyGame(@PathVariable Integer game_id, @PathVariable Integer user_id) {
-        User user = userService.findById(user_id);
-        int balanceIsUpdated = userService.updateBalance(user);
-        boolean gameIsBought = gameService.buyGame(game_id, user);
-        return gameIsBought && balanceIsUpdated == 1 ? "game is added" : "not added";
     }
 }
 

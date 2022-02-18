@@ -1,6 +1,6 @@
 package com.gamesage.store.domain.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class Order {
@@ -8,9 +8,9 @@ public class Order {
     private Integer id;
     private User user;
     private Game game;
-    private Date date;
+    private LocalDate date;
 
-    public Order(Integer id, User user, Game game, Date date) {
+    public Order(Integer id, User user, Game game, LocalDate date) {
         this.id = id;
         this.user = user;
         this.game = game;
@@ -29,7 +29,7 @@ public class Order {
         return game;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 

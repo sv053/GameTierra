@@ -23,22 +23,22 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    @Test
-    void findById_Success_RightUserIsFound() {
-        Integer userId = 5;
-        User user = new User(userId, null, null, null);
-
-        when(repository.findById(userId)).thenReturn(Optional.of(user));
-
-        assertEquals(user, userService.findById(userId));
-    }
-
-    @Test
-    void findById_Fail_NotFound_Exception() {
-        Integer userId = 2;
-        when(repository.findById(userId)).thenReturn(Optional.empty());
-
-        assertThrows(EntityNotFoundException.class, () -> userService.findById(userId));
-    }
+//    @Test
+//    void findById_Success_RightUserIsFound() {
+//        Integer userId = 5;
+//        User user = new User(userId, null, null, null);
+//
+//        when(repository.findById(userId)).thenReturn(Optional.of(user));
+//
+//        assertEquals(user, userService.findById(userId));
+//    }
+//
+//    @Test
+//    void findById_Fail_NotFound_Exception() {
+//        Integer userId = 2;
+//        when(repository.findById(userId)).thenReturn(Optional.empty());
+//
+//        assertThrows(EntityNotFoundException.class, () -> userService.findById(userId));
+//    }
 }
 

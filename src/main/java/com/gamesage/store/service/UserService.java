@@ -1,7 +1,7 @@
 package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.Repository;
+import com.gamesage.store.domain.repository.UpdateRepository;
 import com.gamesage.store.exception.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -11,9 +11,9 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private final Repository<User, Integer> repository;
+    private final UpdateRepository<User, Integer> repository;
 
-    public UserService(@Qualifier("dbUserRepository") Repository<User, Integer> repository) {
+    public UserService(@Qualifier("dbUserRepository") UpdateRepository<User, Integer> repository) {
         this.repository = repository;
     }
 
@@ -29,7 +29,7 @@ public class UserService {
         return repository.createOne(userToAdd);
     }
 
-    public int updateBalance(User userToUpdate) {
+    public User updateBalance(User userToUpdate) {
         return repository.update(userToUpdate);
     }
 }

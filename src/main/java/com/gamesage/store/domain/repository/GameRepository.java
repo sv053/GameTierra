@@ -1,7 +1,6 @@
 package com.gamesage.store.domain.repository;
 
 import com.gamesage.store.domain.model.Game;
-import com.gamesage.store.domain.model.Order;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -9,7 +8,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Repository
-public class GameRepository implements CreateManyAndBuyOneRepository<Game, Integer> {
+public class GameRepository implements CreateManyRepository<Game, Integer> {
 
     private final List<Game> games;
     private final Map<Integer, Game> allGamesById;
@@ -38,11 +37,6 @@ public class GameRepository implements CreateManyAndBuyOneRepository<Game, Integ
     }
 
     @Override
-    public int update(Game item) {
-        return 0;
-    }
-
-    @Override
     public List<Game> create(List<Game> gamesToAdd) {
         List<Game> gamesToAddWithId = addIdToAll(gamesToAdd);
         games.addAll(gamesToAddWithId);
@@ -66,11 +60,6 @@ public class GameRepository implements CreateManyAndBuyOneRepository<Game, Integ
                         Collectors.toMap(Game::getId, Function.identity(),
                                 (oldValue, newValue) -> (newValue)));
         allGamesById.putAll(mapForNewGames);
-    }
-
-    @Override
-    public Order createOrder(Order orderToAdd) {
-        return null;
     }
 }
 
