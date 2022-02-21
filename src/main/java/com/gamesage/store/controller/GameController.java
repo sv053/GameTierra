@@ -2,7 +2,6 @@ package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.service.GameService;
-import com.gamesage.store.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,11 +11,9 @@ import java.util.List;
 public class GameController {
 
     private final GameService gameService;
-    private final UserService userService;
 
-    public GameController(GameService gameService, UserService userService) {
+    public GameController(GameService gameService) {
         this.gameService = gameService;
-        this.userService = userService;
     }
 
     @GetMapping("/{id}")

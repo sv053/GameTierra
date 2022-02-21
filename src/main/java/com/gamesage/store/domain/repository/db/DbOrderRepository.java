@@ -7,14 +7,15 @@ import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.sql.Timestamp;
 
 @org.springframework.stereotype.Repository
-public class DbStoreRepository {
+public class DbOrderRepository {
 
-    private static final String INSERT_ORDER = "INSERT into user_game (user_id, game_id, order_date) VALUES (?, ?, ?) ";
+    private static final String INSERT_ORDER = "INSERT into user_game (user_id, game_id, order_datetime) VALUES (?, ?, ?) ";
     private final JdbcTemplate jdbcTemplate;
 
-    public DbStoreRepository(JdbcTemplate jdbcTemplate) {
+    public DbOrderRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -26,7 +27,7 @@ public class DbStoreRepository {
                             Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, orderToAdd.getUser().getId());
             ps.setInt(2, orderToAdd.getGame().getId());
-            ps.setDate(3, java.sql.Date.valueOf(orderToAdd.getDate().toString()));
+            ps.setTimestamp(3, Timestamp.valueOf(orderToAdd.getDate()));
             return ps;
         }, keyHolder);
         return new Order(keyHolder.getKeyAs(Integer.class),

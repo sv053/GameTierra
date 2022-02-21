@@ -24,7 +24,8 @@ public class DbUserRepository implements UpdateRepository<User, Integer> {
             "LEFT JOIN tier " +
             "on user.tier_id = tier.id ";
     private static final String INSERT_USER_QUERY = "INSERT into user (login, balance, tier_id) VALUES ( ?, ?, ?) ";
-    private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ";
+    private static final String UPDATE_USER = "UPDATE user SET login = ?, balance = ?, tier_id = ?  WHERE id = ? ";
+    private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ? WHERE id = ?";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> userRowMapper;
 
@@ -70,16 +71,21 @@ public class DbUserRepository implements UpdateRepository<User, Integer> {
     }
 
     @Override
-    public User update(User userToUpdate) {
-        if (jdbcTemplate.update(UPDATE_USER_BALANCE
-                        + userToUpdate.getBalance()
-                        + " WHERE id = ? ",
-                userToUpdate.getId()) == 1)
-            return new User(userToUpdate.getId(),
-                    userToUpdate.getLogin(),
-                    userToUpdate.getTier(),
-                    userToUpdate.getBalance());
-        else return null;
+    public Optional<User> update(User userToUpdate) {
+        jdbcTemplate.update(UPDATE_USER
+                        , userToUpdate.getLogin()
+                        , userToUpdate.getBalance()
+                        , userToUpdate.getTier().getId()
+                        , userToUpdate.getId());
+        return findById(userToUpdate.getId());
+    }
+
+    @Override
+    public Optional<User> updateColumn(User userToUpdate) {
+        jdbcTemplate.update(UPDATE_USER_BALANCE
+                , userToUpdate.getBalance()
+                , userToUpdate.getId());
+        return findById(userToUpdate.getId());
     }
 
     @Component

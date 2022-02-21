@@ -1,16 +1,16 @@
 package com.gamesage.store.domain.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Order {
 
-    private Integer id;
-    private User user;
-    private Game game;
-    private LocalDate date;
+    private final Integer id;
+    private final User user;
+    private final Game game;
+    private final LocalDateTime date;
 
-    public Order(Integer id, User user, Game game, LocalDate date) {
+    public Order(Integer id, User user, Game game, LocalDateTime date) {
         this.id = id;
         this.user = user;
         this.game = game;
@@ -29,7 +29,7 @@ public class Order {
         return game;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
@@ -37,13 +37,22 @@ public class Order {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         Order order = (Order) o;
-        return Objects.equals(user, order.user) && Objects.equals(game, order.game) && Objects.equals(date, order.date);
+
+        if ((!Objects.equals(id, order.id))
+            || (!Objects.equals(user, order.user))
+                ||(!Objects.equals(game, order.game))) return false;
+        return Objects.equals(date, order.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(user, game, date);
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (user != null ? user.hashCode() : 0);
+        result = 31 * result + (game != null ? game.hashCode() : 0);
+        result = 31 * result + (date != null ? date.hashCode() : 0);
+        return result;
     }
 }
 

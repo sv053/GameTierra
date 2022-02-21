@@ -30,7 +30,7 @@ public class UserService {
     }
 
     public User updateBalance(User userToUpdate) {
-        return repository.update(userToUpdate);
+        return repository.updateColumn(userToUpdate).orElseThrow(() -> new EntityNotFoundException(userToUpdate.getId()));
     }
 }
 

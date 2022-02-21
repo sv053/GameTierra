@@ -3,21 +3,22 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Order;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.db.DbStoreRepository;
+import com.gamesage.store.domain.repository.db.DbOrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
-public class StoreService {
+public class OrderService {
 
-    private final DbStoreRepository storeRepository;
+    private final DbOrderRepository storeRepository;
     private final UserService userService;
     private final GameService gameService;
 
-    public StoreService(DbStoreRepository storeRepository,
+    public OrderService(DbOrderRepository storeRepository,
                         UserService userService, GameService gameService) {
         this.storeRepository = storeRepository;
         this.userService = userService;
@@ -30,7 +31,7 @@ public class StoreService {
     }
 
     @Transactional
-    public boolean buyGame(int gameId, int userId) {
+    public Map<User,Game> buyGame(int gameId, int userId) {
         User user = userService.findById(userId);
         Game game = gameService.findById(gameId);
         BigDecimal price = game.getPrice();
@@ -38,14 +39,11 @@ public class StoreService {
             BigDecimal cashback = calculateCashback(price, user);
             user.withdrawBalance(price);
             user.depositBalance(cashback);
-            //    user.addGame(game);
-            Order createdOrder = storeRepository.createOne(new Order(null, user, game, LocalDate.now()));
+            storeRepository.createOne(new Order(null, user, game, LocalDateTime.now()));
             User updatedUser = userService.updateBalance(user);
-
-            if (updatedUser != null && createdOrder.getId() != null)
-                return true;
+            return Map.of(updatedUser, game);
         }
-        return false;
+        return Map.of(user, game);
     }
 }
 

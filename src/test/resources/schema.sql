@@ -1,5 +1,3 @@
-BEGIN TRANSACTION;
-
 CREATE TABLE IF NOT EXISTS game
 (
     id          INTEGER PRIMARY KEY AUTO_INCREMENT,
@@ -28,9 +26,7 @@ CREATE TABLE IF NOT EXISTS user_game
     id         INTEGER PRIMARY KEY AUTO_INCREMENT,
     user_id    INTEGER,
     game_id    INTEGER,
-    order_date DATE,
+    order_datetime DATETIME,
     FOREIGN KEY(user_id) REFERENCES user(id),
     FOREIGN KEY(game_id) REFERENCES game(id)
 );
-
-COMMIT;
