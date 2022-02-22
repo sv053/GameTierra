@@ -10,7 +10,7 @@ public class User {
 
     private final String login;
     private final Tier tier;
-    private final Set<Game> games;
+    private Set<Game> games;
     private Integer id;
     private BigDecimal balance;
 
@@ -40,6 +40,10 @@ public class User {
 
     public Set<Game> getGames() {
         return games;
+    }
+
+    public void setGames(Set<Game> games) {
+        this.games = games;
     }
 
     public boolean addGame(Game game) {

@@ -22,8 +22,10 @@ import java.util.Optional;
 @Repository
 public class DbGameRepository implements CreateManyRepository<Game, Integer> {
 
-    private static final String SELECT_GAME_QUERY = "SELECT id, name, price FROM game";
-    private static final String INSERT_GAME_QUERY = "INSERT into game (name, price) VALUES (?, ?) ";
+    private static final String SELECT_GAME_QUERY =         "SELECT id, name, price FROM game WHERE ID = ?";
+    private static final String SELECT_USER_GAMES_QUERY =   "SELECT id, name, price FROM game " +
+                                                                "WHERE id = (SELECT game_id FROM orders WHERE user_id  = ?) ";
+    private static final String INSERT_GAME_QUERY =         "INSERT INTO game (name, price) VALUES (?, ?) ";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<Game> gameRowMapper;
 
@@ -32,11 +34,17 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
         this.gameRowMapper = gameRowMapper;
     }
 
+    public List<Game> findGamesByUserId(Integer userId) {
+        return jdbcTemplate.query(SELECT_USER_GAMES_QUERY,
+                gameRowMapper,
+                userId);
+    }
+
     @Override
     public Optional<Game> findById(Integer id) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
-                    SELECT_GAME_QUERY + " WHERE ID = ?"
+                    SELECT_GAME_QUERY
                     , gameRowMapper
                     , id));
         } catch (EmptyResultDataAccessException e) {

@@ -3,6 +3,7 @@ package com.gamesage.store.domain.repository.db;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.UpdateRepository;
+import com.gamesage.store.exception.EntityNotFoundException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -20,12 +21,15 @@ import java.util.Optional;
 public class DbUserRepository implements UpdateRepository<User, Integer> {
 
     private static final String SELECT_USER_QUERY = "SELECT user.id AS user_id, login, balance, " +
-            "tier_id, level AS tl, tier.percentage AS tp FROM user " +
-            "LEFT JOIN tier " +
-            "on user.tier_id = tier.id ";
-    private static final String INSERT_USER_QUERY = "INSERT into user (login, balance, tier_id) VALUES ( ?, ?, ?) ";
-    private static final String UPDATE_USER = "UPDATE user SET login = ?, balance = ?, tier_id = ?  WHERE id = ? ";
-    private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ? WHERE id = ?";
+                                                        "tier_id, level AS tl, tier.percentage AS tp FROM user " +
+                                                        "LEFT JOIN tier " +
+                                                        "on user.tier_id = tier.id ";
+    private static final String INSERT_USER_QUERY = "INSERT INTO user (login, balance, tier_id) " +
+                                                        "VALUES ( ?, ?, ?) ";
+    private static final String UPDATE_USER =       "UPDATE user SET login = ?, balance = ?, tier_id = ?  " +
+                                                        "WHERE id = ? ";
+    private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ? " +
+                                                        "WHERE id = ?";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> userRowMapper;
 
@@ -71,21 +75,25 @@ public class DbUserRepository implements UpdateRepository<User, Integer> {
     }
 
     @Override
-    public Optional<User> update(User userToUpdate) {
+    public User update(User userToUpdate) {
         jdbcTemplate.update(UPDATE_USER
-                        , userToUpdate.getLogin()
-                        , userToUpdate.getBalance()
-                        , userToUpdate.getTier().getId()
-                        , userToUpdate.getId());
-        return findById(userToUpdate.getId());
+                , userToUpdate.getLogin()
+                , userToUpdate.getBalance()
+                , userToUpdate.getTier().getId()
+                , userToUpdate.getId());
+        Optional<User> retrievedUser = findById(userToUpdate.getId());
+
+        return retrievedUser.orElseThrow(() -> new EntityNotFoundException(userToUpdate.getId()));
     }
 
     @Override
-    public Optional<User> updateColumn(User userToUpdate) {
+    public User updateUserBalanceColumn(User userToUpdate) {
         jdbcTemplate.update(UPDATE_USER_BALANCE
                 , userToUpdate.getBalance()
                 , userToUpdate.getId());
-        return findById(userToUpdate.getId());
+        Optional<User> retrievedUser = findById(userToUpdate.getId());
+
+        return retrievedUser.orElseThrow(() -> new EntityNotFoundException(userToUpdate.getId()));
     }
 
     @Component

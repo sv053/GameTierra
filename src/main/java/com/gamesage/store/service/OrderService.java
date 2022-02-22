@@ -31,19 +31,20 @@ public class OrderService {
     }
 
     @Transactional
-    public Map<User,Game> buyGame(int gameId, int userId) {
+    public Map<Boolean, User> buyGame(int gameId, int userId) {
         User user = userService.findById(userId);
         Game game = gameService.findById(gameId);
+        User updatedUser = null;
+
         BigDecimal price = game.getPrice();
         if (user.canPay(price) && (!user.hasGame(game))) {
             BigDecimal cashback = calculateCashback(price, user);
             user.withdrawBalance(price);
             user.depositBalance(cashback);
             storeRepository.createOne(new Order(null, user, game, LocalDateTime.now()));
-            User updatedUser = userService.updateBalance(user);
-            return Map.of(updatedUser, game);
+            updatedUser = userService.updateBalance(user);
         }
-        return Map.of(user, game);
+        return Map.of((updatedUser != null), userService.findById(userId));
     }
 }
 

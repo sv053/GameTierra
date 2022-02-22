@@ -1,6 +1,5 @@
 package com.gamesage.store.controller;
 
-import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.OrderService;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,7 +20,7 @@ public class OrderController {
     }
 
     @PostMapping("/{gameId}/{userId}")
-    public Map<User, Game> buyGame(@PathVariable Integer gameId, @PathVariable Integer userId) {
+    public Map<Boolean, User> buyGame(@PathVariable Integer gameId, @PathVariable Integer userId) {
         return orderService.buyGame(gameId, userId);
     }
 }

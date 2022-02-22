@@ -8,13 +8,13 @@ public class Order {
     private final Integer id;
     private final User user;
     private final Game game;
-    private final LocalDateTime date;
+    private final LocalDateTime dateTime;
 
-    public Order(Integer id, User user, Game game, LocalDateTime date) {
+    public Order(Integer id, User user, Game game, LocalDateTime dateTime) {
         this.id = id;
         this.user = user;
         this.game = game;
-        this.date = date;
+        this.dateTime = dateTime;
     }
 
     public Integer getId() {
@@ -29,8 +29,8 @@ public class Order {
         return game;
     }
 
-    public LocalDateTime getDate() {
-        return date;
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 
     @Override
@@ -40,10 +40,10 @@ public class Order {
 
         Order order = (Order) o;
 
-        if ((!Objects.equals(id, order.id))
-            || (!Objects.equals(user, order.user))
-                ||(!Objects.equals(game, order.game))) return false;
-        return Objects.equals(date, order.date);
+        return Objects.equals(id, order.id)
+                && Objects.equals(user, order.user)
+                && Objects.equals(game, order.game)
+                && Objects.equals(dateTime, order.dateTime);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class Order {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (user != null ? user.hashCode() : 0);
         result = 31 * result + (game != null ? game.hashCode() : 0);
-        result = 31 * result + (date != null ? date.hashCode() : 0);
+        result = 31 * result + (dateTime != null ? dateTime.hashCode() : 0);
         return result;
     }
 }
