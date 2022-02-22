@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS user
     FOREIGN KEY(tier_id) REFERENCES tier(id)
 );
 
-CREATE TABLE IF NOT EXISTS order
+CREATE TABLE IF NOT EXISTS orders
 (
     id              INTEGER PRIMARY KEY AUTO_INCREMENT,
     user_id         INTEGER,

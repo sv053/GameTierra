@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS 'user'
     CONSTRAINT 'tier_fk' FOREIGN KEY ('tier_id') REFERENCES 'tier' ('id')
 );
 
-CREATE TABLE IF NOT EXISTS 'order'
+CREATE TABLE IF NOT EXISTS 'orders'
 (
     'id'                INTEGER,
     'user_id'           INTEGER,
