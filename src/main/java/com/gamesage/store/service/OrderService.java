@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Map;
 
 @Service
 public class OrderService {
@@ -31,20 +30,38 @@ public class OrderService {
     }
 
     @Transactional
-    public Map<Boolean, User> buyGame(int gameId, int userId) {
+    public PurchaseResult buyGame(int gameId, int userId) {
         User user = userService.findById(userId);
-        Game game = gameService.findById(gameId);
-        User updatedUser = null;
+        PurchaseResult purchaseResult = new PurchaseResult();
+        purchaseResult.lastGame = gameService.findById(gameId);
 
-        BigDecimal price = game.getPrice();
-        if (user.canPay(price) && (!user.hasGame(game))) {
-            BigDecimal cashback = calculateCashback(price, user);
-            user.withdrawBalance(price);
-            user.depositBalance(cashback);
-            storeRepository.createOne(new Order(null, user, game, LocalDateTime.now()));
-            updatedUser = userService.updateBalance(user);
+        BigDecimal price = purchaseResult.lastGame.getPrice();
+        if (user.canPay(price)) {
+            if (!user.hasGame(purchaseResult.lastGame)) {
+                BigDecimal cashback = calculateCashback(price, user);
+                user.withdrawBalance(price);
+                user.depositBalance(cashback);
+                storeRepository.createOne(new Order(null, user, purchaseResult.lastGame, LocalDateTime.now()));
+                userService.updateBalance(user);
+                purchaseResult.result = true;
+                purchaseResult.message = " play now! ";
+            } else {
+                purchaseResult.message = " is already owned";
+            }
+        } else {
+            purchaseResult.message = "the balance is " + user.getBalance()
+                    + " and the game price is " + purchaseResult.lastGame.getPrice();
         }
-        return Map.of((updatedUser != null), userService.findById(userId));
+        purchaseResult.user = userService.findById(userId);
+        return purchaseResult;
+    }
+
+    public class PurchaseResult {
+
+        public boolean result;
+        public String message;
+        public Game lastGame;
+        public User user;
     }
 }
 

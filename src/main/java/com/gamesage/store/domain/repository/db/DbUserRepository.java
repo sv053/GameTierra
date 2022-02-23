@@ -26,7 +26,7 @@ public class DbUserRepository implements UpdateRepository<User, Integer> {
                                                         "on user.tier_id = tier.id ";
     private static final String INSERT_USER_QUERY = "INSERT INTO user (login, balance, tier_id) " +
                                                         "VALUES ( ?, ?, ?) ";
-    private static final String UPDATE_USER =       "UPDATE user SET login = ?, balance = ?, tier_id = ?  " +
+    private static final String UPDATE_USER = "UPDATE user SET login = ?, balance = ?, tier_id = ?  " +
                                                         "WHERE id = ? ";
     private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ? " +
                                                         "WHERE id = ?";

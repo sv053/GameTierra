@@ -33,7 +33,7 @@ public class UserService {
 
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
-        for(User u : repository.findAll()){
+        for (User u : repository.findAll()) {
             users.add(findById(u.getId()));
         }
         return users;

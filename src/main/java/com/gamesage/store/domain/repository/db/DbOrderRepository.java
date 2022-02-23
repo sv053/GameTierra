@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 public class DbOrderRepository implements CreateOneRepository<Order, Integer> {
 
     private static final String INSERT_ORDER = "INSERT INTO orders (user_id, game_id, order_datetime) " +
-                                                    "VALUES (?, ?, ?) ";
+            "VALUES (?, ?, ?) ";
     private final JdbcTemplate jdbcTemplate;
 
     public DbOrderRepository(JdbcTemplate jdbcTemplate) {
