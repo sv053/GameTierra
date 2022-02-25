@@ -1,9 +1,11 @@
 package com.gamesage.store.domain.repository;
 
-public interface UpdateRepository<T, K> extends Repository<T, K> {
+import com.gamesage.store.domain.model.User;
 
-    T update(T item);
+public interface UpdateRepository extends Repository<User, Integer> {
 
-    T updateUserBalanceColumn(T item);
+    User update(User user);
+
+    User updateUserBalance(User user);
 }
 

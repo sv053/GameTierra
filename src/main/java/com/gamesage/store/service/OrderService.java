@@ -2,26 +2,37 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Order;
+import com.gamesage.store.domain.model.PurchaseIntent;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.db.DbOrderRepository;
+import com.gamesage.store.domain.repository.Repository;
+import com.gamesage.store.exception.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class OrderService {
 
-    private final DbOrderRepository storeRepository;
+    private final Repository<Order, Integer> repository;
     private final UserService userService;
     private final GameService gameService;
 
-    public OrderService(DbOrderRepository storeRepository,
+    public OrderService(Repository<Order, Integer> repository,
                         UserService userService, GameService gameService) {
-        this.storeRepository = storeRepository;
+        this.repository = repository;
         this.userService = userService;
         this.gameService = gameService;
+    }
+
+    public Order findById(int id) {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+    }
+
+    public List<Order> findAll() {
+        return repository.findAll();
     }
 
     public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
@@ -30,38 +41,31 @@ public class OrderService {
     }
 
     @Transactional
-    public PurchaseResult buyGame(int gameId, int userId) {
+    public PurchaseIntent buyGame(int gameId, int userId) {
+        Game game = gameService.findById(gameId);
         User user = userService.findById(userId);
-        PurchaseResult purchaseResult = new PurchaseResult();
-        purchaseResult.lastGame = gameService.findById(gameId);
+        PurchaseIntent purchaseIntent = new PurchaseIntent()
+                .status(false)
+                .targetGame(game)
+                .buyer(user);
 
-        BigDecimal price = purchaseResult.lastGame.getPrice();
+        BigDecimal price = game.getPrice();
         if (user.canPay(price)) {
-            if (!user.hasGame(purchaseResult.lastGame)) {
-                BigDecimal cashback = calculateCashback(price, user);
+            if (!user.hasGame(game)) {
                 user.withdrawBalance(price);
-                user.depositBalance(cashback);
-                storeRepository.createOne(new Order(null, user, purchaseResult.lastGame, LocalDateTime.now()));
-                userService.updateBalance(user);
-                purchaseResult.result = true;
-                purchaseResult.message = " play now! ";
+                user.depositBalance(calculateCashback(price, user));
+                Order createdOrder = repository.createOne(new Order(user, game, LocalDateTime.now()));
+                purchaseIntent.order(createdOrder)
+                        .buyer(userService.updateBalance(user))
+                        .status(true);
             } else {
-                purchaseResult.message = " is already owned";
+                purchaseIntent.message("is already owned");
             }
         } else {
-            purchaseResult.message = "the balance is " + user.getBalance()
-                    + " and the game price is " + purchaseResult.lastGame.getPrice();
+            purchaseIntent.message("the game price is higher than the balance");
         }
-        purchaseResult.user = userService.findById(userId);
-        return purchaseResult;
-    }
-
-    public class PurchaseResult {
-
-        public boolean result;
-        public String message;
-        public Game lastGame;
-        public User user;
+        userService.findById(userId);
+        return purchaseIntent;
     }
 }
 

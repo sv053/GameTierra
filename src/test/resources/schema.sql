@@ -1,21 +1,21 @@
 CREATE TABLE IF NOT EXISTS game
 (
     id              INTEGER PRIMARY KEY AUTO_INCREMENT,
-    name            VARCHAR(350) NOT NULL,
+    name            VARCHAR(350) NOT NULL UNIQUE,
     price           REAL
 );
 
 CREATE TABLE IF NOT EXISTS tier
 (
     id              INTEGER PRIMARY KEY AUTO_INCREMENT,
-    level           VARCHAR(30) NOT NULL,
+    level           VARCHAR(30) NOT NULL UNIQUE,
     percentage      REAL
 );
 
 CREATE TABLE IF NOT EXISTS user
 (
     id              INTEGER PRIMARY KEY AUTO_INCREMENT,
-    login           VARCHAR(150) NOT NULL,
+    login           VARCHAR(150) NOT NULL UNIQUE,
     balance         REAL,
     tier_id         INTEGER,
     FOREIGN KEY(tier_id) REFERENCES tier(id)

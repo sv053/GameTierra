@@ -3,40 +3,34 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.UpdateRepository;
-import com.gamesage.store.domain.repository.db.DbGameRepository;
 import com.gamesage.store.exception.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 @Service
 public class UserService {
 
-    private final UpdateRepository<User, Integer> repository;
-    private final DbGameRepository gameRepository;
+    private final UpdateRepository repository;
+    private final GameService gameService;
 
-    public UserService(@Qualifier("dbUserRepository") UpdateRepository<User, Integer> repository,
-                       DbGameRepository gameRepository) {
+    public UserService(@Qualifier("dbUserRepository") UpdateRepository repository,
+                       GameService gameService) {
         this.repository = repository;
-        this.gameRepository = gameRepository;
+        this.gameService = gameService;
     }
 
     public User findById(int id) {
         User retrievedUser = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
-        List<Game> userGames = gameRepository.findGamesByUserId(id);
+        List<Game> userGames = gameService.findAllGamesByUserId(retrievedUser.getId());
         retrievedUser.setGames(Set.copyOf(userGames));
         return retrievedUser;
     }
 
     public List<User> findAll() {
-        List<User> users = new ArrayList<>();
-        for (User u : repository.findAll()) {
-            users.add(findById(u.getId()));
-        }
-        return users;
+        return repository.findAll();
     }
 
     public User createOne(User userToAdd) {
@@ -44,7 +38,7 @@ public class UserService {
     }
 
     public User updateBalance(User userToUpdate) {
-        return repository.updateUserBalanceColumn(userToUpdate);
+        return repository.updateUserBalance(userToUpdate);
     }
 }
 

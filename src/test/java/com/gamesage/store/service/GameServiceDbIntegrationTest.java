@@ -9,7 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,7 +24,9 @@ class GameServiceDbIntegrationTest {
 
     @BeforeEach
     void init() {
-        game = gameService.createOne(new Game("Detroit: Become Human", BigDecimal.TEN));
+        Integer randomForName = new Random().nextInt(LocalDateTime.now().getNano());
+        String name = randomForName.toString();
+        game = gameService.createOne(new Game(name, BigDecimal.TEN));
     }
 
     @Test
@@ -37,23 +41,21 @@ class GameServiceDbIntegrationTest {
 
     @Test
     void createAGame_Success() {
-        Game addedGame = gameService.createOne(game);
-
         assertAll(
-                () -> assertTrue(gameService.findAll().contains(addedGame)),
-                () -> assertNotNull(addedGame.getId()));
+                () -> assertTrue(gameService.findAll().contains(game)),
+                () -> assertNotNull(game.getId()));
     }
 
     @Test
     void createGames_Success() {
         List<Game> games = List.of(
-                new Game("Detroit: Become Human", BigDecimal.TEN),
-                new Game("Detroit: Become Android", BigDecimal.TEN));
+                new Game("Detroit: Become Humano", BigDecimal.TEN),
+                new Game("Detroit: Become Androido", BigDecimal.TEN));
 
-        List<Game> newGames = gameService.createAll(games);
-
-        assertTrue(gameService.findAll().containsAll(newGames));
-        newGames.forEach(g -> assertNotNull(g.getId()));
+        List<Game> createdGames = gameService.createAll(games);
+        List<Game> retrievedGames = gameService.findAll();
+        assertTrue(retrievedGames.containsAll(createdGames));
+        createdGames.forEach(g -> assertNotNull(g.getId()));
     }
 }
 

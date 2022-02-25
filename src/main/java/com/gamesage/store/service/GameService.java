@@ -25,6 +25,10 @@ public class GameService {
         return repository.findAll();
     }
 
+    public List<Game> findAllGamesByUserId(int ownerId) {
+        return repository.findAllDependent(ownerId);
+    }
+
     public List<Game> createAll(List<Game> gamesToAdd) {
         return repository.create(gamesToAdd);
     }

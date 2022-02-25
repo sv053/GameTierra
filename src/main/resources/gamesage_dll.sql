@@ -3,7 +3,7 @@ BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS 'game'
 (
     'id'                INTEGER,
-    'name'              TEXT NOT NULL CHECK ('name' != ''),
+    'name'              TEXT NOT NULL CHECK ('name' != '') UNIQUE,
     'price'             REAL,
     PRIMARY KEY ('id' AUTOINCREMENT)
 );
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS 'game'
 CREATE TABLE IF NOT EXISTS 'tier'
 (
     'id'                INTEGER,
-    'level'             TEXT NOT NULL CHECK ('level' != ''),
+    'level'             TEXT NOT NULL CHECK ('level' != '') UNIQUE,
     'percentage'        REAL,
     PRIMARY KEY ('id' AUTOINCREMENT)
 );
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS 'tier'
 CREATE TABLE IF NOT EXISTS 'user'
 (
     'id'                INTEGER,
-    'login'             TEXT NOT NULL CHECK ('login' != ''),
+    'login'             TEXT NOT NULL CHECK ('login' != '') UNIQUE,
     'balance'           REAL,
     'tier_id'           INTEGER,
     PRIMARY KEY ('id' AUTOINCREMENT),
@@ -38,6 +38,4 @@ CREATE TABLE IF NOT EXISTS 'orders'
 );
 
 COMMIT;
-
-
 

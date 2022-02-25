@@ -23,8 +23,9 @@ import java.util.Optional;
 @Repository
 public class DbGameRepository implements CreateManyRepository<Game, Integer> {
 
-    private static final String SELECT_GAME_QUERY = "SELECT id, name, price FROM game WHERE ID = ?";
-    private static final String SELECT_GAME_IDS_QUERY = "SELECT game_id FROM orders WHERE user_id  = ? ";
+    private static final String SELECT_ALL_GAMES_QUERY = "SELECT id, name, price FROM game ";
+    private static final String SELECT_GAME_QUERY = SELECT_ALL_GAMES_QUERY + " WHERE ID = ?";
+    private static final String SELECT_USER_GAMES_IDS_QUERY = "SELECT game_id FROM orders WHERE user_id  = ? ";
     private static final String INSERT_GAME_QUERY = "INSERT INTO game (name, price) VALUES (?, ?) ";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<Game> gameRowMapper;
@@ -32,17 +33,6 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
     public DbGameRepository(JdbcTemplate jdbcTemplate, RowMapper<Game> gameRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.gameRowMapper = gameRowMapper;
-    }
-
-    public List<Game> findGamesByUserId(Integer userId) {
-        List<Integer> gameIds = jdbcTemplate.queryForList(SELECT_GAME_IDS_QUERY,
-                Integer.class,
-                userId);
-        List<Game> userGames = new ArrayList<>();
-        for (Integer gameId : gameIds) {
-            userGames.add(findById(gameId).orElseThrow(() -> new EntityNotFoundException(gameId)));
-        }
-        return userGames;
     }
 
     @Override
@@ -59,7 +49,19 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
 
     @Override
     public List<Game> findAll() {
-        return jdbcTemplate.query(SELECT_GAME_QUERY, gameRowMapper);
+        return jdbcTemplate.query(SELECT_ALL_GAMES_QUERY, gameRowMapper);
+    }
+
+    @Override
+    public List<Game> findAllDependent(Integer ownerId) {
+        List<Integer> gameIds = jdbcTemplate.queryForList(SELECT_USER_GAMES_IDS_QUERY,
+                Integer.class,
+                ownerId);
+        List<Game> userGames = new ArrayList<>();
+        for (Integer gameId : gameIds) {
+            userGames.add(findById(gameId).orElseThrow(() -> new EntityNotFoundException(gameId)));
+        }
+        return userGames;
     }
 
     @Override
