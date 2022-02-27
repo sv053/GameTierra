@@ -10,25 +10,24 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @Transactional
 class OrderServiceDbIntegrationTest {
-    User userToCreate;
-    User user;
-    Game game;
+
     @Autowired
     private OrderService orderService;
     @Autowired
     private UserService userService;
     @Autowired
     private GameService gameService;
+    private User user;
+    private Game game;
 
     @BeforeEach
     void init() {
-        userToCreate = new User(null, "aqua", new Tier(
+        User userToCreate = new User(null, "aqua", new Tier(
                 3, null, 10.d), BigDecimal.TEN);
         user = userService.createOne(userToCreate);
         game = gameService.createOne(new Game("future in the past", BigDecimal.TEN));
@@ -46,20 +45,17 @@ class OrderServiceDbIntegrationTest {
 
     @Test
     void buyGame_Success() {
+        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
         PurchaseIntent expectedResult =
                 new PurchaseIntent
                         .Builder(game)
                         .gameIsBought(true)
                         .buyer(user)
-                        .message("play now!")
+                        .message(PurchaseIntent.Message.PLAY_NOW)
+                        .orderDateTime(result.getOrderDateTime())
                         .build();
-        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
 
-        assertAll(
-                () -> assertEquals(expectedResult.isBought(), result.isBought()),
-                () -> assertEquals(expectedResult.getBuyer().getId(), result.getBuyer().getId()),
-                () -> assertEquals(expectedResult.getTargetGame(), result.getTargetGame()),
-                () -> assertEquals(expectedResult.getMessage(), result.getMessage()));
+        assertEquals(expectedResult, result);
     }
 }
 

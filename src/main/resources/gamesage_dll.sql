@@ -10,9 +10,9 @@ CREATE TABLE IF NOT EXISTS 'game'
 
 CREATE TABLE IF NOT EXISTS 'tier'
 (
-    'id'                INTEGER,
+    'id'               INTEGER,
     'name'             TEXT NOT NULL CHECK ('name' != '') UNIQUE,
-    'percentage'        REAL,
+    'percentage'       REAL,
     PRIMARY KEY ('id' AUTOINCREMENT)
 );
 

@@ -3,13 +3,14 @@ package com.gamesage.store.domain.model;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+
 public class PurchaseIntent {
 
     private final boolean isBought;
-    private final String message;
     private final Game targetGame;
     private final User buyer;
     private final LocalDateTime orderDateTime;
+    private final Message message;
 
     private PurchaseIntent(Builder builder) {
         isBought = builder.gameIsBought;
@@ -27,7 +28,7 @@ public class PurchaseIntent {
         return orderDateTime;
     }
 
-    public String getMessage() {
+    public Message getMessage() {
         return message;
     }
 
@@ -63,12 +64,18 @@ public class PurchaseIntent {
         return result;
     }
 
+    public enum Message {
+        PLAY_NOW,
+        IS_ALREADY_OWNED,
+        THE_GAME_PRICE_IS_HIGHER_THAN_THE_BALANCE
+    }
+
     public static class Builder {
 
         private final Game targetGame;
         private User buyer;
         private LocalDateTime orderDateTime;
-        private String message;
+        private Message message;
         private boolean gameIsBought;
 
         public Builder(Game targetGame) {
@@ -85,7 +92,7 @@ public class PurchaseIntent {
             return this;
         }
 
-        public Builder message(String message) {
+        public Builder message(Message message) {
             this.message = message;
             return this;
         }

@@ -46,7 +46,7 @@ public class OrderService {
         User user = userService.findById(userId);
         Order order = new Order(user, game, LocalDateTime.now());
         boolean isBought = false;
-        String message = "play now!";
+        PurchaseIntent.Message message = PurchaseIntent.Message.PLAY_NOW;
 
         BigDecimal price = game.getPrice();
         if (user.canPay(price)) {
@@ -57,10 +57,10 @@ public class OrderService {
                 isBought = true;
                 user = userService.updateBalance(user);
             } else {
-                message = "is already owned";
+                message = PurchaseIntent.Message.IS_ALREADY_OWNED;
             }
         } else {
-            message = "the game price is higher than the balance";
+            message = PurchaseIntent.Message.THE_GAME_PRICE_IS_HIGHER_THAN_THE_BALANCE;
         }
         return new PurchaseIntent.Builder(game)
                 .gameIsBought(isBought)
