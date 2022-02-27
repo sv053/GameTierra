@@ -44,28 +44,30 @@ public class OrderService {
     public PurchaseIntent buyGame(int gameId, int userId) {
         Game game = gameService.findById(gameId);
         User user = userService.findById(userId);
-        PurchaseIntent purchaseIntent = new PurchaseIntent()
-                .status(false)
-                .targetGame(game)
-                .buyer(user);
+        Order order = new Order(user, game, LocalDateTime.now());
+        boolean isBought = false;
+        String message = "play now!";
 
         BigDecimal price = game.getPrice();
         if (user.canPay(price)) {
             if (!user.hasGame(game)) {
                 user.withdrawBalance(price);
                 user.depositBalance(calculateCashback(price, user));
-                Order createdOrder = repository.createOne(new Order(user, game, LocalDateTime.now()));
-                purchaseIntent.order(createdOrder)
-                        .buyer(userService.updateBalance(user))
-                        .status(true);
+                order = repository.createOne(order);
+                isBought = true;
+                user = userService.updateBalance(user);
             } else {
-                purchaseIntent.message("is already owned");
+                message = "is already owned";
             }
         } else {
-            purchaseIntent.message("the game price is higher than the balance");
+            message = "the game price is higher than the balance";
         }
-        userService.findById(userId);
-        return purchaseIntent;
+        return new PurchaseIntent.Builder(game)
+                .gameIsBought(isBought)
+                .buyer(user)
+                .message(message)
+                .orderDateTime(order.getDateTime())
+                .build();
     }
 }
 

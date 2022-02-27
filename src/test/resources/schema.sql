@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS game
 CREATE TABLE IF NOT EXISTS tier
 (
     id              INTEGER PRIMARY KEY AUTO_INCREMENT,
-    level           VARCHAR(30) NOT NULL UNIQUE,
+    name           VARCHAR(30) NOT NULL UNIQUE,
     percentage      REAL
 );
 

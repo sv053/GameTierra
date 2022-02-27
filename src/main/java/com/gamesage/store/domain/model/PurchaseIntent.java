@@ -1,17 +1,30 @@
 package com.gamesage.store.domain.model;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class PurchaseIntent {
 
-    private boolean status;
-    private String message;
-    private Game targetGame;
-    private User buyer;
-    private Order order;
+    private final boolean isBought;
+    private final String message;
+    private final Game targetGame;
+    private final User buyer;
+    private final LocalDateTime orderDateTime;
 
-    public boolean getStatus() {
-        return status;
+    private PurchaseIntent(Builder builder) {
+        isBought = builder.gameIsBought;
+        targetGame = builder.targetGame;
+        message = builder.message;
+        buyer = builder.buyer;
+        orderDateTime = builder.orderDateTime;
+    }
+
+    public boolean isBought() {
+        return isBought;
+    }
+
+    public LocalDateTime getOrderDateTime() {
+        return orderDateTime;
     }
 
     public String getMessage() {
@@ -26,35 +39,6 @@ public class PurchaseIntent {
         return buyer;
     }
 
-    public Order getOrder() {
-        return order;
-    }
-
-    public PurchaseIntent status(boolean purchaseStatus) {
-        status = purchaseStatus;
-        return this;
-    }
-
-    public PurchaseIntent targetGame(Game targetGame) {
-        this.targetGame = targetGame;
-        return this;
-    }
-
-    public PurchaseIntent message(String message) {
-        this.message = message;
-        return this;
-    }
-
-    public PurchaseIntent buyer(User buyer) {
-        this.buyer = buyer;
-        return this;
-    }
-
-    public PurchaseIntent order(Order order) {
-        this.order = order;
-        return this;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -62,21 +46,58 @@ public class PurchaseIntent {
 
         PurchaseIntent purchase = (PurchaseIntent) o;
 
-        return Objects.equals(status, purchase.getStatus())
+        return Objects.equals(isBought, purchase.isBought())
                 && Objects.equals(message, purchase.getMessage())
                 && Objects.equals(targetGame, purchase.getTargetGame())
                 && Objects.equals(buyer, purchase.getBuyer())
-                && Objects.equals(order, purchase.getOrder());
+                && Objects.equals(orderDateTime, purchase.getOrderDateTime());
     }
 
     @Override
     public int hashCode() {
-        int result = (status ? 1 : 0);
+        int result = (isBought ? 1 : 0);
         result = 31 * result + (message != null ? message.hashCode() : 0);
         result = 31 * result + (targetGame != null ? targetGame.hashCode() : 0);
         result = 31 * result + (buyer != null ? buyer.hashCode() : 0);
-        result = 31 * result + (order != null ? order.hashCode() : 0);
+        result = 31 * result + (orderDateTime != null ? orderDateTime.hashCode() : 0);
         return result;
+    }
+
+    public static class Builder {
+
+        private final Game targetGame;
+        private User buyer;
+        private LocalDateTime orderDateTime;
+        private String message;
+        private boolean gameIsBought;
+
+        public Builder(Game targetGame) {
+            this.targetGame = targetGame;
+        }
+
+        public Builder gameIsBought(boolean isBought) {
+            this.gameIsBought = isBought;
+            return this;
+        }
+
+        public Builder buyer(User buyer) {
+            this.buyer = buyer;
+            return this;
+        }
+
+        public Builder message(String message) {
+            this.message = message;
+            return this;
+        }
+
+        public Builder orderDateTime(LocalDateTime dateTime) {
+            this.orderDateTime = dateTime;
+            return this;
+        }
+
+        public PurchaseIntent build() {
+            return new PurchaseIntent(this);
+        }
     }
 }
 

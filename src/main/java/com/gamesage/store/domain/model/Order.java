@@ -29,8 +29,16 @@ public class Order {
         return user;
     }
 
+    public int getUserId() {
+        return user.getId();
+    }
+
     public Game getGame() {
         return game;
+    }
+
+    public int getGameId() {
+        return game.getId();
     }
 
     public LocalDateTime getDateTime() {

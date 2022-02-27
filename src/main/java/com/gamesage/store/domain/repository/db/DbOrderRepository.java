@@ -2,6 +2,7 @@ package com.gamesage.store.domain.repository.db;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Order;
+import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.Repository;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -12,6 +13,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,13 +22,14 @@ public class DbOrderRepository implements Repository<Order, Integer> {
 
     private static final String INSERT_ORDER = "INSERT INTO orders (user_id, game_id, order_datetime) " +
             "VALUES (?, ?, ?) ";
-    private static final String SELECT_ALL_ORDERS_QUERY = "SELECT orders.id, user_id, game_id, order_datetime, " +
-            "user.id, game.id " +
-            " FROM orders LEFT JOIN user " +
-            "ON user_id = user.id " +
-            "LEFT JOIN game " +
-            "ON game_id = game.id";
-    private static final String SELECT_ORDER_QUERY = SELECT_ALL_ORDERS_QUERY + " WHERE ID = ?";
+    private static final String SELECT_ALL_ORDERS_QUERY = "SELECT orders.id AS id, user_id, game_id, order_datetime, " +
+            "user.login, user.tier_id, user.balance, game.name, game.price" +
+            " FROM user" +
+            " LEFT JOIN orders" +
+            " ON  user.id = orders.user_id" +
+            " LEFT JOIN game " +
+            " ON game.id = game_id ";
+    private static final String SELECT_ORDER_QUERY = SELECT_ALL_ORDERS_QUERY + " WHERE orders.id = ?";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<Order> rowMapper;
 
@@ -42,8 +45,8 @@ public class DbOrderRepository implements Repository<Order, Integer> {
             PreparedStatement ps = con
                     .prepareStatement(INSERT_ORDER,
                             Statement.RETURN_GENERATED_KEYS);
-            ps.setInt(1, orderToAdd.getUser().getId());
-            ps.setInt(2, orderToAdd.getGame().getId());
+            ps.setInt(1, orderToAdd.getUserId());
+            ps.setInt(2, orderToAdd.getGameId());
             ps.setTimestamp(3, Timestamp.valueOf(orderToAdd.getDateTime()));
             return ps;
         }, keyHolder);
@@ -76,22 +79,30 @@ public class DbOrderRepository implements Repository<Order, Integer> {
         @Override
         public Order mapRow(ResultSet rs, int rowNum) throws SQLException {
 
+            Tier tier = new Tier(
+                    rs.getInt("tier_id"),
+                    null,
+                    0);
+
             User user = new User(
                     rs.getInt("user_id"),
-                    null,
-                    null,
-                    null);
+                    rs.getString("login"),
+                    tier,
+                    rs.getBigDecimal("balance"));
 
             Game game = new Game(
                     rs.getInt("game_id"),
-                    null,
-                    null);
+                    rs.getString("name"),
+                    rs.getBigDecimal("price"));
+
+            Timestamp timestamp = rs.getTimestamp("order_datetime");
+            LocalDateTime dateTime = timestamp.toLocalDateTime();
 
             return new Order(
                     rs.getInt("id"),
                     user,
                     game,
-                    null);
+                    dateTime);
         }
     }
 }

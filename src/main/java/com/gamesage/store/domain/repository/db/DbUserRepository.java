@@ -2,7 +2,7 @@ package com.gamesage.store.domain.repository.db;
 
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.UpdateRepository;
+import com.gamesage.store.domain.repository.UserUpdateRepository;
 import com.gamesage.store.exception.EntityNotFoundException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class DbUserRepository implements UpdateRepository {
+public class DbUserRepository implements UserUpdateRepository {
 
     private static final String SELECT_USER_QUERY = "SELECT user.id AS user_id, login, balance, " +
-            "tier_id, level AS tl, tier.percentage AS tp FROM user " +
+            "tier_id, name AS tl, tier.percentage AS tp FROM user " +
             "LEFT JOIN tier " +
             "on user.tier_id = tier.id ";
     private static final String INSERT_USER_QUERY = "INSERT INTO user (login, balance, tier_id) " +

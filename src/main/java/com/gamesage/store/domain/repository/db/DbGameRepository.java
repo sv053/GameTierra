@@ -2,7 +2,6 @@ package com.gamesage.store.domain.repository.db;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.repository.CreateManyRepository;
-import com.gamesage.store.exception.EntityNotFoundException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -25,7 +24,10 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
 
     private static final String SELECT_ALL_GAMES_QUERY = "SELECT id, name, price FROM game ";
     private static final String SELECT_GAME_QUERY = SELECT_ALL_GAMES_QUERY + " WHERE ID = ?";
-    private static final String SELECT_USER_GAMES_IDS_QUERY = "SELECT game_id FROM orders WHERE user_id  = ? ";
+    private static final String SELECT_USER_GAMES_QUERY = "SELECT game.id, name, price " +
+            " FROM game" +
+            " LEFT JOIN orders" +
+            " ON game.id = orders.game_id  WHERE orders.user_id  = ? ";
     private static final String INSERT_GAME_QUERY = "INSERT INTO game (name, price) VALUES (?, ?) ";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<Game> gameRowMapper;
@@ -54,14 +56,9 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
 
     @Override
     public List<Game> findAllDependent(Integer ownerId) {
-        List<Integer> gameIds = jdbcTemplate.queryForList(SELECT_USER_GAMES_IDS_QUERY,
-                Integer.class,
+        return jdbcTemplate.query(SELECT_USER_GAMES_QUERY,
+                gameRowMapper,
                 ownerId);
-        List<Game> userGames = new ArrayList<>();
-        for (Integer gameId : gameIds) {
-            userGames.add(findById(gameId).orElseThrow(() -> new EntityNotFoundException(gameId)));
-        }
-        return userGames;
     }
 
     @Override
