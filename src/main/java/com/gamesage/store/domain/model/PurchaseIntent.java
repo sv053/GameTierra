@@ -10,12 +10,12 @@ public class PurchaseIntent {
     private final Game targetGame;
     private final User buyer;
     private final LocalDateTime orderDateTime;
-    private final Message message;
+    private final String message;
 
     private PurchaseIntent(Builder builder) {
         isBought = builder.gameIsBought;
         targetGame = builder.targetGame;
-        message = builder.message;
+        message = builder.message.getPhrase();
         buyer = builder.buyer;
         orderDateTime = builder.orderDateTime;
     }
@@ -28,7 +28,7 @@ public class PurchaseIntent {
         return orderDateTime;
     }
 
-    public Message getMessage() {
+    public String getMessage() {
         return message;
     }
 
@@ -62,17 +62,6 @@ public class PurchaseIntent {
         result = 31 * result + (buyer != null ? buyer.hashCode() : 0);
         result = 31 * result + (orderDateTime != null ? orderDateTime.hashCode() : 0);
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "PurchaseIntent{" +
-                "\nisBought=" + isBought +
-                ", \ntargetGame=" + targetGame +
-                ", buyer=" + buyer +
-                ", \norderDateTime=" + orderDateTime +
-                ", \nmessage=" + message.getPhrase() +
-                '}';
     }
 
     public enum Message {
