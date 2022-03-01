@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.gamesage.store.domain.model.PurchaseIntent.Message.*;
@@ -50,43 +49,39 @@ public class OrderService {
         return gameService.findById(id);
     }
 
-    private void pay(User user, Game game) {
-        BigDecimal price = game.getPrice();
-        user.withdrawBalance(price);
-        user.depositBalance(calculateCashback(price, user));
-    }
-
     private boolean ifCanBuy(boolean canPay, boolean hasGame) {
         return !hasGame && canPay;
     }
 
-    private String createPurchaseMessage(boolean canPay, boolean hasGame) {
-        if (!canPay) return THE_GAME_PRICE_IS_HIGHER_THAN_THE_BALANCE.getPhrase();
-        if (hasGame) return IS_ALREADY_OWNED.getPhrase();
-        return PURCHASE_SUCCESSFUL.getPhrase();
+    private PurchaseIntent.Message createPurchaseMessage(boolean canPay, boolean hasGame) {
+        if (!canPay) return NOT_ENOUGH_BALANCE;
+        if (hasGame) return IS_ALREADY_OWNED;
+        return PURCHASE_SUCCESSFUL;
     }
 
-    public LocalDateTime getLocalDateTime() {
-        return LocalDateTime.now();
-    }
-
-    public Order createNewOrder(User user, Game game, LocalDateTime dateTime) {
-        return new Order(user, game, dateTime);
+    public Order createNewOrder(User user, Game game) {
+        return new Order(user, game);
     }
 
     public Order saveOrder(Order order) {
         return repository.createOne(order);
     }
 
+    private void pay(User user, Game game) {
+        BigDecimal price = game.getPrice();
+        user.withdrawBalance(price);
+        user.depositBalance(calculateCashback(price, user));
+    }
+
     @Transactional
-    public PurchaseIntent buyGame(int gameId, int userId, LocalDateTime dateTime) {
+    public PurchaseIntent buyGame(int gameId, int userId) {
         Game game = retrieveGame(gameId);
         User user = retrieveUser(userId);
         boolean hasGame = user.hasGame(game);
         boolean canPay = user.canPay(game.getPrice());
         boolean canBuy = ifCanBuy(canPay, hasGame);
-        String message = createPurchaseMessage(canPay, hasGame);
-        Order order = createNewOrder(user, game, dateTime);
+        PurchaseIntent.Message message = createPurchaseMessage(canPay, hasGame);
+        Order order = createNewOrder(user, game);
         saveOrder(order);
         if (canBuy) {
             pay(user, game);

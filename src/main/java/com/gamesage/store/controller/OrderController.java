@@ -1,7 +1,6 @@
 package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.Order;
-import com.gamesage.store.domain.model.PurchaseIntent;
 import com.gamesage.store.service.OrderService;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,8 +27,8 @@ public class OrderController {
     }
 
     @PostMapping("/{gameId}/{userId}")
-    public PurchaseIntent buyGame(@PathVariable Integer gameId, @PathVariable Integer userId) {
-        return orderService.buyGame(gameId, userId, orderService.getLocalDateTime());
+    public String buyGame(@PathVariable Integer gameId, @PathVariable Integer userId) {
+        return orderService.buyGame(gameId, userId).toString();
     }
 }
 

@@ -10,7 +10,7 @@ public class PurchaseIntent {
     private final Game targetGame;
     private final User buyer;
     private final LocalDateTime orderDateTime;
-    private final String message;
+    private final Message message;
 
     private PurchaseIntent(Builder builder) {
         isBought = builder.gameIsBought;
@@ -28,7 +28,7 @@ public class PurchaseIntent {
         return orderDateTime;
     }
 
-    public String getMessage() {
+    public Message getMessage() {
         return message;
     }
 
@@ -64,10 +64,21 @@ public class PurchaseIntent {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "PurchaseIntent{" +
+                "\nisBought=" + isBought +
+                ", \ntargetGame=" + targetGame +
+                ", buyer=" + buyer +
+                ", \norderDateTime=" + orderDateTime +
+                ", \nmessage=" + message.getPhrase() +
+                '}';
+    }
+
     public enum Message {
         PURCHASE_SUCCESSFUL("Congrats! You have bought the game!"),
         IS_ALREADY_OWNED("Looks like you already have got this game"),
-        THE_GAME_PRICE_IS_HIGHER_THAN_THE_BALANCE("Sorry, your balance is not enough to buy the game");
+        NOT_ENOUGH_BALANCE("Sorry, your balance is not enough to buy the game");
 
         public final String phrase;
 
@@ -85,7 +96,7 @@ public class PurchaseIntent {
         private final Game targetGame;
         private User buyer;
         private LocalDateTime orderDateTime;
-        private String message;
+        private Message message;
         private boolean gameIsBought;
 
         public Builder(Game targetGame) {
@@ -102,7 +113,7 @@ public class PurchaseIntent {
             return this;
         }
 
-        public Builder message(String message) {
+        public Builder message(Message message) {
             this.message = message;
             return this;
         }

@@ -8,10 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -37,8 +36,7 @@ class OrderServiceDbIntegrationTest {
 
     @Test
     void findById_Success_TheOrderIsFound() {
-        LocalDateTime dateTime = orderService.getLocalDateTime();
-        Order order = orderService.createNewOrder(user, game, dateTime);
+        Order order = orderService.createNewOrder(user, game);
         orderService.saveOrder(order);
         List<Order> allOrdersInTheTable = orderService.findAll();
 
@@ -48,19 +46,27 @@ class OrderServiceDbIntegrationTest {
     }
 
     @Test
-    void buyGame_Success() {
-        LocalDateTime dateTime = orderService.getLocalDateTime();
-        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId(), dateTime);
+    void buyGame_Success() throws InterruptedException {
+        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
+        Thread.sleep(5);
+        Order order = orderService.createNewOrder(user, game);
         PurchaseIntent expectedResult =
                 new PurchaseIntent
                         .Builder(game)
                         .gameIsBought(true)
                         .buyer(user)
-                        .message(PurchaseIntent.Message.PURCHASE_SUCCESSFUL.getPhrase())
-                        .orderDateTime(dateTime)
+                        .message(PurchaseIntent.Message.PURCHASE_SUCCESSFUL)
+                        .orderDateTime(order.getDateTime())
                         .build();
 
-        assertEquals(expectedResult, result);
+        assertAll(
+                () -> assertTrue(expectedResult.getOrderDateTime().isAfter(result.getOrderDateTime())),
+                () -> assertTrue(expectedResult.getOrderDateTime().minusSeconds(1).isBefore(result.getOrderDateTime())),
+                () -> assertTrue(result.isBought()),
+                () -> assertEquals(expectedResult.getBuyer(), result.getBuyer()),
+                () -> assertEquals(expectedResult.getTargetGame(), result.getTargetGame()),
+                () -> assertEquals(expectedResult.getMessage(), result.getMessage())
+        );
     }
 }
 

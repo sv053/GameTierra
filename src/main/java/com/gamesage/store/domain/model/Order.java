@@ -10,8 +10,8 @@ public class Order {
     private final Game game;
     private final LocalDateTime dateTime;
 
-    public Order(User user, Game game, LocalDateTime dateTime) {
-        this(null, user, game, dateTime);
+    public Order(User user, Game game) {
+        this(null, user, game, LocalDateTime.now());
     }
 
     public Order(Integer id, User user, Game game, LocalDateTime dateTime) {
