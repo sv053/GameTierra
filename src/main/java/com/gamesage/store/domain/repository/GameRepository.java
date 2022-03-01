@@ -7,7 +7,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Repository
-public class GameRepository implements Repository<Game, Integer> {
+public class GameRepository implements CreateManyRepository<Game, Integer> {
 
     private final List<Game> games;
     private final Map<Integer, Game> allGamesById;

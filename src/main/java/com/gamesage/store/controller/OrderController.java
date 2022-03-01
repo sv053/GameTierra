@@ -29,7 +29,7 @@ public class OrderController {
 
     @PostMapping("/{gameId}/{userId}")
     public PurchaseIntent buyGame(@PathVariable Integer gameId, @PathVariable Integer userId) {
-        return orderService.buyGame(gameId, userId);
+        return orderService.buyGame(gameId, userId, orderService.getLocalDateTime());
     }
 }
 

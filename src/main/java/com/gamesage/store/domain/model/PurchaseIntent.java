@@ -10,7 +10,7 @@ public class PurchaseIntent {
     private final Game targetGame;
     private final User buyer;
     private final LocalDateTime orderDateTime;
-    private final Message message;
+    private final String message;
 
     private PurchaseIntent(Builder builder) {
         isBought = builder.gameIsBought;
@@ -28,7 +28,7 @@ public class PurchaseIntent {
         return orderDateTime;
     }
 
-    public Message getMessage() {
+    public String getMessage() {
         return message;
     }
 
@@ -65,9 +65,19 @@ public class PurchaseIntent {
     }
 
     public enum Message {
-        PLAY_NOW,
-        IS_ALREADY_OWNED,
-        THE_GAME_PRICE_IS_HIGHER_THAN_THE_BALANCE
+        PURCHASE_SUCCESSFUL("Congrats! You have bought the game!"),
+        IS_ALREADY_OWNED("Looks like you already have got this game"),
+        THE_GAME_PRICE_IS_HIGHER_THAN_THE_BALANCE("Sorry, your balance is not enough to buy the game");
+
+        public final String phrase;
+
+        Message(String message) {
+            phrase = message;
+        }
+
+        public String getPhrase() {
+            return phrase;
+        }
     }
 
     public static class Builder {
@@ -75,7 +85,7 @@ public class PurchaseIntent {
         private final Game targetGame;
         private User buyer;
         private LocalDateTime orderDateTime;
-        private Message message;
+        private String message;
         private boolean gameIsBought;
 
         public Builder(Game targetGame) {
@@ -92,7 +102,7 @@ public class PurchaseIntent {
             return this;
         }
 
-        public Builder message(Message message) {
+        public Builder message(String message) {
             this.message = message;
             return this;
         }

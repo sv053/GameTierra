@@ -1,7 +1,7 @@
 package com.gamesage.store.domain.repository.db;
 
 import com.gamesage.store.domain.model.Game;
-import com.gamesage.store.domain.repository.CreateManyRepository;
+import com.gamesage.store.domain.repository.FindAllDependentRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class DbGameRepository implements CreateManyRepository<Game, Integer> {
+public class DbGameRepository implements FindAllDependentRepository<Game, Integer> {
 
     private static final String SELECT_ALL_GAMES_QUERY = "SELECT id, name, price FROM game ";
     private static final String SELECT_GAME_QUERY = SELECT_ALL_GAMES_QUERY + " WHERE ID = ?";
