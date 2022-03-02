@@ -3,6 +3,8 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Order;
 import com.gamesage.store.domain.model.PurchaseIntent;
+import com.gamesage.store.domain.model.PurchaseIntent.Builder;
+import com.gamesage.store.domain.model.PurchaseIntent.PurchaseMessage;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.Repository;
 import com.gamesage.store.exception.EntityNotFoundException;
@@ -43,10 +45,10 @@ public class OrderService {
     }
 
     private boolean ifCanBuy(boolean canPay, boolean hasGame) {
-        return !hasGame && canPay;
+        return canPay && !hasGame;
     }
 
-    private PurchaseIntent.PurchaseMessage preparePurchaseMessage(boolean canPay, boolean hasGame) {
+    private PurchaseMessage preparePurchaseMessage(boolean canPay, boolean hasGame) {
         if (!canPay) return NOT_ENOUGH_BALANCE;
         if (hasGame) return ALREADY_OWNED;
         return PURCHASE_SUCCESSFUL;
@@ -62,10 +64,10 @@ public class OrderService {
     public PurchaseIntent buyGame(int gameId, int userId) {
         Game game = gameService.findById(gameId);
         User user = userService.findById(userId);
-        boolean hasGame = user.hasGame(game);
         boolean canPay = user.canPay(game.getPrice());
+        boolean hasGame = user.hasGame(game);
         boolean canBuy = ifCanBuy(canPay, hasGame);
-        PurchaseIntent.PurchaseMessage purchaseMessage = preparePurchaseMessage(canPay, hasGame);
+        PurchaseMessage purchaseMessage = preparePurchaseMessage(canPay, hasGame);
         Order order = null;
 
         if (canBuy) {
@@ -74,7 +76,7 @@ public class OrderService {
             order = repository.createOne(new Order(user, game));
         }
         LocalDateTime dateTime = (order == null) ? LocalDateTime.now() : order.getDateTime();
-        return new PurchaseIntent.Builder(game)
+        return new Builder(game)
                 .gameIsBought(canBuy)
                 .buyer(user)
                 .message(purchaseMessage)

@@ -37,11 +37,8 @@ public class UserService {
     }
 
     public User updateBalance(User userToUpdate) {
-        User user = null;
-        if (findById(userToUpdate.getId()) != null) {
-            user = repository.updateUserBalance(userToUpdate);
-        }
-        return user;
+        findById(userToUpdate.getId());
+        return repository.updateUserBalance(userToUpdate);
     }
 }
 

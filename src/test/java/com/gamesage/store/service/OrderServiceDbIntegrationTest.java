@@ -47,7 +47,6 @@ class OrderServiceDbIntegrationTest {
 
     @Test
     void buyGame_Success() {
-        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
         LocalDateTime timePoint = LocalDateTime.now();
         PurchaseIntent expectedResult =
                 new PurchaseIntent
@@ -57,15 +56,21 @@ class OrderServiceDbIntegrationTest {
                         .message(PurchaseIntent.PurchaseMessage.PURCHASE_SUCCESSFUL)
                         .orderDateTime(timePoint)
                         .build();
+        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
+
+        compareDateTime(timePoint, result.getOrderDateTime());
 
         assertAll(
-                () -> assertTrue(timePoint.isAfter(result.getOrderDateTime())),
-                () -> assertTrue(timePoint.minusSeconds(10).isBefore(result.getOrderDateTime())),
                 () -> assertTrue(result.isBought()),
                 () -> assertEquals(expectedResult.getBuyer(), result.getBuyer()),
                 () -> assertEquals(expectedResult.getTargetGame(), result.getTargetGame()),
                 () -> assertEquals(expectedResult.getMessage(), result.getMessage())
         );
+    }
+
+    void compareDateTime(LocalDateTime expectedDateTime, LocalDateTime dateTime) {
+        assertTrue(expectedDateTime.isBefore(dateTime));
+        assertTrue(expectedDateTime.plusSeconds(1).isAfter(dateTime));
     }
 }
 
