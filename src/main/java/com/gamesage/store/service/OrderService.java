@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.gamesage.store.domain.model.PurchaseIntent.PurchaseMessage.*;
@@ -65,18 +66,19 @@ public class OrderService {
         boolean canPay = user.canPay(game.getPrice());
         boolean canBuy = ifCanBuy(canPay, hasGame);
         PurchaseIntent.PurchaseMessage purchaseMessage = preparePurchaseMessage(canPay, hasGame);
-        Order order = new Order(user, game);
+        Order order = null;
 
         if (canBuy) {
             pay(user, game);
             user = userService.updateBalance(user);
-            order = repository.createOne(order);
+            order = repository.createOne(new Order(user, game));
         }
+        LocalDateTime dateTime = (order == null) ? LocalDateTime.now() : order.getDateTime();
         return new PurchaseIntent.Builder(game)
                 .gameIsBought(canBuy)
                 .buyer(user)
                 .message(purchaseMessage)
-                .orderDateTime(order.getDateTime())
+                .orderDateTime(dateTime)
                 .build();
     }
 }

@@ -43,7 +43,7 @@ public class User {
         return games;
     }
 
-    public void setGames(List<Game> games) {
+    public void addGames(List<Game> games) {
         this.games.addAll(games);
     }
 

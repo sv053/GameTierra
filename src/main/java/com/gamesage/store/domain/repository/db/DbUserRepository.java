@@ -76,28 +76,18 @@ public class DbUserRepository implements UserUpdateRepository {
 
     @Override
     public User update(User userToUpdate) {
-        User retrievedUser = findById(userToUpdate.getId()).get();
-        if (retrievedUser.equals(null)) {
-            return retrievedUser;
-        } else {
-            jdbcTemplate.update(UPDATE_USER
-                    , userToUpdate.getBalance()
-                    , userToUpdate.getTier().getId()
-                    , userToUpdate.getId());
-        }
+        jdbcTemplate.update(UPDATE_USER
+                , userToUpdate.getBalance()
+                , userToUpdate.getTier().getId()
+                , userToUpdate.getId());
         return userToUpdate;
     }
 
     @Override
     public User updateUserBalance(User userToUpdate) {
-        User retrievedUser = findById(userToUpdate.getId()).get();
-        if (retrievedUser.equals(null)) {
-            return retrievedUser;
-        } else {
-            jdbcTemplate.update(UPDATE_USER_BALANCE
-                    , userToUpdate.getBalance()
-                    , userToUpdate.getId());
-        }
+        jdbcTemplate.update(UPDATE_USER_BALANCE
+                , userToUpdate.getBalance()
+                , userToUpdate.getId());
         return userToUpdate;
     }
 

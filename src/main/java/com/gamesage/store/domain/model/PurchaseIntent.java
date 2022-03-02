@@ -1,8 +1,5 @@
 package com.gamesage.store.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonValue;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -66,20 +63,18 @@ public class PurchaseIntent {
         return result;
     }
 
-    @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public enum PurchaseMessage {
 
         PURCHASE_SUCCESSFUL("Congrats! You have bought the game!"),
         ALREADY_OWNED("Looks like you already have got this game"),
         NOT_ENOUGH_BALANCE("Sorry, your balance is not enough to buy the game");
 
-        private String message;
+        private final String message;
 
-        private PurchaseMessage(String message) {
+        PurchaseMessage(String message) {
             this.message = message;
         }
 
-        @JsonValue
         public String getMessage() {
             return message;
         }

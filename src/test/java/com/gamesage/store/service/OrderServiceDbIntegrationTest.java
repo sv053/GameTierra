@@ -46,23 +46,21 @@ class OrderServiceDbIntegrationTest {
     }
 
     @Test
-    void buyGame_Success() throws InterruptedException {
+    void buyGame_Success() {
         PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
-        Thread.sleep(5);
-        Order order = new Order(user, game);
+        LocalDateTime timePoint = LocalDateTime.now();
         PurchaseIntent expectedResult =
                 new PurchaseIntent
                         .Builder(game)
                         .gameIsBought(true)
                         .buyer(user)
                         .message(PurchaseIntent.PurchaseMessage.PURCHASE_SUCCESSFUL)
-                        .orderDateTime(order.getDateTime())
+                        .orderDateTime(timePoint)
                         .build();
 
         assertAll(
-                () -> assertTrue(expectedResult.getOrderDateTime().isAfter(result.getOrderDateTime())),
-                () -> assertTrue(LocalDateTime.now().isAfter(result.getOrderDateTime())),
-                () -> assertTrue(LocalDateTime.now().minusSeconds(1).isBefore(result.getOrderDateTime())),
+                () -> assertTrue(timePoint.isAfter(result.getOrderDateTime())),
+                () -> assertTrue(timePoint.minusSeconds(10).isBefore(result.getOrderDateTime())),
                 () -> assertTrue(result.isBought()),
                 () -> assertEquals(expectedResult.getBuyer(), result.getBuyer()),
                 () -> assertEquals(expectedResult.getTargetGame(), result.getTargetGame()),

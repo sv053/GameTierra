@@ -24,7 +24,7 @@ public class UserService {
     public User findById(int id) {
         User retrievedUser = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
         List<Game> userGames = gameService.findAllGamesByUserId(retrievedUser.getId());
-        retrievedUser.setGames(userGames);
+        retrievedUser.addGames(userGames);
         return retrievedUser;
     }
 
@@ -37,7 +37,11 @@ public class UserService {
     }
 
     public User updateBalance(User userToUpdate) {
-        return repository.updateUserBalance(userToUpdate);
+        User user = null;
+        if (findById(userToUpdate.getId()) != null) {
+            user = repository.updateUserBalance(userToUpdate);
+        }
+        return user;
     }
 }
 
