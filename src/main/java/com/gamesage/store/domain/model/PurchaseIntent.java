@@ -1,8 +1,9 @@
 package com.gamesage.store.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
-
 
 public class PurchaseIntent {
 
@@ -10,12 +11,12 @@ public class PurchaseIntent {
     private final Game targetGame;
     private final User buyer;
     private final LocalDateTime orderDateTime;
-    private final String message;
+    private final PurchaseMessage purchaseMessage;
 
     private PurchaseIntent(Builder builder) {
         isBought = builder.gameIsBought;
         targetGame = builder.targetGame;
-        message = builder.message.getPhrase();
+        purchaseMessage = builder.purchaseMessage;
         buyer = builder.buyer;
         orderDateTime = builder.orderDateTime;
     }
@@ -28,8 +29,8 @@ public class PurchaseIntent {
         return orderDateTime;
     }
 
-    public String getMessage() {
-        return message;
+    public PurchaseMessage getMessage() {
+        return purchaseMessage;
     }
 
     public Game getTargetGame() {
@@ -48,7 +49,7 @@ public class PurchaseIntent {
         PurchaseIntent purchase = (PurchaseIntent) o;
 
         return Objects.equals(isBought, purchase.isBought())
-                && Objects.equals(message, purchase.getMessage())
+                && Objects.equals(purchaseMessage, purchase.getMessage())
                 && Objects.equals(targetGame, purchase.getTargetGame())
                 && Objects.equals(buyer, purchase.getBuyer())
                 && Objects.equals(orderDateTime, purchase.getOrderDateTime());
@@ -57,26 +58,28 @@ public class PurchaseIntent {
     @Override
     public int hashCode() {
         int result = (isBought ? 1 : 0);
-        result = 31 * result + (message != null ? message.hashCode() : 0);
+        result = 31 * result + (purchaseMessage != null ? purchaseMessage.hashCode() : 0);
         result = 31 * result + (targetGame != null ? targetGame.hashCode() : 0);
         result = 31 * result + (buyer != null ? buyer.hashCode() : 0);
         result = 31 * result + (orderDateTime != null ? orderDateTime.hashCode() : 0);
         return result;
     }
 
-    public enum Message {
+    @JsonFormat(shape = JsonFormat.Shape.OBJECT)
+    public enum PurchaseMessage {
+
         PURCHASE_SUCCESSFUL("Congrats! You have bought the game!"),
-        IS_ALREADY_OWNED("Looks like you already have got this game"),
+        ALREADY_OWNED("Looks like you already have got this game"),
         NOT_ENOUGH_BALANCE("Sorry, your balance is not enough to buy the game");
 
-        public final String phrase;
+        private String message;
 
-        Message(String message) {
-            phrase = message;
+        private PurchaseMessage(String message) {
+            this.message = message;
         }
 
-        public String getPhrase() {
-            return phrase;
+        public String getMessage() {
+            return message;
         }
     }
 
@@ -85,7 +88,7 @@ public class PurchaseIntent {
         private final Game targetGame;
         private User buyer;
         private LocalDateTime orderDateTime;
-        private Message message;
+        private PurchaseMessage purchaseMessage;
         private boolean gameIsBought;
 
         public Builder(Game targetGame) {
@@ -102,8 +105,8 @@ public class PurchaseIntent {
             return this;
         }
 
-        public Builder message(Message message) {
-            this.message = message;
+        public Builder message(PurchaseMessage purchaseMessage) {
+            this.purchaseMessage = purchaseMessage;
             return this;
         }
 

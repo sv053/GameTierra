@@ -9,9 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,9 +23,7 @@ class GameServiceDbIntegrationTest {
 
     @BeforeEach
     void init() {
-        Integer randomForName = new Random().nextInt(LocalDateTime.now().getNano());
-        String name = randomForName.toString();
-        game = gameService.createOne(new Game(name, BigDecimal.TEN));
+        game = gameService.createOne(new Game("Test game", BigDecimal.TEN));
     }
 
     @Test

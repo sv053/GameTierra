@@ -3,7 +3,6 @@ package com.gamesage.store.domain.repository.db;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.UserUpdateRepository;
-import com.gamesage.store.exception.EntityNotFoundException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -77,24 +76,28 @@ public class DbUserRepository implements UserUpdateRepository {
 
     @Override
     public User update(User userToUpdate) {
-        Optional<User> retrievedUser = findById(userToUpdate.getId());
-        if (retrievedUser.isPresent()) {
+        User retrievedUser = findById(userToUpdate.getId()).get();
+        if (retrievedUser.equals(null)) {
+            return retrievedUser;
+        } else {
             jdbcTemplate.update(UPDATE_USER
                     , userToUpdate.getBalance()
                     , userToUpdate.getTier().getId()
                     , userToUpdate.getId());
-        } else throw new EntityNotFoundException(userToUpdate.getId());
+        }
         return userToUpdate;
     }
 
     @Override
     public User updateUserBalance(User userToUpdate) {
-        Optional<User> retrievedUser = findById(userToUpdate.getId());
-        if (retrievedUser.isPresent()) {
+        User retrievedUser = findById(userToUpdate.getId()).get();
+        if (retrievedUser.equals(null)) {
+            return retrievedUser;
+        } else {
             jdbcTemplate.update(UPDATE_USER_BALANCE
                     , userToUpdate.getBalance()
                     , userToUpdate.getId());
-        } else throw new EntityNotFoundException(userToUpdate.getId());
+        }
         return userToUpdate;
     }
 

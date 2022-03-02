@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class UserService {
@@ -25,7 +24,7 @@ public class UserService {
     public User findById(int id) {
         User retrievedUser = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
         List<Game> userGames = gameService.findAllGamesByUserId(retrievedUser.getId());
-        retrievedUser.setGames(Set.copyOf(userGames));
+        retrievedUser.setGames(userGames);
         return retrievedUser;
     }
 

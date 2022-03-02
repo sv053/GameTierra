@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,8 +37,7 @@ class OrderServiceDbIntegrationTest {
 
     @Test
     void findById_Success_TheOrderIsFound() {
-        Order order = orderService.createNewOrder(user, game);
-        orderService.saveOrder(order);
+        orderService.buyGame(game.getId(), user.getId());
         List<Order> allOrdersInTheTable = orderService.findAll();
 
         Order orderToFind = allOrdersInTheTable.get(0);
@@ -49,19 +49,20 @@ class OrderServiceDbIntegrationTest {
     void buyGame_Success() throws InterruptedException {
         PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
         Thread.sleep(5);
-        Order order = orderService.createNewOrder(user, game);
+        Order order = new Order(user, game);
         PurchaseIntent expectedResult =
                 new PurchaseIntent
                         .Builder(game)
                         .gameIsBought(true)
                         .buyer(user)
-                        .message(PurchaseIntent.Message.PURCHASE_SUCCESSFUL)
+                        .message(PurchaseIntent.PurchaseMessage.PURCHASE_SUCCESSFUL)
                         .orderDateTime(order.getDateTime())
                         .build();
 
         assertAll(
                 () -> assertTrue(expectedResult.getOrderDateTime().isAfter(result.getOrderDateTime())),
-                () -> assertTrue(expectedResult.getOrderDateTime().minusSeconds(1).isBefore(result.getOrderDateTime())),
+                () -> assertTrue(LocalDateTime.now().isAfter(result.getOrderDateTime())),
+                () -> assertTrue(LocalDateTime.now().minusSeconds(1).isBefore(result.getOrderDateTime())),
                 () -> assertTrue(result.isBought()),
                 () -> assertEquals(expectedResult.getBuyer(), result.getBuyer()),
                 () -> assertEquals(expectedResult.getTargetGame(), result.getTargetGame()),

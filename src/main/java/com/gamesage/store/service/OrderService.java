@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static com.gamesage.store.domain.model.PurchaseIntent.Message.*;
+import static com.gamesage.store.domain.model.PurchaseIntent.PurchaseMessage.*;
 
 @Service
 public class OrderService {
@@ -41,30 +41,14 @@ public class OrderService {
         return gamePrice.multiply(percentage);
     }
 
-    private User retrieveUser(int id) {
-        return userService.findById(id);
-    }
-
-    private Game retrieveGame(int id) {
-        return gameService.findById(id);
-    }
-
     private boolean ifCanBuy(boolean canPay, boolean hasGame) {
         return !hasGame && canPay;
     }
 
-    private PurchaseIntent.Message createPurchaseMessage(boolean canPay, boolean hasGame) {
+    private PurchaseIntent.PurchaseMessage preparePurchaseMessage(boolean canPay, boolean hasGame) {
         if (!canPay) return NOT_ENOUGH_BALANCE;
-        if (hasGame) return IS_ALREADY_OWNED;
+        if (hasGame) return ALREADY_OWNED;
         return PURCHASE_SUCCESSFUL;
-    }
-
-    public Order createNewOrder(User user, Game game) {
-        return new Order(user, game);
-    }
-
-    public Order saveOrder(Order order) {
-        return repository.createOne(order);
     }
 
     private void pay(User user, Game game) {
@@ -75,14 +59,14 @@ public class OrderService {
 
     @Transactional
     public PurchaseIntent buyGame(int gameId, int userId) {
-        Game game = retrieveGame(gameId);
-        User user = retrieveUser(userId);
+        Game game = gameService.findById(gameId);
+        User user = userService.findById(userId);
         boolean hasGame = user.hasGame(game);
         boolean canPay = user.canPay(game.getPrice());
         boolean canBuy = ifCanBuy(canPay, hasGame);
-        PurchaseIntent.Message message = createPurchaseMessage(canPay, hasGame);
-        Order order = createNewOrder(user, game);
-        saveOrder(order);
+        PurchaseIntent.PurchaseMessage purchaseMessage = preparePurchaseMessage(canPay, hasGame);
+        Order order = new Order(user, game);
+
         if (canBuy) {
             pay(user, game);
             user = userService.updateBalance(user);
@@ -91,7 +75,7 @@ public class OrderService {
         return new PurchaseIntent.Builder(game)
                 .gameIsBought(canBuy)
                 .buyer(user)
-                .message(message)
+                .message(purchaseMessage)
                 .orderDateTime(order.getDateTime())
                 .build();
     }
