@@ -39,11 +39,6 @@ public class OrderService {
         return repository.findAll();
     }
 
-    public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
-        BigDecimal percentage = BigDecimal.valueOf(user.getTier().getCashbackPercentage());
-        return gamePrice.multiply(percentage);
-    }
-
     @Transactional
     public PurchaseIntent buyGame(int gameId, int userId) {
         Game game = gameService.findById(gameId);
@@ -76,6 +71,11 @@ public class OrderService {
         if (!canPay) return NOT_ENOUGH_BALANCE;
         if (hasGame) return ALREADY_OWNED;
         return PURCHASE_SUCCESSFUL;
+    }
+
+    public BigDecimal calculateCashback(BigDecimal gamePrice, User user) {
+        BigDecimal percentage = BigDecimal.valueOf(user.getTier().getCashbackPercentage());
+        return gamePrice.multiply(percentage);
     }
 
     private void pay(User user, Game game) {
