@@ -44,22 +44,6 @@ public class OrderService {
         return gamePrice.multiply(percentage);
     }
 
-    private boolean ifCanBuy(boolean canPay, boolean hasGame) {
-        return canPay && !hasGame;
-    }
-
-    private PurchaseMessage preparePurchaseMessage(boolean canPay, boolean hasGame) {
-        if (!canPay) return NOT_ENOUGH_BALANCE;
-        if (hasGame) return ALREADY_OWNED;
-        return PURCHASE_SUCCESSFUL;
-    }
-
-    private void pay(User user, Game game) {
-        BigDecimal price = game.getPrice();
-        user.withdrawBalance(price);
-        user.depositBalance(calculateCashback(price, user));
-    }
-
     @Transactional
     public PurchaseIntent buyGame(int gameId, int userId) {
         Game game = gameService.findById(gameId);
@@ -82,6 +66,22 @@ public class OrderService {
                 .message(purchaseMessage)
                 .orderDateTime(dateTime)
                 .build();
+    }
+
+    private boolean ifCanBuy(boolean canPay, boolean hasGame) {
+        return canPay && !hasGame;
+    }
+
+    private PurchaseMessage preparePurchaseMessage(boolean canPay, boolean hasGame) {
+        if (!canPay) return NOT_ENOUGH_BALANCE;
+        if (hasGame) return ALREADY_OWNED;
+        return PURCHASE_SUCCESSFUL;
+    }
+
+    private void pay(User user, Game game) {
+        BigDecimal price = game.getPrice();
+        user.withdrawBalance(price);
+        user.depositBalance(calculateCashback(price, user));
     }
 }
 
