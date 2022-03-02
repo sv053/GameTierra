@@ -1,6 +1,7 @@
 package com.gamesage.store.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -78,6 +79,7 @@ public class PurchaseIntent {
             this.message = message;
         }
 
+        @JsonValue
         public String getMessage() {
             return message;
         }
