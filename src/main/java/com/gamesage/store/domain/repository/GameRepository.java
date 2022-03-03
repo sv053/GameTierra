@@ -1,13 +1,12 @@
 package com.gamesage.store.domain.repository;
 
 import com.gamesage.store.domain.model.Game;
-import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Repository
+@org.springframework.stereotype.Repository
 public class GameRepository implements CreateManyRepository<Game, Integer> {
 
     private final List<Game> games;
@@ -24,6 +23,7 @@ public class GameRepository implements CreateManyRepository<Game, Integer> {
         return Optional.ofNullable(allGamesById.get(key));
     }
 
+    @Override
     public List<Game> findAll() {
         return games;
     }
@@ -36,7 +36,6 @@ public class GameRepository implements CreateManyRepository<Game, Integer> {
         return gameToAddWithId;
     }
 
-    @Override
     public List<Game> create(List<Game> gamesToAdd) {
         List<Game> gamesToAddWithId = addIdToAll(gamesToAdd);
         games.addAll(gamesToAddWithId);

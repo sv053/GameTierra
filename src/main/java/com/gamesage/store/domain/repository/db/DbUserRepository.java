@@ -2,13 +2,14 @@ package com.gamesage.store.domain.repository.db;
 
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.Repository;
+import com.gamesage.store.domain.repository.UserUpdateRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,14 +17,19 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-@org.springframework.stereotype.Repository
-class DbUserRepository implements Repository<User, Integer> {
+@Repository
+public class DbUserRepository implements UserUpdateRepository {
 
     private static final String SELECT_USER_QUERY = "SELECT user.id AS user_id, login, balance, " +
-            "tier_id, level AS tl, tier.percentage AS tp FROM user " +
+            "tier_id, name AS tl, tier.percentage AS tp FROM user " +
             "LEFT JOIN tier " +
             "on user.tier_id = tier.id ";
-    private static final String INSERT_USER_QUERY = "INSERT into user (login, balance, tier_id) VALUES ( ?, ?, ?) ";
+    private static final String INSERT_USER_QUERY = "INSERT INTO user (login, balance, tier_id) " +
+            "VALUES ( ?, ?, ?) ";
+    private static final String UPDATE_USER = "UPDATE user SET balance = ?, tier_id = ?  " +
+            "WHERE id = ? ";
+    private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ? " +
+            "WHERE id = ?";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> userRowMapper;
 
@@ -66,6 +72,23 @@ class DbUserRepository implements Repository<User, Integer> {
                 userToAdd.getLogin(),
                 userToAdd.getTier(),
                 userToAdd.getBalance());
+    }
+
+    @Override
+    public User update(User userToUpdate) {
+        jdbcTemplate.update(UPDATE_USER
+                , userToUpdate.getBalance()
+                , userToUpdate.getTier().getId()
+                , userToUpdate.getId());
+        return userToUpdate;
+    }
+
+    @Override
+    public User updateUserBalance(User userToUpdate) {
+        jdbcTemplate.update(UPDATE_USER_BALANCE
+                , userToUpdate.getBalance()
+                , userToUpdate.getId());
+        return userToUpdate;
     }
 
     @Component

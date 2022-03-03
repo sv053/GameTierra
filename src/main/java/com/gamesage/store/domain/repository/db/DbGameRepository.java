@@ -1,7 +1,7 @@
 package com.gamesage.store.domain.repository.db;
 
 import com.gamesage.store.domain.model.Game;
-import com.gamesage.store.domain.repository.CreateManyRepository;
+import com.gamesage.store.domain.repository.FindAllDependentRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -20,10 +20,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class DbGameRepository implements CreateManyRepository<Game, Integer> {
+public class DbGameRepository implements FindAllDependentRepository<Game, Integer> {
 
-    private static final String SELECT_GAME_QUERY = "SELECT id, name, price FROM game";
-    private static final String INSERT_GAME_QUERY = "INSERT into game (name, price) VALUES (?, ?) ";
+    private static final String SELECT_ALL_GAMES_QUERY = "SELECT id, name, price FROM game ";
+    private static final String SELECT_GAME_QUERY = SELECT_ALL_GAMES_QUERY + " WHERE ID = ?";
+    private static final String SELECT_USER_GAMES_QUERY = "SELECT game.id, name, price " +
+            " FROM game" +
+            " LEFT JOIN orders" +
+            " ON game.id = orders.game_id  WHERE orders.user_id  = ? ";
+    private static final String INSERT_GAME_QUERY = "INSERT INTO game (name, price) VALUES (?, ?) ";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<Game> gameRowMapper;
 
@@ -36,7 +41,7 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
     public Optional<Game> findById(Integer id) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
-                    SELECT_GAME_QUERY + " WHERE ID = ?"
+                    SELECT_GAME_QUERY
                     , gameRowMapper
                     , id));
         } catch (EmptyResultDataAccessException e) {
@@ -46,7 +51,14 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
 
     @Override
     public List<Game> findAll() {
-        return jdbcTemplate.query(SELECT_GAME_QUERY, gameRowMapper);
+        return jdbcTemplate.query(SELECT_ALL_GAMES_QUERY, gameRowMapper);
+    }
+
+    @Override
+    public List<Game> findAllDependent(Integer ownerId) {
+        return jdbcTemplate.query(SELECT_USER_GAMES_QUERY,
+                gameRowMapper,
+                ownerId);
     }
 
     @Override
@@ -61,8 +73,8 @@ public class DbGameRepository implements CreateManyRepository<Game, Integer> {
             return ps;
         }, keyHolder);
         return new Game(keyHolder.getKeyAs(Integer.class),
-                        gameToAdd.getName(),
-                        gameToAdd.getPrice());
+                gameToAdd.getName(),
+                gameToAdd.getPrice());
     }
 
     @Override

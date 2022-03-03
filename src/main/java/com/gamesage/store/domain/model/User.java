@@ -3,6 +3,7 @@ package com.gamesage.store.domain.model;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -40,6 +41,10 @@ public class User {
 
     public Set<Game> getGames() {
         return games;
+    }
+
+    public void addGames(List<Game> games) {
+        this.games.addAll(games);
     }
 
     public boolean addGame(Game game) {
@@ -87,13 +92,13 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{"
+        return "\nUser{"
                 + "id=" + id
                 + ", login=" + login
                 + ", tier=" + tier.getLevel()
                 + ", cashback=" + tier.getCashbackPercentage() * 100 + "%}"
                 + ", balance=$" + balance
-                + ", games=\\n" + getGames()
+                + ", \ngames=\n" + getGames()
                 + '}';
     }
 }

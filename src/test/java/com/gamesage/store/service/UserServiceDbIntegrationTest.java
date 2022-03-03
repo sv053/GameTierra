@@ -34,7 +34,7 @@ class UserServiceDbIntegrationTest {
 
     @Test
     void findById_Failure() {
-        assertAll(() -> assertThrows(EntityNotFoundException.class, () -> userService.findById(77777)));
+        assertThrows(EntityNotFoundException.class, () -> userService.findById(77777));
     }
 
     @Test
