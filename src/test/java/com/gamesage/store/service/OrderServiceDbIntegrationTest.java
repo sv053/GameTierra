@@ -58,9 +58,8 @@ class OrderServiceDbIntegrationTest {
                         .build();
         PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
 
-        compareDateTime(timePoint, result.getOrderDateTime());
-
         assertAll(
+                () -> assertBetweenTimePoints(timePoint, result.getOrderDateTime()),
                 () -> assertTrue(result.isBought()),
                 () -> assertEquals(expectedResult.getBuyer(), result.getBuyer()),
                 () -> assertEquals(expectedResult.getTargetGame(), result.getTargetGame()),
@@ -68,7 +67,7 @@ class OrderServiceDbIntegrationTest {
         );
     }
 
-    void compareDateTime(LocalDateTime expectedDateTime, LocalDateTime dateTime) {
+    void assertBetweenTimePoints(LocalDateTime expectedDateTime, LocalDateTime dateTime) {
         assertTrue(expectedDateTime.isBefore(dateTime));
         assertTrue(expectedDateTime.plusSeconds(1).isAfter(dateTime));
     }
