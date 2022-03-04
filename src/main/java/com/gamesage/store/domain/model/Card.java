@@ -11,7 +11,6 @@ public class Card {
     private final Integer cvcCode;
     private final BigDecimal amountToPay;
 
-
     public Card(Long cardNumber16, String cardholderName, LocalDateTime expireDate,
                 Integer cvcCode, BigDecimal amountToPay) {
         this.cardNumber16 = cardNumber16;
