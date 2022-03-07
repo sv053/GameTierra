@@ -33,11 +33,6 @@ public class UserController {
         return userService.createOne(user);
     }
 
-    @PostMapping("/let")
-    public String topup(@RequestBody PaymentRequest paymentRequest) {
-        return paymentRequest.getPublicId();
-    }
-
     @PostMapping("/topup/{id}")
     public String tryTopUp(@PathVariable Integer id, @RequestBody PaymentRequest paymentRequest) {
         String result = "sth went wrong";
@@ -67,34 +62,28 @@ public class UserController {
         float amountToPay = paymentRequestIntent.getAmount();
         Card card = paymentRequestIntent.getCard();
 
-        PaymentResponse paymentResponse = new PaymentResponse(
-                "bd6353c3-0ed6-4a65-946f-083664bf8dbd", true, "", 0);
+        PaymentResponse paymentResponse = new PaymentResponse("bd6353c3-0ed6-4a65-946f-083664bf8dbd", true, "", 0);
 
         if (amountToPay > cardLimit) {
-            paymentResponse = new PaymentResponse(
-                    "bd6353c3-0ed6-4a65-946f-083664bf8dbd", false, "", 5054);
+            paymentResponse = new PaymentResponse("bd6353c3-0ed6-4a65-946f-083664bf8dbd", false, "", 5054);
         }
         if (card.getCardholderName().startsWith("err")) {
-            paymentResponse = new PaymentResponse(
-                    "bd6353c3-0ed6-4a65-946f-083664bf8dbd", false, "", 5030);
+            paymentResponse = new PaymentResponse("bd6353c3-0ed6-4a65-946f-083664bf8dbd", false, "", 5030);
         }
         if (card.getExpireDate().isBefore(LocalDate.now())) {
-            paymentResponse = new PaymentResponse(
-                    "bd6353c3-0ed6-4a65-946f-083664bf8dbd", false, "", 5033);
+            paymentResponse = new PaymentResponse("bd6353c3-0ed6-4a65-946f-083664bf8dbd", false, "", 5033);
         }
         if (16 != card.getCardNumber().toString().length()) {
-            paymentResponse = new PaymentResponse(
-                    "bd6353c3-0ed6-4a65-946f-083664bf8dbd", false, "", 5014);
+            paymentResponse = new PaymentResponse("bd6353c3-0ed6-4a65-946f-083664bf8dbd", false, "", 5014);
         }
         Integer cvc = card.getCvcCode();
         if (cvc.toString().length() < 3 || 0 == cvc || null == cvc) {
-            paymentResponse = new PaymentResponse(
-                    "bd6353c3-0ed6-4a65-946f-083664bf8dbd", false, "", 5006);
+            paymentResponse = new PaymentResponse("bd6353c3-0ed6-4a65-946f-083664bf8dbd", false, "", 5006);
         }
         return paymentResponse;
     }
 }
-
+// PaymentRequest example
 //{
 //        "publicId": "99ывоа8крииьодщ",
 //        "amount": 10.0,
