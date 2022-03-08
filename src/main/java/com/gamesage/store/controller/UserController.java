@@ -40,7 +40,6 @@ public class UserController {
         PaymentResponse paymentResponse = new PaymentResponse(null, false, "", 0);
         if (userService.compareAmountWithLimit(paymentMinimum, paymentRequest.getAmount())) {
             paymentResponse = intentCloudpayment(paymentRequest);
-            userService.updateUserIfPaymentSucceed(paymentResponse, id);
         } else {
             paymentResponse.setMessage("minimum payment is $0.01");
         }
