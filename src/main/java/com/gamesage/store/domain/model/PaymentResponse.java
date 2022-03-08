@@ -4,18 +4,30 @@ public class PaymentResponse {
 
     private final String transactionId;
     private final boolean success;
-    private final String message;
-    private final Integer errorCode;
+    private final Integer responseCode;
+    private String message;
 
     public PaymentResponse(String transactionId, boolean success, String message, Integer errorCode) {
         this.transactionId = transactionId;
         this.success = success;
         this.message = message;
-        this.errorCode = errorCode;
+        this.responseCode = errorCode;
     }
 
-    public int getErrorCode() {
-        return errorCode;
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public int getResponseCode() {
+        return responseCode;
     }
 
     public boolean isSuccess() {

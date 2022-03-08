@@ -1,12 +1,13 @@
 package com.gamesage.store.controller;
 
-import com.gamesage.store.domain.model.*;
+import com.gamesage.store.domain.model.PaymentRequest;
+import com.gamesage.store.domain.model.PaymentResponse;
+import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -34,53 +35,22 @@ public class UserController {
     }
 
     @PostMapping("/topup/{id}")
-    public String tryTopUp(@PathVariable Integer id, @RequestBody PaymentRequest paymentRequest) {
-        String result = "sth went wrong";
-
-        if (paymentRequest.getAmount() < 0.01) {
-            return "minimum payment is $0.01";
-        }
-
-        PaymentResponse paymentResponse = intentCloudpayment(paymentRequest);
-
-        if (paymentResponse.isSuccess()) {
-            userService.updateBalance(userService.findById(id));
-            result = "success";
+    public PaymentResponse tryTopUp(@PathVariable int id, @RequestBody PaymentRequest paymentRequest) {
+        BigDecimal paymentMinimum = BigDecimal.valueOf(0.01);
+        PaymentResponse paymentResponse = new PaymentResponse(null, false, "", 0);
+        if (userService.compareAmountWithLimit(paymentMinimum, paymentRequest.getAmount())) {
+            paymentResponse = intentCloudpayment(paymentRequest);
+            userService.updateUserIfPaymentSucceed(paymentResponse, id);
         } else {
-            Optional<CardError> cardError = CardError.cardErrors.stream().filter(c -> c.getCode() == paymentResponse.getErrorCode()).findFirst();
-            if (cardError.isPresent()) {
-                result = cardError.get().getCardErrorMessage();
-            }
+            paymentResponse.setMessage("minimum payment is $0.01");
         }
-        return result;
+        return paymentResponse;
     }
 
     //@PostMapping("https://api.cloudpayments.ru/")
     //public PaymentResponse intentCloudpayment(@RequestBody PaymentRequest paymentRequestIntent) {
     public PaymentResponse intentCloudpayment(PaymentRequest paymentRequestIntent) {
-        float cardLimit = 100;
-        float amountToPay = paymentRequestIntent.getAmount();
-        Card card = paymentRequestIntent.getCard();
-
-        PaymentResponse paymentResponse = new PaymentResponse("bd6353c3-0ed6-4a65-946f-083664bf8dbd", true, "", 0);
-
-        if (amountToPay > cardLimit) {
-            paymentResponse = new PaymentResponse("bd6353c3-0ed6-4a65-946f-083664bf8dbd", false, "", 5054);
-        }
-        if (card.getCardholderName().startsWith("err")) {
-            paymentResponse = new PaymentResponse("bd6353c3-0ed6-4a65-946f-083664bf8dbd", false, "", 5030);
-        }
-        if (card.getExpireDate().isBefore(LocalDate.now())) {
-            paymentResponse = new PaymentResponse("bd6353c3-0ed6-4a65-946f-083664bf8dbd", false, "", 5033);
-        }
-        if (16 != card.getCardNumber().toString().length()) {
-            paymentResponse = new PaymentResponse("bd6353c3-0ed6-4a65-946f-083664bf8dbd", false, "", 5014);
-        }
-        Integer cvc = card.getCvcCode();
-        if (cvc.toString().length() < 3 || 0 == cvc || null == cvc) {
-            paymentResponse = new PaymentResponse("bd6353c3-0ed6-4a65-946f-083664bf8dbd", false, "", 5006);
-        }
-        return paymentResponse;
+        return userService.formPaymentResponse(paymentRequestIntent);
     }
 }
 // PaymentRequest example
