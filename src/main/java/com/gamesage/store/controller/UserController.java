@@ -4,9 +4,9 @@ import com.gamesage.store.domain.model.PaymentRequest;
 import com.gamesage.store.domain.model.PaymentResponse;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.UserService;
+import com.gamesage.store.util.TestPaymentResponse;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -36,20 +36,13 @@ public class UserController {
 
     @PostMapping("/topup/{id}")
     public PaymentResponse tryTopUp(@PathVariable int id, @RequestBody PaymentRequest paymentRequest) {
-        BigDecimal paymentMinimum = BigDecimal.valueOf(0.01);
-        PaymentResponse paymentResponse = new PaymentResponse(null, false, "", 0);
-        if (userService.compareAmountWithLimit(paymentMinimum, paymentRequest.getAmount())) {
-            paymentResponse = intentCloudpayment(paymentRequest);
-        } else {
-            paymentResponse.setMessage("minimum payment is $0.01");
-        }
-        return paymentResponse;
+        return userService.updateUserIfPaymentSucceed(intentCloudpayment(paymentRequest), id);
     }
 
     //@PostMapping("https://api.cloudpayments.ru/")
     //public PaymentResponse intentCloudpayment(@RequestBody PaymentRequest paymentRequestIntent) {
     public PaymentResponse intentCloudpayment(PaymentRequest paymentRequestIntent) {
-        return userService.formPaymentResponse(paymentRequestIntent);
+        return TestPaymentResponse.formPaymentResponse(paymentRequestIntent);
     }
 }
 // PaymentRequest example

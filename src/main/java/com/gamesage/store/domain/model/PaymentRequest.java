@@ -1,12 +1,21 @@
 package com.gamesage.store.domain.model;
 
+import org.springframework.lang.NonNull;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+@Validated
 public class PaymentRequest {
 
-    private final String publicId;
+    @NonNull
+    @Min(1)
     private final BigDecimal amount;
+
+    @NonNull
     private final Card card;
 //    private final String currency;
 //    private final String email;
@@ -15,16 +24,10 @@ public class PaymentRequest {
 //    private final String description;
 //    private final Boolean requireEmail;
 //    private final Boolean retryPayment;
-//    private final Data data;
 
-    public PaymentRequest(String publicId, BigDecimal amount, Card card) {
-        this.publicId = publicId;
+    public PaymentRequest(@Valid BigDecimal amount, @Valid Card card) {
         this.amount = amount;
         this.card = card;
-    }
-
-    public String getPublicId() {
-        return publicId;
     }
 
     public Card getCard() {

@@ -1,6 +1,5 @@
 package com.gamesage.store.domain.repository.db;
 
-import com.gamesage.store.domain.model.Card;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.UserUpdateRepository;
@@ -12,7 +11,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -91,12 +89,6 @@ public class DbUserRepository implements UserUpdateRepository {
                 , userToUpdate.getBalance()
                 , userToUpdate.getId());
         return userToUpdate;
-    }
-
-    @Override
-    public Card validateCard(Card card, BigDecimal amount) {
-
-        return null;
     }
 
     @Component
