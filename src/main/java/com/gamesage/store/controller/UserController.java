@@ -36,13 +36,11 @@ public class UserController {
 
     @PostMapping("/topup/{id}")
     public PaymentResponse tryTopUp(@PathVariable int id, @RequestBody PaymentRequest paymentRequest) {
-        return userService.updateUserIfPaymentSucceed(intentCloudpayment(paymentRequest), id);
-    }
-
-    //@PostMapping("https://api.cloudpayments.ru/")
-    //public PaymentResponse intentCloudpayment(@RequestBody PaymentRequest paymentRequestIntent) {
-    public PaymentResponse intentCloudpayment(PaymentRequest paymentRequestIntent) {
-        return TestPaymentResponse.formPaymentResponse(paymentRequestIntent);
+        PaymentResponse paymentResponse = TestPaymentResponse.formPaymentResponse(paymentRequest);
+        if (paymentResponse.isSuccess()) {
+            userService.updateUserIfPaymentSucceed(TestPaymentResponse.formPaymentResponse(paymentRequest), id);
+        }
+        return paymentResponse;
     }
 }
 // PaymentRequest example
