@@ -1,5 +1,6 @@
 package com.gamesage.store.domain.model;
 
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,7 +13,7 @@ public class TestPaymentResponse {
         PaymentResponse paymentResponse = new PaymentResponse(transactionId, true, "", 0);
         @Min(1)
         BigDecimal cardLimit = BigDecimal.valueOf(100);
-        @Min(1)
+        @DecimalMin(value = "0.01")
         BigDecimal amount = paymentRequestIntent.getAmount();
 
         Card card = paymentRequestIntent.getCard();
