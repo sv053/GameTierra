@@ -1,27 +1,23 @@
-package com.gamesage.store.util;
+package com.gamesage.store.domain.model;
 
-import com.gamesage.store.domain.model.Card;
-import com.gamesage.store.domain.model.CardError;
-import com.gamesage.store.domain.model.PaymentRequest;
-import com.gamesage.store.domain.model.PaymentResponse;
-import com.gamesage.store.service.UserService;
-import org.springframework.validation.annotation.Validated;
-
-import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
-@Validated
 public class TestPaymentResponse {
 
-    public static PaymentResponse formPaymentResponse(@Valid PaymentRequest paymentRequestIntent) {
+    public static PaymentResponse formPaymentResponse(PaymentRequest paymentRequestIntent) {
         String transactionId = "bd6353c3-0ed6-4a65-946f-083664bf8dbd";
         PaymentResponse paymentResponse = new PaymentResponse(transactionId, true, "", 0);
+        @Min(1)
         BigDecimal cardLimit = BigDecimal.valueOf(100);
+        @Min(1)
+        BigDecimal amount = paymentRequestIntent.getAmount();
+
         Card card = paymentRequestIntent.getCard();
 
-        if (UserService.compareAmountWithLimit(cardLimit, paymentRequestIntent.getAmount())) {
+        if (Double.parseDouble(String.valueOf(cardLimit.subtract(amount))) > 0.0d) {
             paymentResponse = new PaymentResponse(transactionId, false, "", 5054);
         }
         if (card.getCardholderName().startsWith("err")) {

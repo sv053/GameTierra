@@ -4,9 +4,9 @@ import com.gamesage.store.domain.model.PaymentRequest;
 import com.gamesage.store.domain.model.PaymentResponse;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.UserService;
-import com.gamesage.store.util.TestPaymentResponse;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -35,12 +35,8 @@ public class UserController {
     }
 
     @PostMapping("/topup/{id}")
-    public PaymentResponse tryTopUp(@PathVariable int id, @RequestBody PaymentRequest paymentRequest) {
-        PaymentResponse paymentResponse = TestPaymentResponse.formPaymentResponse(paymentRequest);
-        if (paymentResponse.isSuccess()) {
-            userService.updateUserIfPaymentSucceed(TestPaymentResponse.formPaymentResponse(paymentRequest), id);
-        }
-        return paymentResponse;
+    public PaymentResponse tryTopUp(@PathVariable int id, @RequestBody @NotNull PaymentRequest paymentRequest) {
+        return userService.updateUserIfPaymentSucceed(paymentRequest, id);
     }
 }
 // PaymentRequest example

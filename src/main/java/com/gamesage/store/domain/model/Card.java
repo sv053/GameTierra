@@ -2,7 +2,6 @@ package com.gamesage.store.domain.model;
 
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
@@ -21,8 +20,7 @@ public class Card {
     @Pattern(regexp = "^\\d{3}")
     private final Integer cvcCode;
 
-    public Card(@Valid Long cardNumber, @Valid String cardholderName, @Valid LocalDate expireDate,
-                @Valid Integer cvcCode) {
+    public Card(Long cardNumber, String cardholderName, LocalDate expireDate, Integer cvcCode) {
         this.cardNumber = cardNumber;
         this.cardholderName = cardholderName;
         this.expireDate = expireDate;

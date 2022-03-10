@@ -25,7 +25,7 @@ public class PaymentRequest {
 //    private final Boolean requireEmail;
 //    private final Boolean retryPayment;
 
-    public PaymentRequest(@Valid BigDecimal amount, @Valid Card card) {
+    public PaymentRequest(BigDecimal amount, @Valid Card card) {
         this.amount = amount;
         this.card = card;
     }
