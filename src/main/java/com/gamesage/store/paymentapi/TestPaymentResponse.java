@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
-//@Validated
 @Component
 public class TestPaymentResponse implements PaymentResponseApi {
 
