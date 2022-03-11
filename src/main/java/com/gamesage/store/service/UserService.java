@@ -18,11 +18,13 @@ public class UserService {
 
     private final UserUpdateRepository repository;
     private final GameService gameService;
+    private final TestPaymentResponse testPaymentResponse;
 
     public UserService(@Qualifier("dbUserRepository") UserUpdateRepository repository,
-                       GameService gameService) {
+                       GameService gameService, TestPaymentResponse testPaymentResponse) {
         this.repository = repository;
         this.gameService = gameService;
+        this.testPaymentResponse = testPaymentResponse;
     }
 
     public User findById(int id) {
@@ -52,7 +54,7 @@ public class UserService {
     }
 
     public PaymentResponse updateUserIfPaymentSucceed(PaymentRequest paymentRequest, int id) {
-        PaymentResponse paymentResponse = new TestPaymentResponse().formPaymentResponse(paymentRequest);
+        PaymentResponse paymentResponse = testPaymentResponse.formPaymentResponse(paymentRequest);
         if (paymentResponse.isSuccess()) {
             updateBalance(id, paymentRequest.getAmount());
         }
