@@ -1,4 +1,4 @@
-package com.gamesage.store.domain.model;
+package com.gamesage.store.paymentapi;
 
 public class PaymentResponse {
 

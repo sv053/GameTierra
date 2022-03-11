@@ -61,5 +61,19 @@ class UserServiceDbIntegrationTest {
                 () -> assertTrue(users.contains(addedUser)),
                 () -> assertNotNull(addedUser.getId()));
     }
+
+    @Test
+    void updateUserBalance() {
+        BigDecimal balance = BigDecimal.TEN;
+        User user = userService.createOne(new User(null, "loco", new Tier(
+                3, "SILVER", 10.d), balance));
+        assertEquals(balance, user.getBalance());
+
+        BigDecimal amount = BigDecimal.ONE;
+        BigDecimal newBalance = balance.add(amount);
+        user = userService.updateBalance(user.getId(), amount);
+
+        assertTrue(newBalance.compareTo(user.getBalance()) == 0);
+    }
 }
 

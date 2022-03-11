@@ -11,6 +11,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -89,6 +90,14 @@ public class DbUserRepository implements UserUpdateRepository {
                 , userToUpdate.getBalance()
                 , userToUpdate.getId());
         return userToUpdate;
+    }
+
+    @Override
+    public int updateUserBalance(int id, BigDecimal newBalance) {
+        jdbcTemplate.update(UPDATE_USER_BALANCE
+                , newBalance
+                , id);
+        return id;
     }
 
     @Component

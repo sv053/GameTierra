@@ -1,11 +1,16 @@
 package com.gamesage.store.service;
 
-import com.gamesage.store.domain.model.*;
+import com.gamesage.store.domain.model.Game;
+import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.UserUpdateRepository;
 import com.gamesage.store.exception.EntityNotFoundException;
+import com.gamesage.store.paymentapi.PaymentRequest;
+import com.gamesage.store.paymentapi.PaymentResponse;
+import com.gamesage.store.paymentapi.TestPaymentResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -40,10 +45,16 @@ public class UserService {
         return repository.updateUserBalance(userToUpdate);
     }
 
+    public User updateBalance(int userId, BigDecimal amount) {
+        User user = findById(userId);
+        user.depositBalance(amount);
+        return repository.updateUserBalance(user);
+    }
+
     public PaymentResponse updateUserIfPaymentSucceed(PaymentRequest paymentRequest, int id) {
-        PaymentResponse paymentResponse = TestPaymentResponse.formPaymentResponse(paymentRequest);
+        PaymentResponse paymentResponse = new TestPaymentResponse().formPaymentResponse(paymentRequest);
         if (paymentResponse.isSuccess()) {
-            updateBalance(findById(id));
+            updateBalance(id, paymentRequest.getAmount());
         }
         return paymentResponse;
     }

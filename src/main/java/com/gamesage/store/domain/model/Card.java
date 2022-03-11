@@ -1,23 +1,17 @@
 package com.gamesage.store.domain.model;
 
-import org.springframework.validation.annotation.Validated;
-
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-@Validated
 public class Card {
 
-    @Pattern(regexp = "^[0-9]{16}")
     private final Long cardNumber;
 
-    @Pattern(regexp = "^[a-zA-Z]{0,}")
+    @Pattern(regexp = "^[A-Z]{1,19}\\s[A-Z]{1,19}$", message = "Please provide correct cardholder name")
     private final String cardholderName;
 
-    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$")
     private final LocalDate expireDate;
 
-    @Pattern(regexp = "^\\d{3}")
     private final Integer cvcCode;
 
     public Card(Long cardNumber, String cardholderName, LocalDate expireDate, Integer cvcCode) {
