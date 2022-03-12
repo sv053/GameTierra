@@ -1,37 +1,29 @@
 package com.gamesage.store.paymentapi;
 
+import com.gamesage.store.domain.model.CardError;
+
 public class PaymentResponse {
 
     private final String transactionId;
     private final boolean success;
-    private final Integer responseCode;
-    private String message;
+    private final CardError cardError;
 
-    public PaymentResponse(String transactionId, boolean success, String message, Integer errorCode) {
+    public PaymentResponse(String transactionId, boolean success, CardError cardError) {
         this.transactionId = transactionId;
         this.success = success;
-        this.message = message;
-        this.responseCode = errorCode;
+        this.cardError = cardError;
     }
 
     public String getTransactionId() {
         return transactionId;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public int getResponseCode() {
-        return responseCode;
-    }
-
     public boolean isSuccess() {
         return success;
+    }
+
+    public CardError getCardError() {
+        return cardError;
     }
 }
 

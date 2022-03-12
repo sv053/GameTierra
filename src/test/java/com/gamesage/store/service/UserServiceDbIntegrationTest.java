@@ -63,7 +63,7 @@ class UserServiceDbIntegrationTest {
     }
 
     @Test
-    void updateUserBalance() {
+    void updateUserBalance_Success() {
         BigDecimal balance = BigDecimal.TEN;
         User user = userService.createOne(new User(null, "loco", new Tier(
                 3, "SILVER", 10.d), balance));
@@ -74,6 +74,11 @@ class UserServiceDbIntegrationTest {
         user = userService.updateBalance(user.getId(), amount);
 
         assertTrue(newBalance.compareTo(user.getBalance()) == 0);
+    }
+
+    @Test
+    void updateUserBalance_Failure_WrongUserId() {
+        assertThrows(EntityNotFoundException.class, () -> userService.updateBalance(8888888, BigDecimal.ONE));
     }
 }
 

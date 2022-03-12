@@ -4,7 +4,6 @@ import com.gamesage.store.domain.model.Card;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,14 +11,14 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-@Transactional
-class TestPaymentResponseTest {
+class TestPaymentResponse {
 
     @Autowired
-    TestPaymentResponse testPaymentResponse;
+    PaymentMock paymentMock;
 
     @Test
     void formPaymentResponse_amountLessThanBalance() {
+        paymentMock.setCARD_LIMIT(BigDecimal.ZERO);
         Card card = new Card(
                 1234567891234567L,
                 "JOHN DOW",
@@ -28,13 +27,14 @@ class TestPaymentResponseTest {
         );
         BigDecimal amount = BigDecimal.valueOf(1001);
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
-        PaymentResponse paymentResponse = testPaymentResponse.formPaymentResponse(paymentRequest);
+        PaymentResponse paymentResponse = paymentMock.processPayment(paymentRequest);
 
-        assertEquals("Недостаточно средств на карте", paymentResponse.getMessage());
+        assertEquals("Недостаточно средств", paymentResponse.getCardError().getCardErrorMessage());
     }
 
     @Test
     void formPaymentResponse_wrongCardNumber() {
+        paymentMock.setCARD_LIMIT(BigDecimal.valueOf(100));
         Card card = new Card(
                 123456789L,
                 "JOHN DOW",
@@ -43,14 +43,14 @@ class TestPaymentResponseTest {
         );
         BigDecimal amount = BigDecimal.TEN;
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
-        PaymentResponse paymentResponse = testPaymentResponse.formPaymentResponse(paymentRequest);
+        PaymentResponse paymentResponse = paymentMock.processPayment(paymentRequest);
 
-        assertEquals("Проверьте правильность введенных данных карты или воспользуйтесь другой картой",
-                paymentResponse.getMessage());
+        assertEquals("Некорректный номер карты", paymentResponse.getCardError().getCardErrorMessage());
     }
 
     @Test
     void formPaymentResponse_wrongExpireDate() {
+        paymentMock.setCARD_LIMIT(BigDecimal.valueOf(100));
         Card card = new Card(
                 1234567891234567L,
                 "JOHN DOW",
@@ -59,14 +59,14 @@ class TestPaymentResponseTest {
         );
         BigDecimal amount = BigDecimal.TEN;
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
-        PaymentResponse paymentResponse = testPaymentResponse.formPaymentResponse(paymentRequest);
+        PaymentResponse paymentResponse = paymentMock.processPayment(paymentRequest);
 
-        assertEquals("Свяжитесь с вашим банком или воспользуйтесь другой картой",
-                paymentResponse.getMessage());
+        assertEquals("Истёк срок действия карты", paymentResponse.getCardError().getCardErrorMessage());
     }
 
     @Test
     void formPaymentResponse_wrongCvc() {
+        paymentMock.setCARD_LIMIT(BigDecimal.valueOf(100));
         Card card = new Card(
                 1234567891234567L,
                 "JOHN DOW",
@@ -75,14 +75,15 @@ class TestPaymentResponseTest {
         );
         BigDecimal amount = BigDecimal.TEN;
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
-        PaymentResponse paymentResponse = testPaymentResponse.formPaymentResponse(paymentRequest);
+        PaymentResponse paymentResponse = paymentMock.processPayment(paymentRequest);
 
-        assertEquals("Проверьте правильность введенных данных карты или воспользуйтесь другой картой",
-                paymentResponse.getMessage());
+        assertEquals("Отказ сети проводить операцию или неправильный CVV-код",
+                paymentResponse.getCardError().getCardErrorMessage());
     }
 
     @Test
     void formPaymentResponse_wrongCardholderName() {
+        paymentMock.setCARD_LIMIT(BigDecimal.valueOf(100));
         Card card = new Card(
                 1234567891234567L,
                 "errJOHNDOW",
@@ -91,9 +92,9 @@ class TestPaymentResponseTest {
         );
         BigDecimal amount = BigDecimal.TEN;
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
-        PaymentResponse paymentResponse = testPaymentResponse.formPaymentResponse(paymentRequest);
+        PaymentResponse paymentResponse = paymentMock.processPayment(paymentRequest);
 
-        assertEquals("Повторите попытку позже", paymentResponse.getMessage());
+        assertEquals("Повторите попытку позже", paymentResponse.getCardError().getCardErrorMessage());
     }
 }
 
