@@ -2,22 +2,17 @@ package com.gamesage.store.paymentapi;
 
 import com.gamesage.store.domain.model.Card;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
 class TestPaymentResponse {
-
-    @Autowired
-    PaymentMock paymentMock;
 
     @Test
     void formPaymentResponse_amountLessThanBalance() {
+        PaymentMock paymentMock = new PaymentMock();
         paymentMock.setCARD_LIMIT(BigDecimal.ZERO);
         Card card = new Card(
                 1234567891234567L,
@@ -34,6 +29,7 @@ class TestPaymentResponse {
 
     @Test
     void formPaymentResponse_wrongCardNumber() {
+        PaymentMock paymentMock = new PaymentMock();
         paymentMock.setCARD_LIMIT(BigDecimal.valueOf(100));
         Card card = new Card(
                 123456789L,
@@ -50,6 +46,7 @@ class TestPaymentResponse {
 
     @Test
     void formPaymentResponse_wrongExpireDate() {
+        PaymentMock paymentMock = new PaymentMock();
         paymentMock.setCARD_LIMIT(BigDecimal.valueOf(100));
         Card card = new Card(
                 1234567891234567L,
@@ -66,6 +63,7 @@ class TestPaymentResponse {
 
     @Test
     void formPaymentResponse_wrongCvc() {
+        PaymentMock paymentMock = new PaymentMock();
         paymentMock.setCARD_LIMIT(BigDecimal.valueOf(100));
         Card card = new Card(
                 1234567891234567L,
@@ -83,6 +81,7 @@ class TestPaymentResponse {
 
     @Test
     void formPaymentResponse_wrongCardholderName() {
+        PaymentMock paymentMock = new PaymentMock();
         paymentMock.setCARD_LIMIT(BigDecimal.valueOf(100));
         Card card = new Card(
                 1234567891234567L,
