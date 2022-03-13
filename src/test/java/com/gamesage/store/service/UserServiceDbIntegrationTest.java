@@ -1,14 +1,17 @@
 package com.gamesage.store.service;
 
+import com.gamesage.store.domain.model.Card;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.exception.EntityNotFoundException;
+import com.gamesage.store.paymentapi.PaymentRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,14 +74,22 @@ class UserServiceDbIntegrationTest {
 
         BigDecimal amount = BigDecimal.ONE;
         BigDecimal newBalance = balance.add(amount);
-        user = userService.updateBalance(user.getId(), amount);
+        user.depositBalance(amount);
+        user = userService.updateBalance(user);
 
         assertTrue(newBalance.compareTo(user.getBalance()) == 0);
     }
 
     @Test
     void updateUserBalance_Failure_WrongUserId() {
-        assertThrows(EntityNotFoundException.class, () -> userService.updateBalance(8888888, BigDecimal.ONE));
+        int userId = 1;
+        BigDecimal amount = BigDecimal.TEN;
+        Card card = new Card(1111_2222_3333_4444L,
+                "TA IA",
+                LocalDate.of(2090, 01, 01),
+                888);
+        PaymentRequest paymentRequest = new PaymentRequest(amount, card);
+        assertThrows(EntityNotFoundException.class, () -> userService.updateUserIfPaymentSucceed(paymentRequest, userId));
     }
 }
 

@@ -2,7 +2,7 @@ package com.gamesage.store.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum CardError {
+public enum ResponseError {
 
     CVC_ERROR("Отказ сети проводить операцию или неправильный CVV-код"),
     INVALID_CARD_NUMBER("Некорректный номер карты"),
@@ -13,7 +13,7 @@ public enum CardError {
     @JsonValue
     private final String cardErrorMessage;
 
-    CardError(String cardErrorMessage) {
+    ResponseError(String cardErrorMessage) {
         this.cardErrorMessage = cardErrorMessage;
     }
 

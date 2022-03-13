@@ -1,7 +1,7 @@
 package com.gamesage.store.paymentapi;
 
 import com.gamesage.store.domain.model.Card;
-import com.gamesage.store.domain.model.CardError;
+import com.gamesage.store.domain.model.ResponseError;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -29,20 +29,20 @@ public class PaymentMock implements PaymentProcessingApi {
         Card card = paymentRequestIntent.getCard();
 
         if (Double.parseDouble(String.valueOf(CARD_LIMIT.subtract(amount))) < 0.0d) {
-            paymentResponse = new PaymentResponse(TRANSACTION_ID, false, CardError.INSUFFICIENT_FUNDS);
+            paymentResponse = new PaymentResponse(TRANSACTION_ID, false, ResponseError.INSUFFICIENT_FUNDS);
         }
         if (card.getCardholderName().startsWith("err")) {
-            paymentResponse = new PaymentResponse(TRANSACTION_ID, false, CardError.FORMAT_ERROR);
+            paymentResponse = new PaymentResponse(TRANSACTION_ID, false, ResponseError.FORMAT_ERROR);
         }
         if (card.getExpireDate().isBefore(LocalDate.now())) {
-            paymentResponse = new PaymentResponse(TRANSACTION_ID, false, CardError.EXPIRED_CARD);
+            paymentResponse = new PaymentResponse(TRANSACTION_ID, false, ResponseError.EXPIRED_CARD);
         }
         if (16 != card.getCardNumber().toString().length()) {
-            paymentResponse = new PaymentResponse(TRANSACTION_ID, false, CardError.INVALID_CARD_NUMBER);
+            paymentResponse = new PaymentResponse(TRANSACTION_ID, false, ResponseError.INVALID_CARD_NUMBER);
         }
         Integer cvc = card.getCvcCode();
         if (cvc.toString().length() < 3) {
-            paymentResponse = new PaymentResponse(TRANSACTION_ID, false, CardError.CVC_ERROR);
+            paymentResponse = new PaymentResponse(TRANSACTION_ID, false, ResponseError.CVC_ERROR);
         }
         return paymentResponse;
     }

@@ -1,17 +1,17 @@
 package com.gamesage.store.paymentapi;
 
-import com.gamesage.store.domain.model.CardError;
+import com.gamesage.store.domain.model.ResponseError;
 
 public class PaymentResponse {
 
     private final String transactionId;
     private final boolean success;
-    private final CardError cardError;
+    private final ResponseError responseError;
 
-    public PaymentResponse(String transactionId, boolean success, CardError cardError) {
+    public PaymentResponse(String transactionId, boolean success, ResponseError responseError) {
         this.transactionId = transactionId;
         this.success = success;
-        this.cardError = cardError;
+        this.responseError = responseError;
     }
 
     public String getTransactionId() {
@@ -22,8 +22,8 @@ public class PaymentResponse {
         return success;
     }
 
-    public CardError getCardError() {
-        return cardError;
+    public ResponseError getResponseError() {
+        return responseError;
     }
 }
 

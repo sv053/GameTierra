@@ -44,21 +44,21 @@ public class UserService {
     }
 
     public User updateBalance(User userToUpdate) {
-        findById(userToUpdate.getId());
+        //   findById(userToUpdate.getId());
         return repository.updateUserBalance(userToUpdate);
     }
 
-    public User updateBalance(int userId, BigDecimal amount) {
-        User user = findById(userId);
+    private User updateBalance(User user, BigDecimal amount) {
         user.depositBalance(amount);
-        return repository.updateUserBalance(user);
+        return updateBalance(user);
     }
 
     @Transactional
     public PaymentResponse updateUserIfPaymentSucceed(PaymentRequest paymentRequest, int id) {
+        User user = findById(id);
         PaymentResponse paymentResponse = paymentMock.processPayment(paymentRequest);
         if (paymentResponse.isSuccess()) {
-            updateBalance(id, paymentRequest.getAmount());
+            updateBalance(user, paymentRequest.getAmount());
         }
         return paymentResponse;
     }

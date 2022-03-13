@@ -24,7 +24,7 @@ class TestPaymentResponse {
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
         PaymentResponse paymentResponse = paymentMock.processPayment(paymentRequest);
 
-        assertEquals("Недостаточно средств", paymentResponse.getCardError().getCardErrorMessage());
+        assertEquals("Недостаточно средств", paymentResponse.getResponseError().getCardErrorMessage());
     }
 
     @Test
@@ -41,7 +41,7 @@ class TestPaymentResponse {
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
         PaymentResponse paymentResponse = paymentMock.processPayment(paymentRequest);
 
-        assertEquals("Некорректный номер карты", paymentResponse.getCardError().getCardErrorMessage());
+        assertEquals("Некорректный номер карты", paymentResponse.getResponseError().getCardErrorMessage());
     }
 
     @Test
@@ -58,7 +58,7 @@ class TestPaymentResponse {
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
         PaymentResponse paymentResponse = paymentMock.processPayment(paymentRequest);
 
-        assertEquals("Истёк срок действия карты", paymentResponse.getCardError().getCardErrorMessage());
+        assertEquals("Истёк срок действия карты", paymentResponse.getResponseError().getCardErrorMessage());
     }
 
     @Test
@@ -76,7 +76,7 @@ class TestPaymentResponse {
         PaymentResponse paymentResponse = paymentMock.processPayment(paymentRequest);
 
         assertEquals("Отказ сети проводить операцию или неправильный CVV-код",
-                paymentResponse.getCardError().getCardErrorMessage());
+                paymentResponse.getResponseError().getCardErrorMessage());
     }
 
     @Test
@@ -93,7 +93,7 @@ class TestPaymentResponse {
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
         PaymentResponse paymentResponse = paymentMock.processPayment(paymentRequest);
 
-        assertEquals("Повторите попытку позже", paymentResponse.getCardError().getCardErrorMessage());
+        assertEquals("Повторите попытку позже", paymentResponse.getResponseError().getCardErrorMessage());
     }
 }
 
