@@ -9,23 +9,28 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestPayPal {
+class PaymentProcessingMockTest {
+
+    private final PaymentProcessingMock paymentProcessingMock;
+
+    PaymentProcessingMockTest() {
+        this.paymentProcessingMock = new PaymentProcessingMock();
+    }
 
     @Test
     void formPaymentResponse_amountLessThanBalance() {
-        PayPal payPal = new PayPal();
         Card card = new Card(
                 1234567891234567L,
                 "JOHN DOW",
-                LocalDate.of(2023, 06, 06),
+                LocalDate.of(2023, 6, 6),
                 123
         );
         BigDecimal amount = BigDecimal.valueOf(1001);
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
-        PaymentResponse paymentResponse = payPal.processPayment(paymentRequest);
+        PaymentResponse paymentResponse = paymentProcessingMock.processPayment(paymentRequest);
 
         assertAll(
-                () -> assertEquals(ResponseError.INSUFFICIENT_FUNDS.getCardErrorMessage(), paymentResponse.getResponseError().getCardErrorMessage()),
+                () -> assertEquals(ResponseError.INSUFFICIENT_FUNDS, paymentResponse.getResponseError()),
                 () -> assertTrue(paymentResponse.getTransactionId().length() > 0),
                 () -> assertFalse(paymentResponse.isSuccess())
         );
@@ -33,19 +38,18 @@ class TestPayPal {
 
     @Test
     void formPaymentResponse_wrongCardNumber() {
-        PayPal payPal = new PayPal();
         Card card = new Card(
                 123456789L,
                 "JOHN DOW",
-                LocalDate.of(2023, 06, 06),
+                LocalDate.of(2023, 6, 6),
                 123
         );
         BigDecimal amount = BigDecimal.TEN;
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
-        PaymentResponse paymentResponse = payPal.processPayment(paymentRequest);
+        PaymentResponse paymentResponse = paymentProcessingMock.processPayment(paymentRequest);
 
         assertAll(
-                () -> assertEquals(ResponseError.INVALID_CARD_NUMBER.getCardErrorMessage(), paymentResponse.getResponseError().getCardErrorMessage()),
+                () -> assertEquals(ResponseError.INVALID_CARD_NUMBER, paymentResponse.getResponseError()),
                 () -> assertTrue(paymentResponse.getTransactionId().length() > 0),
                 () -> assertFalse(paymentResponse.isSuccess())
         );
@@ -53,19 +57,18 @@ class TestPayPal {
 
     @Test
     void formPaymentResponse_wrongExpireDate() {
-        PayPal payPal = new PayPal();
         Card card = new Card(
                 1234567891234567L,
                 "JOHN DOW",
-                LocalDate.of(2020, 06, 06),
+                LocalDate.of(2020, 6, 6),
                 123
         );
         BigDecimal amount = BigDecimal.TEN;
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
-        PaymentResponse paymentResponse = payPal.processPayment(paymentRequest);
+        PaymentResponse paymentResponse = paymentProcessingMock.processPayment(paymentRequest);
 
         assertAll(
-                () -> assertEquals(ResponseError.EXPIRED_CARD.getCardErrorMessage(), paymentResponse.getResponseError().getCardErrorMessage()),
+                () -> assertEquals(ResponseError.EXPIRED_CARD, paymentResponse.getResponseError()),
                 () -> assertTrue(paymentResponse.getTransactionId().length() > 0),
                 () -> assertFalse(paymentResponse.isSuccess())
         );
@@ -73,19 +76,18 @@ class TestPayPal {
 
     @Test
     void formPaymentResponse_wrongCvc() {
-        PayPal payPal = new PayPal();
         Card card = new Card(
                 1234567891234567L,
                 "JOHN DOW",
-                LocalDate.of(2027, 06, 06),
+                LocalDate.of(2027, 6, 6),
                 12
         );
         BigDecimal amount = BigDecimal.TEN;
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
-        PaymentResponse paymentResponse = payPal.processPayment(paymentRequest);
+        PaymentResponse paymentResponse = paymentProcessingMock.processPayment(paymentRequest);
 
         assertAll(
-                () -> assertEquals(ResponseError.CVC_ERROR.getCardErrorMessage(), paymentResponse.getResponseError().getCardErrorMessage()),
+                () -> assertEquals(ResponseError.CVC_ERROR, paymentResponse.getResponseError()),
                 () -> assertTrue(paymentResponse.getTransactionId().length() > 0),
                 () -> assertFalse(paymentResponse.isSuccess())
         );
@@ -93,20 +95,19 @@ class TestPayPal {
 
     @Test
     void formPaymentResponse_wrongCardholderName() {
-        PayPal payPal = new PayPal();
         Card card = new Card(
                 1234567891234567L,
                 "errJOHNDOW",
-                LocalDate.of(2027, 06, 06),
+                LocalDate.of(2027, 6, 6),
                 123
         );
         BigDecimal amount = BigDecimal.TEN;
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
-        PaymentResponse paymentResponse = payPal.processPayment(paymentRequest);
+        PaymentResponse paymentResponse = paymentProcessingMock.processPayment(paymentRequest);
 
         assertEquals("Повторите попытку позже", paymentResponse.getResponseError().getCardErrorMessage());
         assertAll(
-                () -> assertEquals(ResponseError.FORMAT_ERROR.getCardErrorMessage(), paymentResponse.getResponseError().getCardErrorMessage()),
+                () -> assertEquals(ResponseError.FORMAT_ERROR, paymentResponse.getResponseError()),
                 () -> assertTrue(paymentResponse.getTransactionId().length() > 0),
                 () -> assertFalse(paymentResponse.isSuccess())
         );

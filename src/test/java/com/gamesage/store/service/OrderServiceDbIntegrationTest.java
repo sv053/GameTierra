@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,19 +48,18 @@ class OrderServiceDbIntegrationTest {
 
     @Test
     void buyGame_Success() {
-        LocalDateTime timePoint = LocalDateTime.now();
+        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
         PurchaseIntent expectedResult =
                 new PurchaseIntent
                         .Builder(game)
                         .gameIsBought(true)
                         .buyer(user)
                         .message(PurchaseIntent.PurchaseMessage.PURCHASE_SUCCESSFUL)
-                        .orderDateTime(timePoint)
+                        .orderDateTime(LocalDateTime.now())
                         .build();
-        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
 
         assertAll(
-                () -> assertBetweenTimePoints(timePoint, result.getOrderDateTime()),
+                () -> assertBetweenTimePoints(expectedResult.getOrderDateTime(), result.getOrderDateTime()),
                 () -> assertTrue(result.isBought()),
                 () -> assertEquals(expectedResult.getBuyer(), result.getBuyer()),
                 () -> assertEquals(expectedResult.getTargetGame(), result.getTargetGame()),
@@ -68,8 +68,9 @@ class OrderServiceDbIntegrationTest {
     }
 
     void assertBetweenTimePoints(LocalDateTime expectedDateTime, LocalDateTime dateTime) {
-        assertTrue(expectedDateTime.minusNanos(100).isBefore(dateTime));
-        assertTrue(expectedDateTime.plusSeconds(1).isAfter(dateTime));
+        assertTrue(expectedDateTime.isAfter(dateTime) && expectedDateTime.minusSeconds(1l).isBefore(dateTime));
+        assertTrue(expectedDateTime.compareTo(dateTime) >= 0 && expectedDateTime.minusSeconds(1l).compareTo(dateTime) <= 0);
+        assertTrue(Math.abs(ChronoUnit.MILLIS.between(expectedDateTime, dateTime)) < 800);
     }
 }
 

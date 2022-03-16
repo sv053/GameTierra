@@ -36,7 +36,7 @@ public class UserController {
 
     @PostMapping("/{id}/topup")
     public PaymentResponse tryTopUp(@PathVariable int id, @Valid @RequestBody PaymentRequest paymentRequest) {
-        return userService.updateUserIfPaymentSucceed(paymentRequest, id);
+        return userService.topUpBalance(paymentRequest, id);
     }
 }
 

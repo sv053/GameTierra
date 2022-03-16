@@ -9,7 +9,8 @@ public class Card {
     private final LocalDate expireDate;
     private final Integer cvcCode;
 
-    public Card(Long cardNumber, String cardholderName, LocalDate expireDate, Integer cvcCode) {
+    public Card(Long cardNumber, String cardholderName, LocalDate expireDate,
+                Integer cvcCode) {
         this.cardNumber = cardNumber;
         this.cardholderName = cardholderName;
         this.expireDate = expireDate;

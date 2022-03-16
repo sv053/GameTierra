@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,11 +74,11 @@ class UserServiceDbIntegrationTest {
         assertEquals(balance, user.getBalance());
 
         BigDecimal amount = BigDecimal.ONE;
-        BigDecimal newBalance = balance.add(amount);
+        BigDecimal newBalance = balance.add(amount).setScale(2, RoundingMode.HALF_UP);
         user.depositBalance(amount);
         user = userService.updateBalance(user);
 
-        assertEquals(0, newBalance.compareTo(user.getBalance()));
+        assertEquals(newBalance, user.getBalance());
     }
 
     @Test
@@ -86,10 +87,10 @@ class UserServiceDbIntegrationTest {
         BigDecimal amount = BigDecimal.TEN;
         Card card = new Card(1111_2222_3333_4444L,
                 "TA IA",
-                LocalDate.of(2090, 01, 01),
+                LocalDate.of(2090, 1, 1),
                 888);
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
-        assertThrows(EntityNotFoundException.class, () -> userService.updateUserIfPaymentSucceed(paymentRequest, userId));
+        assertThrows(EntityNotFoundException.class, () -> userService.topUpBalance(paymentRequest, userId));
     }
 
     @Test

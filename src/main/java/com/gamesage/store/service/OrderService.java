@@ -45,7 +45,7 @@ public class OrderService {
         User user = userService.findById(userId);
         boolean canPay = user.canPay(game.getPrice());
         boolean hasGame = user.hasGame(game);
-        boolean canBuy = ifCanBuy(canPay, hasGame);
+        boolean canBuy = canBuy(canPay, hasGame);
         PurchaseMessage purchaseMessage = preparePurchaseMessage(canPay, hasGame);
         Order order = null;
 
@@ -63,7 +63,7 @@ public class OrderService {
                 .build();
     }
 
-    private boolean ifCanBuy(boolean canPay, boolean hasGame) {
+    private boolean canBuy(boolean canPay, boolean hasGame) {
         return canPay && !hasGame;
     }
 

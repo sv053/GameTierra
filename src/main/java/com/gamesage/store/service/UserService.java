@@ -18,13 +18,13 @@ public class UserService {
 
     private final UserUpdateRepository repository;
     private final GameService gameService;
-    private final PaymentProcessingApi payPal;
+    private final PaymentProcessingApi paymentProcessingApi;
 
     public UserService(@Qualifier("dbUserRepository") UserUpdateRepository repository,
-                       GameService gameService, PaymentProcessingApi payPal) {
+                       GameService gameService, PaymentProcessingApi paymentProcessingApi) {
         this.repository = repository;
         this.gameService = gameService;
-        this.payPal = payPal;
+        this.paymentProcessingApi = paymentProcessingApi;
     }
 
     public User findById(int id) {
@@ -46,16 +46,16 @@ public class UserService {
         return repository.updateUserBalance(userToUpdate);
     }
 
-    private User updateBalance(User user, BigDecimal amount) {
-        user.depositBalance(amount);
+    private User depositAndUpdateBalance(User user, BigDecimal amountToAdd) {
+        user.depositBalance(amountToAdd);
         return updateBalance(user);
     }
 
-    public PaymentResponse updateUserIfPaymentSucceed(PaymentRequest paymentRequest, int id) {
+    public PaymentResponse topUpBalance(PaymentRequest paymentRequest, int id) {
         User user = findById(id);
-        PaymentResponse paymentResponse = payPal.processPayment(paymentRequest);
+        PaymentResponse paymentResponse = paymentProcessingApi.processPayment(paymentRequest);
         if (paymentResponse.isSuccess()) {
-            updateBalance(user, paymentRequest.getAmount());
+            depositAndUpdateBalance(user, paymentRequest.getAmount());
         }
         return paymentResponse;
     }
