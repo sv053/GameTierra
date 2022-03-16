@@ -77,7 +77,7 @@ class UserServiceDbIntegrationTest {
         user.depositBalance(amount);
         user = userService.updateBalance(user);
 
-        assertTrue(newBalance.compareTo(user.getBalance()) == 0);
+        assertEquals(0, newBalance.compareTo(user.getBalance()));
     }
 
     @Test
@@ -90,6 +90,20 @@ class UserServiceDbIntegrationTest {
                 888);
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
         assertThrows(EntityNotFoundException.class, () -> userService.updateUserIfPaymentSucceed(paymentRequest, userId));
+    }
+
+    @Test
+    void updateUserBalance_Success_RightUserId() {
+        BigDecimal balance = BigDecimal.TEN;
+        User user = userService.createOne(new User(null, "loco", new Tier(
+                3, "SILVER", 10.d), balance));
+        assertEquals(balance, user.getBalance());
+
+        BigDecimal amount = BigDecimal.ONE;
+        user.depositBalance(amount);
+        user = userService.updateBalance(user);
+
+        assertEquals(0, balance.add(amount).compareTo(user.getBalance()));
     }
 }
 

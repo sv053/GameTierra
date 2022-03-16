@@ -11,7 +11,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,8 +26,6 @@ public class DbUserRepository implements UserUpdateRepository {
             "on user.tier_id = tier.id ";
     private static final String INSERT_USER_QUERY = "INSERT INTO user (login, balance, tier_id) " +
             "VALUES ( ?, ?, ?) ";
-    private static final String UPDATE_USER = "UPDATE user SET balance = ?, tier_id = ?  " +
-            "WHERE id = ? ";
     private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ? " +
             "WHERE id = ?";
     private final JdbcTemplate jdbcTemplate;
@@ -76,28 +73,11 @@ public class DbUserRepository implements UserUpdateRepository {
     }
 
     @Override
-    public User update(User userToUpdate) {
-        jdbcTemplate.update(UPDATE_USER
-                , userToUpdate.getBalance()
-                , userToUpdate.getTier().getId()
-                , userToUpdate.getId());
-        return userToUpdate;
-    }
-
-    @Override
     public User updateUserBalance(User userToUpdate) {
         jdbcTemplate.update(UPDATE_USER_BALANCE
                 , userToUpdate.getBalance()
                 , userToUpdate.getId());
         return userToUpdate;
-    }
-
-    @Override
-    public int updateUserBalance(int id, BigDecimal newBalance) {
-        jdbcTemplate.update(UPDATE_USER_BALANCE
-                , newBalance
-                , id);
-        return id;
     }
 
     @Component

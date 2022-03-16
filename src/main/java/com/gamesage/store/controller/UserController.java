@@ -39,15 +39,4 @@ public class UserController {
         return userService.updateUserIfPaymentSucceed(paymentRequest, id);
     }
 }
-// PaymentRequest example
-//{
-//        "publicId": "99ывоа8крииьодщ",
-//        "amount": 10.0,
-//        "card":{
-//        "cardNumber": 4545984611112222,
-//        "cardholderName": "errnumber",
-//        "expireDate": "2025-12-12",
-//        "cvcCode": 123
-//        }
-//        }
 

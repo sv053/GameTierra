@@ -4,12 +4,11 @@ import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.UserUpdateRepository;
 import com.gamesage.store.exception.EntityNotFoundException;
-import com.gamesage.store.paymentapi.PaymentMock;
+import com.gamesage.store.paymentapi.PaymentProcessingApi;
 import com.gamesage.store.paymentapi.PaymentRequest;
 import com.gamesage.store.paymentapi.PaymentResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,13 +18,13 @@ public class UserService {
 
     private final UserUpdateRepository repository;
     private final GameService gameService;
-    private final PaymentMock paymentMock;
+    private final PaymentProcessingApi payPal;
 
     public UserService(@Qualifier("dbUserRepository") UserUpdateRepository repository,
-                       GameService gameService, PaymentMock paymentMock) {
+                       GameService gameService, PaymentProcessingApi payPal) {
         this.repository = repository;
         this.gameService = gameService;
-        this.paymentMock = paymentMock;
+        this.payPal = payPal;
     }
 
     public User findById(int id) {
@@ -44,7 +43,6 @@ public class UserService {
     }
 
     public User updateBalance(User userToUpdate) {
-        //   findById(userToUpdate.getId());
         return repository.updateUserBalance(userToUpdate);
     }
 
@@ -53,10 +51,9 @@ public class UserService {
         return updateBalance(user);
     }
 
-    @Transactional
     public PaymentResponse updateUserIfPaymentSucceed(PaymentRequest paymentRequest, int id) {
         User user = findById(id);
-        PaymentResponse paymentResponse = paymentMock.processPayment(paymentRequest);
+        PaymentResponse paymentResponse = payPal.processPayment(paymentRequest);
         if (paymentResponse.isSuccess()) {
             updateBalance(user, paymentRequest.getAmount());
         }

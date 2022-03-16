@@ -8,27 +8,27 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Component
-public class PaymentMock implements PaymentProcessingApi {
+public class PayPal implements PaymentProcessingApi {
 
     private static final String TRANSACTION_ID = "cdy-5r3fiy-6ki6-6nbvh8g";
-    private BigDecimal CARD_LIMIT;
+    private final BigDecimal cardLimit;
+    private final BigDecimal zeroCardLimit;
+    private PaymentResponse paymentResponse;
 
-    public PaymentMock() {
-        CARD_LIMIT = BigDecimal.valueOf(1000);
-    }
+    public PayPal() {
 
-    public void setCARD_LIMIT(BigDecimal CARD_LIMIT) {
-        this.CARD_LIMIT = CARD_LIMIT;
+        cardLimit = BigDecimal.valueOf(1000);
+        zeroCardLimit = BigDecimal.ZERO;
+        paymentResponse = new PaymentResponse(TRANSACTION_ID, true, null);
     }
 
     @Override
     public PaymentResponse processPayment(PaymentRequest paymentRequestIntent) {
-        PaymentResponse paymentResponse = new PaymentResponse(TRANSACTION_ID, true, null);
         BigDecimal amount = paymentRequestIntent.getAmount();
 
         Card card = paymentRequestIntent.getCard();
 
-        if (Double.parseDouble(String.valueOf(CARD_LIMIT.subtract(amount))) < 0.0d) {
+        if (Double.parseDouble(String.valueOf(zeroCardLimit.compareTo(amount))) < 0.0d) {
             paymentResponse = new PaymentResponse(TRANSACTION_ID, false, ResponseError.INSUFFICIENT_FUNDS);
         }
         if (card.getCardholderName().startsWith("err")) {
