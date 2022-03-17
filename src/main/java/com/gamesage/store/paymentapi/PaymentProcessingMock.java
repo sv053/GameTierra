@@ -10,20 +10,15 @@ import java.time.LocalDate;
 @Component
 public class PaymentProcessingMock implements PaymentProcessingApi {
 
+    public static final BigDecimal CARD_LIMIT = BigDecimal.valueOf(1000);
     private static final String TRANSACTION_ID = "cdy-5r3fiy-6ki6-6nbvh8g";
-    private PaymentResponse paymentResponse;
-
-    public PaymentProcessingMock() {
-
-        paymentResponse = new PaymentResponse(TRANSACTION_ID, true, null);
-    }
 
     @Override
-    public PaymentResponse processPayment(PaymentRequest paymentRequestIntent) {
+    public PaymentResponse processPayment(PaymentRequest paymentRequest) {
+        PaymentResponse paymentResponse = new PaymentResponse(TRANSACTION_ID, true, null);
+        Card card = paymentRequest.getCard();
 
-        Card card = paymentRequestIntent.getCard();
-
-        if (paymentRequestIntent.getAmount().remainder(BigDecimal.valueOf(2)).compareTo(BigDecimal.ZERO) != 0) {
+        if (paymentRequest.getAmount().compareTo(CARD_LIMIT) >= 0) {
             paymentResponse = new PaymentResponse(TRANSACTION_ID, false, ResponseError.INSUFFICIENT_FUNDS);
         }
         if (card.getCardholderName().startsWith("err")) {

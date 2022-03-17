@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,29 +47,28 @@ class OrderServiceDbIntegrationTest {
 
     @Test
     void buyGame_Success() {
-        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
-        PurchaseIntent expectedResult =
+        LocalDateTime beforeDateTime = LocalDateTime.now();
+        PurchaseIntent expectedPurchase =
                 new PurchaseIntent
                         .Builder(game)
                         .gameIsBought(true)
                         .buyer(user)
                         .message(PurchaseIntent.PurchaseMessage.PURCHASE_SUCCESSFUL)
-                        .orderDateTime(LocalDateTime.now())
+                        .orderDateTime(beforeDateTime)
                         .build();
+        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
 
         assertAll(
-                () -> assertBetweenTimePoints(expectedResult.getOrderDateTime(), result.getOrderDateTime()),
                 () -> assertTrue(result.isBought()),
-                () -> assertEquals(expectedResult.getBuyer(), result.getBuyer()),
-                () -> assertEquals(expectedResult.getTargetGame(), result.getTargetGame()),
-                () -> assertEquals(expectedResult.getMessage(), result.getMessage())
+                () -> assertEquals(expectedPurchase.getBuyer(), result.getBuyer()),
+                () -> assertEquals(expectedPurchase.getTargetGame(), result.getTargetGame()),
+                () -> assertEquals(expectedPurchase.getMessage(), result.getMessage()),
+                () -> assertBetweenTimePoints(beforeDateTime, result.getOrderDateTime())
         );
     }
 
-    void assertBetweenTimePoints(LocalDateTime expectedDateTime, LocalDateTime dateTime) {
-        assertTrue(expectedDateTime.isAfter(dateTime) && expectedDateTime.minusSeconds(1l).isBefore(dateTime));
-        assertTrue(expectedDateTime.compareTo(dateTime) >= 0 && expectedDateTime.minusSeconds(1l).compareTo(dateTime) <= 0);
-        assertTrue(Math.abs(ChronoUnit.MILLIS.between(expectedDateTime, dateTime)) < 800);
+    void assertBetweenTimePoints(LocalDateTime firstDateTime, LocalDateTime dateTime) {
+        assertTrue(dateTime.compareTo(firstDateTime) >= 0 && dateTime.isBefore(LocalDateTime.now()));
     }
 }
 

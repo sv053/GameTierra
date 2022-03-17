@@ -82,29 +82,33 @@ class UserServiceDbIntegrationTest {
     }
 
     @Test
-    void updateUserBalance_Failure_WrongUserId() {
+    void topUpBalance_Failure_WrongUserId() {
         int userId = 1;
         BigDecimal amount = BigDecimal.TEN;
         Card card = new Card(1111_2222_3333_4444L,
                 "TA IA",
-                LocalDate.of(2090, 1, 1),
+                LocalDate.of(LocalDate.now().getYear() + 1, 1, 1),
                 888);
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
         assertThrows(EntityNotFoundException.class, () -> userService.topUpBalance(paymentRequest, userId));
     }
 
     @Test
-    void updateUserBalance_Success_RightUserId() {
+    void topUpBalance_Success_RightUserId() {
         BigDecimal balance = BigDecimal.TEN;
         User user = userService.createOne(new User(null, "loco", new Tier(
                 3, "SILVER", 10.d), balance));
-        assertEquals(balance, user.getBalance());
 
-        BigDecimal amount = BigDecimal.ONE;
-        user.depositBalance(amount);
-        user = userService.updateBalance(user);
+        BigDecimal amount = BigDecimal.TEN;
+        Card card = new Card(1111_2222_3333_4444L,
+                "TA IA",
+                LocalDate.of(LocalDate.now().getYear() + 1, 1, 1),
+                888);
+        PaymentRequest paymentRequest = new PaymentRequest(amount, card);
 
-        assertEquals(0, balance.add(amount).compareTo(user.getBalance()));
+        userService.topUpBalance(paymentRequest, user.getId());
+        User updatedUser = userService.findById(user.getId());
+        assertEquals(balance.add(amount), updatedUser.getBalance().setScale(0));
     }
 }
 

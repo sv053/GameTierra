@@ -22,7 +22,7 @@ class PaymentProcessingMockTest {
         Card card = new Card(
                 1234567891234567L,
                 "JOHN DOW",
-                LocalDate.of(2023, 6, 6),
+                LocalDate.of(LocalDate.now().getYear() + 1, 6, 6),
                 123
         );
         BigDecimal amount = BigDecimal.valueOf(1001);
@@ -41,7 +41,7 @@ class PaymentProcessingMockTest {
         Card card = new Card(
                 123456789L,
                 "JOHN DOW",
-                LocalDate.of(2023, 6, 6),
+                LocalDate.of(LocalDate.now().getYear() + 1, 6, 6),
                 123
         );
         BigDecimal amount = BigDecimal.TEN;
@@ -60,7 +60,7 @@ class PaymentProcessingMockTest {
         Card card = new Card(
                 1234567891234567L,
                 "JOHN DOW",
-                LocalDate.of(2020, 6, 6),
+                LocalDate.of(LocalDate.now().getYear() - 1, 6, 6),
                 123
         );
         BigDecimal amount = BigDecimal.TEN;
@@ -79,7 +79,7 @@ class PaymentProcessingMockTest {
         Card card = new Card(
                 1234567891234567L,
                 "JOHN DOW",
-                LocalDate.of(2027, 6, 6),
+                LocalDate.of(LocalDate.now().getYear() + 1, 6, 6),
                 12
         );
         BigDecimal amount = BigDecimal.TEN;
@@ -98,14 +98,13 @@ class PaymentProcessingMockTest {
         Card card = new Card(
                 1234567891234567L,
                 "errJOHNDOW",
-                LocalDate.of(2027, 6, 6),
+                LocalDate.of(LocalDate.now().getYear() + 1, 6, 6),
                 123
         );
         BigDecimal amount = BigDecimal.TEN;
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
         PaymentResponse paymentResponse = paymentProcessingMock.processPayment(paymentRequest);
 
-        assertEquals("Повторите попытку позже", paymentResponse.getResponseError().getCardErrorMessage());
         assertAll(
                 () -> assertEquals(ResponseError.FORMAT_ERROR, paymentResponse.getResponseError()),
                 () -> assertTrue(paymentResponse.getTransactionId().length() > 0),
