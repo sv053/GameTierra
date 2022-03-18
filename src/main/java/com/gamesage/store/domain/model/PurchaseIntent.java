@@ -71,13 +71,13 @@ public class PurchaseIntent {
         ALREADY_OWNED("Looks like you already have got this game"),
         NOT_ENOUGH_BALANCE("Sorry, your balance is not enough to buy the game");
 
+        @JsonValue
         private final String message;
 
         PurchaseMessage(String message) {
             this.message = message;
         }
 
-        @JsonValue
         public String getMessage() {
             return message;
         }

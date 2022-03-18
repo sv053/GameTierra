@@ -4,9 +4,13 @@ import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.UserUpdateRepository;
 import com.gamesage.store.exception.EntityNotFoundException;
+import com.gamesage.store.paymentapi.PaymentProcessingApi;
+import com.gamesage.store.paymentapi.PaymentRequest;
+import com.gamesage.store.paymentapi.PaymentResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -14,11 +18,13 @@ public class UserService {
 
     private final UserUpdateRepository repository;
     private final GameService gameService;
+    private final PaymentProcessingApi paymentProcessingApi;
 
     public UserService(@Qualifier("dbUserRepository") UserUpdateRepository repository,
-                       GameService gameService) {
+                       GameService gameService, PaymentProcessingApi paymentProcessingApi) {
         this.repository = repository;
         this.gameService = gameService;
+        this.paymentProcessingApi = paymentProcessingApi;
     }
 
     public User findById(int id) {
@@ -37,8 +43,21 @@ public class UserService {
     }
 
     public User updateBalance(User userToUpdate) {
-        findById(userToUpdate.getId());
         return repository.updateUserBalance(userToUpdate);
+    }
+
+    private User depositAndUpdateBalance(User user, BigDecimal amountToAdd) {
+        user.depositBalance(amountToAdd);
+        return updateBalance(user);
+    }
+
+    public PaymentResponse topUpBalance(PaymentRequest paymentRequest, int id) {
+        User user = findById(id);
+        PaymentResponse paymentResponse = paymentProcessingApi.processPayment(paymentRequest);
+        if (paymentResponse.isSuccess()) {
+            depositAndUpdateBalance(user, paymentRequest.getAmount());
+        }
+        return paymentResponse;
     }
 }
 

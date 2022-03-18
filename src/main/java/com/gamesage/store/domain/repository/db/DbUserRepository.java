@@ -26,8 +26,6 @@ public class DbUserRepository implements UserUpdateRepository {
             "on user.tier_id = tier.id ";
     private static final String INSERT_USER_QUERY = "INSERT INTO user (login, balance, tier_id) " +
             "VALUES ( ?, ?, ?) ";
-    private static final String UPDATE_USER = "UPDATE user SET balance = ?, tier_id = ?  " +
-            "WHERE id = ? ";
     private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ? " +
             "WHERE id = ?";
     private final JdbcTemplate jdbcTemplate;
@@ -72,15 +70,6 @@ public class DbUserRepository implements UserUpdateRepository {
                 userToAdd.getLogin(),
                 userToAdd.getTier(),
                 userToAdd.getBalance());
-    }
-
-    @Override
-    public User update(User userToUpdate) {
-        jdbcTemplate.update(UPDATE_USER
-                , userToUpdate.getBalance()
-                , userToUpdate.getTier().getId()
-                , userToUpdate.getId());
-        return userToUpdate;
     }
 
     @Override

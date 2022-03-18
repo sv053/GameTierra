@@ -47,30 +47,28 @@ class OrderServiceDbIntegrationTest {
 
     @Test
     void buyGame_Success() {
-        LocalDateTime timePoint = LocalDateTime.now();
-        PurchaseIntent expectedResult =
+        LocalDateTime beforeDateTime = LocalDateTime.now();
+        PurchaseIntent expectedPurchase =
                 new PurchaseIntent
                         .Builder(game)
                         .gameIsBought(true)
                         .buyer(user)
                         .message(PurchaseIntent.PurchaseMessage.PURCHASE_SUCCESSFUL)
-                        .orderDateTime(timePoint)
+                        .orderDateTime(beforeDateTime)
                         .build();
         PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
 
-        compareDateTime(timePoint, result.getOrderDateTime());
-
         assertAll(
                 () -> assertTrue(result.isBought()),
-                () -> assertEquals(expectedResult.getBuyer(), result.getBuyer()),
-                () -> assertEquals(expectedResult.getTargetGame(), result.getTargetGame()),
-                () -> assertEquals(expectedResult.getMessage(), result.getMessage())
+                () -> assertEquals(expectedPurchase.getBuyer(), result.getBuyer()),
+                () -> assertEquals(expectedPurchase.getTargetGame(), result.getTargetGame()),
+                () -> assertEquals(expectedPurchase.getMessage(), result.getMessage()),
+                () -> assertBetweenTimePoints(beforeDateTime, result.getOrderDateTime())
         );
     }
 
-    void compareDateTime(LocalDateTime expectedDateTime, LocalDateTime dateTime) {
-        assertTrue(expectedDateTime.isBefore(dateTime));
-        assertTrue(expectedDateTime.plusSeconds(1).isAfter(dateTime));
+    void assertBetweenTimePoints(LocalDateTime firstDateTime, LocalDateTime dateTime) {
+        assertTrue(firstDateTime.isBefore(dateTime) && dateTime.isBefore(LocalDateTime.now()));
     }
 }
 
