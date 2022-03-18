@@ -68,7 +68,7 @@ class OrderServiceDbIntegrationTest {
     }
 
     void assertBetweenTimePoints(LocalDateTime firstDateTime, LocalDateTime dateTime) {
-        assertTrue(dateTime.compareTo(firstDateTime) >= 0 && dateTime.isBefore(LocalDateTime.now()));
+        assertTrue(firstDateTime.isBefore(dateTime) && dateTime.isBefore(LocalDateTime.now()));
     }
 }
 

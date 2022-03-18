@@ -11,11 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PaymentProcessingMockTest {
 
-    private final PaymentProcessingMock paymentProcessingMock;
-
-    PaymentProcessingMockTest() {
-        this.paymentProcessingMock = new PaymentProcessingMock();
-    }
+    private final PaymentProcessingMock paymentProcessingMock = new PaymentProcessingMock();
 
     @Test
     void formPaymentResponse_amountLessThanBalance() {
@@ -25,7 +21,7 @@ class PaymentProcessingMockTest {
                 LocalDate.of(LocalDate.now().getYear() + 1, 6, 6),
                 123
         );
-        BigDecimal amount = BigDecimal.valueOf(1001);
+        BigDecimal amount = PaymentProcessingMock.CARD_LIMIT.add(BigDecimal.ONE);
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
         PaymentResponse paymentResponse = paymentProcessingMock.processPayment(paymentRequest);
 
@@ -44,7 +40,7 @@ class PaymentProcessingMockTest {
                 LocalDate.of(LocalDate.now().getYear() + 1, 6, 6),
                 123
         );
-        BigDecimal amount = BigDecimal.TEN;
+        BigDecimal amount = PaymentProcessingMock.CARD_LIMIT;
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
         PaymentResponse paymentResponse = paymentProcessingMock.processPayment(paymentRequest);
 
@@ -63,7 +59,7 @@ class PaymentProcessingMockTest {
                 LocalDate.of(LocalDate.now().getYear() - 1, 6, 6),
                 123
         );
-        BigDecimal amount = BigDecimal.TEN;
+        BigDecimal amount = PaymentProcessingMock.CARD_LIMIT;
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
         PaymentResponse paymentResponse = paymentProcessingMock.processPayment(paymentRequest);
 
@@ -82,7 +78,7 @@ class PaymentProcessingMockTest {
                 LocalDate.of(LocalDate.now().getYear() + 1, 6, 6),
                 12
         );
-        BigDecimal amount = BigDecimal.TEN;
+        BigDecimal amount = PaymentProcessingMock.CARD_LIMIT;
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
         PaymentResponse paymentResponse = paymentProcessingMock.processPayment(paymentRequest);
 
@@ -101,7 +97,7 @@ class PaymentProcessingMockTest {
                 LocalDate.of(LocalDate.now().getYear() + 1, 6, 6),
                 123
         );
-        BigDecimal amount = BigDecimal.TEN;
+        BigDecimal amount = PaymentProcessingMock.CARD_LIMIT;
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
         PaymentResponse paymentResponse = paymentProcessingMock.processPayment(paymentRequest);
 
