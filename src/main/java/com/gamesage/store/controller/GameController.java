@@ -26,7 +26,7 @@ public class GameController {
         return gameService.findAll();
     }
 
-    @PostMapping
+    @PostMapping("/login")
     public List<Game> createGames(@RequestBody List<Game> gamesToSave) {
         return gameService.createAll(gamesToSave);
     }
