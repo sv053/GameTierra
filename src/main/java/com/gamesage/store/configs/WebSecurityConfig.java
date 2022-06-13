@@ -21,8 +21,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/users", "/cart")
                 .authenticated()
-                .anyRequest()
-                .authenticated()
                 .and()
                 .logout()
                 .permitAll();
