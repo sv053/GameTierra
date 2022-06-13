@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/login/cart")
+@RequestMapping("/cart")
 public class OrderController {
 
     private final OrderService orderService;
