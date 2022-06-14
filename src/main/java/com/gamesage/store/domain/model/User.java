@@ -14,6 +14,7 @@ public class User {
     private final Set<Game> games;
     private Integer id;
     private BigDecimal balance;
+    private String password;
 
     public User(Integer id, String login, Tier tier, BigDecimal balance) {
         this.id = id;

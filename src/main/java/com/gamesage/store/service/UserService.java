@@ -59,5 +59,9 @@ public class UserService {
         }
         return paymentResponse;
     }
+
+    public static boolean matchLoginPassword(String login1, String login2, String password1, String password2) {
+        return login1.equals(login2) && password1.equals(password2);
+    }
 }
 

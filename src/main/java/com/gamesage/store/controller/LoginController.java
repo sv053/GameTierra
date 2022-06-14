@@ -1,21 +1,27 @@
 package com.gamesage.store.controller;
 
-import org.springframework.http.HttpStatus;
+import com.gamesage.store.service.AuthService;
+import com.gamesage.store.service.UserService;
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/login")
 public class LoginController {
 
-    @PostMapping("/{user}/{password}")
-    public ResponseEntity login(@PathVariable String user, @PathVariable String password) {
-        if (user.equals("admin") && password.equals("letmein"))
-            return new ResponseEntity<>("U r in!", HttpStatus.OK);
-        else return new ResponseEntity<>("Wrong name or pass!", HttpStatus.NOT_FOUND);
+    private final AuthService authService;
+
+    public LoginController(AuthService authService) {
+        this.authService = authService;
+    }
+
+    @PostMapping("/{user}")
+    public ResponseEntity login(@PathVariable String user, @RequestBody String password) throws Exception {
+        User eligibleUser = authService.getUser();
+        if (UserService.matchLoginPassword(user, eligibleUser.getName(), password, eligibleUser.getPassword()))
+            return ResponseEntity.ok("U r in!");
+        return ResponseEntity.notFound().build();
     }
 }
 
