@@ -1,6 +1,5 @@
 package com.gamesage.store.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
@@ -27,7 +26,6 @@ public class User {
         games = new HashSet<>();
     }
 
-    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public User(@JsonProperty("id") Integer id,
                 @JsonProperty("login") String login,
                 @JsonProperty("tier") Tier tier,
@@ -41,6 +39,7 @@ public class User {
         return login;
     }
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     public String getPassword() {
         return password;
     }
