@@ -11,7 +11,7 @@ public class AuthService {
     @Value("${spring.security.user.password}")
     private String password;
 
-    public boolean ifCredentialsExist(String login, String pass) {
+    public boolean checkIfCredentialsExist(String login, String pass) {
         return login.equals(name) && password.equals(pass);
     }
 }

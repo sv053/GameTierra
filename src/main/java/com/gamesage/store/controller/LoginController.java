@@ -21,7 +21,7 @@ public class LoginController {
 
     @PostMapping
     public ResponseEntity<User> login(@RequestBody User user) {
-        if (authService.ifCredentialsExist(user.getName(), user.getPassword()))
+        if (authService.checkIfCredentialsExist(user.getName(), user.getPassword()))
             return new ResponseEntity<>(user, HttpStatus.OK);
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
