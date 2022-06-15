@@ -16,6 +16,7 @@ public class User {
     private final Set<Game> games;
     private Integer id;
     private BigDecimal balance;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     public User(Integer id, String login, Tier tier, BigDecimal balance) {
@@ -39,7 +40,6 @@ public class User {
         return login;
     }
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     public String getPassword() {
         return password;
     }
