@@ -1,10 +1,13 @@
 package com.gamesage.store.controller;
 
 import com.gamesage.store.service.AuthService;
-import com.gamesage.store.service.UserService;
 import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/login")
@@ -16,12 +19,11 @@ public class LoginController {
         this.authService = authService;
     }
 
-    @PostMapping("/{user}")
-    public ResponseEntity login(@PathVariable String user, @RequestBody String password) throws Exception {
-        User eligibleUser = authService.getUser();
-        if (UserService.matchLoginPassword(user, eligibleUser.getName(), password, eligibleUser.getPassword()))
-            return ResponseEntity.ok("U r in!");
-        return ResponseEntity.notFound().build();
+    @PostMapping
+    public ResponseEntity<User> login(@RequestBody User user) {
+        if (authService.findByLoginPassword(user.getName(), user.getPassword()))
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }
 

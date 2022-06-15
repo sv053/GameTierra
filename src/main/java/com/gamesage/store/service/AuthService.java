@@ -1,27 +1,35 @@
 package com.gamesage.store.service;
 
-import com.gamesage.store.configs.PropertiesConverter;
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
+@ConfigurationProperties(prefix = "spring.security.user")
+@Configuration
 public class AuthService {
 
-    private final User user;
-    private final PropertiesConverter properties;
+    private String name;
+    private String password;
 
-    public AuthService(PropertiesConverter properties) {
-        this.properties = properties;
-        this.user = new User();
-        user.setName(properties.getName());
-        user.setPassword(properties.getPassword());
-        user.setRoles(List.of("ADMIN"));
+    public String getName() {
+        return name;
     }
 
-    public User getUser() {
-        return user;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public boolean findByLoginPassword(String login, String pass) {
+        return login.equals(name) && password.equals(pass);
     }
 }
 
