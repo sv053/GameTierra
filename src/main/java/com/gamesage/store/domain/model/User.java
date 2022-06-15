@@ -1,5 +1,8 @@
 package com.gamesage.store.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashSet;
@@ -24,8 +27,22 @@ public class User {
         games = new HashSet<>();
     }
 
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+    public User(@JsonProperty("id") Integer id,
+                @JsonProperty("login") String login,
+                @JsonProperty("tier") Tier tier,
+                @JsonProperty("balance") BigDecimal balance,
+                @JsonProperty("password") String password) {
+        this(id, login, tier, balance);
+        this.password = password;
+    }
+
     public String getLogin() {
         return login;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public Integer getId() {
