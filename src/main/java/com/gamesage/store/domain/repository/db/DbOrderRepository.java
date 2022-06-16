@@ -88,7 +88,8 @@ public class DbOrderRepository implements Repository<Order, Integer> {
                     rs.getInt("user_id"),
                     rs.getString("login"),
                     tier,
-                    rs.getBigDecimal("balance"));
+                    rs.getBigDecimal("balance"),
+                    rs.getString("password"));
 
             Game game = new Game(
                     rs.getInt("game_id"),

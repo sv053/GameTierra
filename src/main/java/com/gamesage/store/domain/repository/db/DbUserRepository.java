@@ -21,11 +21,11 @@ import java.util.Optional;
 public class DbUserRepository implements UserUpdateRepository {
 
     private static final String SELECT_USER_QUERY = "SELECT user.id AS user_id, login, balance, " +
-            "tier_id, name AS tl, tier.percentage AS tp FROM user " +
+            "tier_id, password, name AS tl, tier.percentage AS tp FROM user " +
             "LEFT JOIN tier " +
             "on user.tier_id = tier.id ";
-    private static final String INSERT_USER_QUERY = "INSERT INTO user (login, balance, tier_id) " +
-            "VALUES ( ?, ?, ?) ";
+    private static final String INSERT_USER_QUERY = "INSERT INTO user (login, balance, tier_id, password) " +
+            "VALUES ( ?, ?, ?, ?) ";
     private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ? " +
             "WHERE id = ?";
     private final JdbcTemplate jdbcTemplate;
@@ -64,12 +64,14 @@ public class DbUserRepository implements UserUpdateRepository {
             ps.setString(1, userToAdd.getLogin());
             ps.setBigDecimal(2, userToAdd.getBalance());
             ps.setInt(3, userToAdd.getTier().getId());
+            ps.setString(4, userToAdd.getPassword());
             return ps;
         }, keyHolder);
         return new User(keyHolder.getKeyAs(Integer.class),
                 userToAdd.getLogin(),
                 userToAdd.getTier(),
-                userToAdd.getBalance());
+                userToAdd.getBalance(),
+                userToAdd.getPassword());
     }
 
     @Override
@@ -94,7 +96,8 @@ public class DbUserRepository implements UserUpdateRepository {
                     rs.getInt("user_id"),
                     rs.getString("login"),
                     tier,
-                    rs.getBigDecimal("balance"));
+                    rs.getBigDecimal("balance"),
+                    rs.getString("password"));
         }
     }
 }

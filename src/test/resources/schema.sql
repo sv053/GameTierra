@@ -14,12 +14,27 @@ CREATE TABLE IF NOT EXISTS tier
 
 CREATE TABLE IF NOT EXISTS user
 (
-    id      INTEGER PRIMARY KEY AUTO_INCREMENT,
-    login   VARCHAR(150) NOT NULL UNIQUE,
+    id
+    INTEGER
+    PRIMARY
+    KEY
+    AUTO_INCREMENT,
+    login
+    VARCHAR
+(
+    150
+) NOT NULL UNIQUE,
     balance REAL,
     tier_id INTEGER,
-    FOREIGN KEY (tier_id) REFERENCES tier (id)
-);
+    password TEXT,
+    FOREIGN KEY
+(
+    tier_id
+) REFERENCES tier
+(
+    id
+)
+    );
 
 CREATE TABLE IF NOT EXISTS orders
 (
