@@ -1,17 +1,24 @@
 package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.NoSuchElementException;
 
 @Service
 public class AuthService {
 
     private final UserService userService;
+    @Value("${spring.security.user.name}")
+    private String name;
+    @Value("${spring.security.user.password}")
+    private String password;
 
     public AuthService(UserService userService) {
         this.userService = userService;
+    }
+
+    public boolean checkIfCredentialsExist(String login, String pass) {
+        return login.equals(name) && password.equals(pass);
     }
 
     private boolean checkIfCredentialsAreTheSame(String login1, String login2, String pass1, String pass2) {
@@ -24,11 +31,7 @@ public class AuthService {
     }
 
     private User findUserByLogin(String login) {
-        return userService.findAll()
-                .stream()
-                .filter(u -> u.getLogin().equals(login))
-                .findFirst()
-                .orElseThrow(NoSuchElementException::new);
+        return userService.findByLogin(login);
     }
 }
 

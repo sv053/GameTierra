@@ -34,6 +34,13 @@ public class UserService {
         return retrievedUser;
     }
 
+    public User findByLogin(String login) {
+        User retrievedUser = repository.findByLogin(login).orElseThrow(() -> new EntityNotFoundException(login));
+        List<Game> userGames = gameService.findAllGamesByUserId(retrievedUser.getId());
+        retrievedUser.addGames(userGames);
+        return retrievedUser;
+    }
+
     public List<User> findAll() {
         return repository.findAll();
     }

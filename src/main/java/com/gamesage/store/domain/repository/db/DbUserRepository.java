@@ -51,6 +51,20 @@ public class DbUserRepository implements UserUpdateRepository {
     }
 
     @Override
+    public Optional<User> findByLogin(String login) {
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(
+                    SELECT_USER_QUERY +
+                            "WHERE user.login = ?",
+                    userRowMapper,
+                    login
+            ));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public List<User> findAll() {
         return jdbcTemplate.query(SELECT_USER_QUERY, userRowMapper);
     }
