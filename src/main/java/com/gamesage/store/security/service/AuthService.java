@@ -15,11 +15,11 @@ import org.springframework.stereotype.Service;
 public class AuthService implements UserDetailsService {
 
     private final UserService userService;
+    private final AppUserDao appUserDao;
     @Value("${spring.security.user.name}")
     private String name;
     @Value("${spring.security.user.password}")
     private String password;
-    private final AppUserDao appUserDao;
     @Value("${spring.security.user.roles}")
     private String roles;
 
