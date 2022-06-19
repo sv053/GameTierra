@@ -1,7 +1,7 @@
 package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.service.AuthService;
+import com.gamesage.store.security.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +21,7 @@ public class LoginController {
 
     @PostMapping
     public ResponseEntity<User> login(@RequestBody User user) {
+
         String userLogin = user.getLogin();
         String userPassword = user.getPassword();
         if (authService.checkIfUserExists(userLogin, userPassword)
