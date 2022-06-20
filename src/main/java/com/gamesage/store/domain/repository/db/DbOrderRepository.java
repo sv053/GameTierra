@@ -33,6 +33,7 @@ public class DbOrderRepository implements Repository<Order, Integer> {
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<Order> rowMapper;
 
+
     public DbOrderRepository(JdbcTemplate jdbcTemplate, RowMapper<Order> rowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.rowMapper = rowMapper;

@@ -1,6 +1,7 @@
 package com.gamesage.store.security.configs;
 
 import com.gamesage.store.security.service.AuthService;
+import com.gamesage.store.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -14,10 +15,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final AuthService authService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final UserService userService;
 
-    public WebSecurityConfig(AuthService authService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public WebSecurityConfig(AuthService authService, BCryptPasswordEncoder bCryptPasswordEncoder, UserService userService) {
         this.authService = authService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.userService = userService;
     }
 
     @Override
@@ -48,7 +51,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(bCryptPasswordEncoder);
-        provider.setUserDetailsService(authService);
+        provider.setUserDetailsService(userService);
         return provider;
     }
 }
