@@ -1,6 +1,5 @@
-package com.gamesage.store.security.configs;
+package com.gamesage.store.security.config;
 
-import com.gamesage.store.security.service.AuthService;
 import com.gamesage.store.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,18 +7,14 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final AuthService authService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserService userService;
 
-    public WebSecurityConfig(AuthService authService, BCryptPasswordEncoder bCryptPasswordEncoder, UserService userService) {
-        this.authService = authService;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    public WebSecurityConfig(UserService userService) {
         this.userService = userService;
     }
 
@@ -42,7 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth
                 .authenticationProvider(daoAuthenticationProvider());
     }
@@ -50,7 +45,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(bCryptPasswordEncoder);
+        provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
         provider.setUserDetailsService(userService);
         return provider;
     }

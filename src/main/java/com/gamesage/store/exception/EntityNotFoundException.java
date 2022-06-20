@@ -11,7 +11,7 @@ public class EntityNotFoundException extends RuntimeException {
     }
 
     public EntityNotFoundException(String name) {
-        super(String.format("Entity with login %s not found", name));
+        super(String.format("Entity with name %s not found", name));
     }
 }
 

@@ -2,8 +2,6 @@ package com.gamesage.store.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gamesage.store.security.model.AppUser;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -22,8 +20,6 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     private AppUser appUser;
-    @Autowired
-    private BCryptPasswordEncoder encoder;
 
     public User(Integer id, String login, Tier tier, BigDecimal balance) {
         this.id = id;
@@ -41,7 +37,7 @@ public class User {
         this(id, login, tier, balance);
         this.password = password;
         this.appUser = new AppUser(null,
-                encoder.encode(password),
+                password,
                 login,
                 true,
                 true,
