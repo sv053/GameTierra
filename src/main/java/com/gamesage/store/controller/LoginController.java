@@ -24,8 +24,7 @@ public class LoginController {
 
         String userLogin = user.getLogin();
         String userPassword = user.getPassword();
-        if (authService.checkIfUserExists(userLogin, userPassword)
-                || authService.checkIfCredentialsExist(userLogin, userPassword))
+        if (authService.checkIfUserExists(userLogin, userPassword))
             return new ResponseEntity<>(user, HttpStatus.OK);
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
