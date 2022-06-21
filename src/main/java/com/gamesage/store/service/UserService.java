@@ -7,6 +7,7 @@ import com.gamesage.store.exception.EntityNotFoundException;
 import com.gamesage.store.paymentapi.PaymentProcessingApi;
 import com.gamesage.store.paymentapi.PaymentRequest;
 import com.gamesage.store.paymentapi.PaymentResponse;
+import com.gamesage.store.security.model.AppUser;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -72,7 +73,14 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        return findByLogin(login).getAppUser();
+        User domainUser = findByLogin(login);
+        return new AppUser(
+                null,
+                true,
+                true,
+                true,
+                true,
+                domainUser);
     }
 }
 

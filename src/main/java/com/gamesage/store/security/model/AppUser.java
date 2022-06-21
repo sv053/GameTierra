@@ -1,5 +1,6 @@
 package com.gamesage.store.security.model;
 
+import com.gamesage.store.domain.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -9,26 +10,24 @@ import java.util.Set;
 public class AppUser implements UserDetails {
 
     private final Set<? extends GrantedAuthority> grantedAuthorities;
-    private final String password;
-    private final String username;
     private final boolean isAccountNonExpired;
     private final boolean isAccountNonLocked;
     private final boolean isCredentialsNonExpired;
     private final boolean isEnabled;
+    private final User user;
 
     public AppUser(Set<? extends GrantedAuthority> grantedAuthorities,
-                   String password,
-                   String username,
                    boolean isAccountNonExpired,
                    boolean isAccountNonLocked,
-                   boolean isCredentialsNonExpired, boolean isEnabled) {
+                   boolean isCredentialsNonExpired,
+                   boolean isEnabled,
+                   User user) {
         this.grantedAuthorities = grantedAuthorities;
-        this.password = password;
-        this.username = username;
         this.isAccountNonExpired = isAccountNonExpired;
         this.isAccountNonLocked = isAccountNonLocked;
         this.isCredentialsNonExpired = isCredentialsNonExpired;
         this.isEnabled = isEnabled;
+        this.user = user;
     }
 
     @Override
@@ -38,12 +37,12 @@ public class AppUser implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return username;
+        return user.getLogin();
     }
 
     @Override
