@@ -74,7 +74,6 @@ public class DbUserRepository implements FindByLoginRepository {
 
     @Override
     public User createOne(User userToAdd) {
-        String encodedPassword = encoder.encode(userToAdd.getPassword());
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con.prepareStatement(INSERT_USER_QUERY,
@@ -82,14 +81,14 @@ public class DbUserRepository implements FindByLoginRepository {
             ps.setString(1, userToAdd.getLogin());
             ps.setBigDecimal(2, userToAdd.getBalance());
             ps.setInt(3, userToAdd.getTier().getId());
-            ps.setString(4, encodedPassword);
+            ps.setString(4, userToAdd.getPassword());
             return ps;
         }, keyHolder);
         return new User(keyHolder.getKeyAs(Integer.class),
                 userToAdd.getLogin(),
                 userToAdd.getTier(),
                 userToAdd.getBalance(),
-                encodedPassword);
+                userToAdd.getPassword());
     }
 
     @Override

@@ -3,16 +3,15 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.FindByLoginRepository;
-import com.gamesage.store.domain.repository.UserUpdateRepository;
 import com.gamesage.store.exception.EntityNotFoundException;
 import com.gamesage.store.paymentapi.PaymentProcessingApi;
 import com.gamesage.store.paymentapi.PaymentRequest;
 import com.gamesage.store.paymentapi.PaymentResponse;
 import com.gamesage.store.security.model.AppUser;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,12 +23,14 @@ public class UserService implements UserDetailsService {
     private final FindByLoginRepository repository;
     private final GameService gameService;
     private final PaymentProcessingApi paymentProcessingApi;
+    private final BCryptPasswordEncoder encoder;
 
     public UserService(FindByLoginRepository repository,
-                       GameService gameService, PaymentProcessingApi paymentProcessingApi) {
+                       GameService gameService, PaymentProcessingApi paymentProcessingApi, BCryptPasswordEncoder encoder) {
         this.repository = repository;
         this.gameService = gameService;
         this.paymentProcessingApi = paymentProcessingApi;
+        this.encoder = encoder;
     }
 
     public User findById(int id) {
@@ -48,7 +49,9 @@ public class UserService implements UserDetailsService {
     }
 
     public User createOne(User userToAdd) {
-        return repository.createOne(userToAdd);
+        User user = userToAdd;
+        user.setPassword(encoder.encode(userToAdd.getPassword()));
+        return repository.createOne(user);
     }
 
     public User updateBalance(User userToUpdate) {
