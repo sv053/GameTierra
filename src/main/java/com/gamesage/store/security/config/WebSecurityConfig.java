@@ -3,6 +3,7 @@ package com.gamesage.store.security.config;
 import com.gamesage.store.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,11 +29,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/games", "/login")
+                .antMatchers(HttpMethod.POST, "/login", "/users")
                 .permitAll()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/users", "/cart", "/users/**", "/cart/**", "/games/**")
+                .antMatchers(HttpMethod.GET, "/games", "/games/**")
+                .permitAll()
+                .and()
+                .authorizeRequests()
+                .antMatchers(HttpMethod.GET, "/users", "/cart", "/users/**", "/cart/**")
                 .authenticated()
                 .and()
                 .logout()

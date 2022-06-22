@@ -2,7 +2,7 @@ package com.gamesage.store.domain.repository.db;
 
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.FindByLoginRepository;
+import com.gamesage.store.domain.repository.UserFunctionRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class DbUserRepository implements FindByLoginRepository {
+public class DbUserRepository implements UserFunctionRepository {
 
     private static final String SELECT_USER_QUERY = "SELECT user.id AS user_id, login, balance, " +
             "tier_id, password, name AS tl, tier.percentage AS tp FROM user " +
