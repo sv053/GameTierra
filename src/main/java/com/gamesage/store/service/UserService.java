@@ -38,7 +38,7 @@ public class UserService implements UserDetailsService {
         return retrievedUser;
     }
 
-    public User findByLoginWithoutGames(String login) {
+    public User findByLogin(String login) {
         return repository.findByLogin(login).orElseThrow(() -> new EntityNotFoundException(login));
     }
 
@@ -70,7 +70,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        User domainUser = findByLoginWithoutGames(login);
+        User domainUser = findByLogin(login);
         return new AppUser(null, domainUser);
     }
 }
