@@ -38,16 +38,8 @@ public class UserService implements UserDetailsService {
         return retrievedUser;
     }
 
-    public User findByLogin(String login) {
-        User retrievedUser = repository.findByLogin(login).orElseThrow(() -> new EntityNotFoundException(login));
-        List<Game> userGames = gameService.findAllGamesByUserId(retrievedUser.getId());
-        retrievedUser.addGames(userGames);
-        return retrievedUser;
-    }
-
-    public boolean existsLoginAndPass(String login, String password) {
-        User retrievedUser = repository.findByLogin(login).orElseThrow(() -> new EntityNotFoundException(login));
-        return retrievedUser.getPassword().equals(password);
+    public User findByLoginWithoutGames(String login) {
+        return repository.findByLogin(login).orElseThrow(() -> new EntityNotFoundException(login));
     }
 
     public List<User> findAll() {
@@ -78,7 +70,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        User domainUser = findByLogin(login);
+        User domainUser = findByLoginWithoutGames(login);
         return new AppUser(null, domainUser);
     }
 }

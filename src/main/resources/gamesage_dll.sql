@@ -18,13 +18,33 @@ CREATE TABLE IF NOT EXISTS 'tier'
 
 CREATE TABLE IF NOT EXISTS 'user'
 (
-    'id'      INTEGER,
-    'login'   TEXT NOT NULL CHECK ('login' != '') UNIQUE,
+    'id'
+    INTEGER,
+    'login'
+    TEXT
+    NOT
+    NULL
+    CHECK
+(
+    'login'
+    !=
+    ''
+) UNIQUE,
     'balance' REAL,
     'tier_id' INTEGER,
-    PRIMARY KEY ('id' AUTOINCREMENT),
-    CONSTRAINT 'tier_fk' FOREIGN KEY ('tier_id') REFERENCES 'tier' ('id')
-);
+    'password' TEXT
+    PRIMARY KEY
+(
+    'id' AUTOINCREMENT
+),
+    CONSTRAINT 'tier_fk' FOREIGN KEY
+(
+    'tier_id'
+) REFERENCES 'tier'
+(
+    'id'
+)
+    );
 
 CREATE TABLE IF NOT EXISTS 'orders'
 (
