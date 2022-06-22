@@ -33,6 +33,7 @@ public class DbOrderRepository implements Repository<Order, Integer> {
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<Order> rowMapper;
 
+
     public DbOrderRepository(JdbcTemplate jdbcTemplate, RowMapper<Order> rowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.rowMapper = rowMapper;
@@ -88,7 +89,8 @@ public class DbOrderRepository implements Repository<Order, Integer> {
                     rs.getInt("user_id"),
                     rs.getString("login"),
                     tier,
-                    rs.getBigDecimal("balance"));
+                    rs.getBigDecimal("balance"),
+                    rs.getString("password"));
 
             Game game = new Game(
                     rs.getInt("game_id"),
