@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
@@ -30,10 +31,12 @@ public class DbUserRepository implements UserUpdateRepository {
             "WHERE id = ?";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> userRowMapper;
+    private final BCryptPasswordEncoder encoder;
 
-    public DbUserRepository(JdbcTemplate jdbcTemplate, UserRowMapper userRowMapper) {
+    public DbUserRepository(JdbcTemplate jdbcTemplate, UserRowMapper userRowMapper, BCryptPasswordEncoder encoder) {
         this.jdbcTemplate = jdbcTemplate;
         this.userRowMapper = userRowMapper;
+        this.encoder = encoder;
     }
 
     @Override
@@ -71,6 +74,7 @@ public class DbUserRepository implements UserUpdateRepository {
 
     @Override
     public User createOne(User userToAdd) {
+        String encodedPassword = encoder.encode(userToAdd.getPassword());
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con.prepareStatement(INSERT_USER_QUERY,
@@ -78,14 +82,14 @@ public class DbUserRepository implements UserUpdateRepository {
             ps.setString(1, userToAdd.getLogin());
             ps.setBigDecimal(2, userToAdd.getBalance());
             ps.setInt(3, userToAdd.getTier().getId());
-            ps.setString(4, userToAdd.getPassword());
+            ps.setString(4, encodedPassword);
             return ps;
         }, keyHolder);
         return new User(keyHolder.getKeyAs(Integer.class),
                 userToAdd.getLogin(),
                 userToAdd.getTier(),
                 userToAdd.getBalance(),
-                userToAdd.getPassword());
+                encodedPassword);
     }
 
     @Override

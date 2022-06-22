@@ -45,6 +45,11 @@ public class UserService implements UserDetailsService {
         return retrievedUser;
     }
 
+    public boolean existsLoginAndPass(String login, String password) {
+        User retrievedUser = repository.findByLogin(login).orElseThrow(() -> new EntityNotFoundException(login));
+        return retrievedUser.getPassword().equals(password);
+    }
+
     public List<User> findAll() {
         return repository.findAll();
     }
@@ -74,13 +79,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         User domainUser = findByLogin(login);
-        return new AppUser(
-                null,
-                true,
-                true,
-                true,
-                true,
-                domainUser);
+        return new AppUser(null, domainUser);
     }
 }
 

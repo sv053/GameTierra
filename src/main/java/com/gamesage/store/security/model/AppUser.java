@@ -10,23 +10,10 @@ import java.util.Set;
 public class AppUser implements UserDetails {
 
     private final Set<? extends GrantedAuthority> grantedAuthorities;
-    private final boolean isAccountNonExpired;
-    private final boolean isAccountNonLocked;
-    private final boolean isCredentialsNonExpired;
-    private final boolean isEnabled;
     private final User user;
 
-    public AppUser(Set<? extends GrantedAuthority> grantedAuthorities,
-                   boolean isAccountNonExpired,
-                   boolean isAccountNonLocked,
-                   boolean isCredentialsNonExpired,
-                   boolean isEnabled,
-                   User user) {
+    public AppUser(Set<? extends GrantedAuthority> grantedAuthorities, User user) {
         this.grantedAuthorities = grantedAuthorities;
-        this.isAccountNonExpired = isAccountNonExpired;
-        this.isAccountNonLocked = isAccountNonLocked;
-        this.isCredentialsNonExpired = isCredentialsNonExpired;
-        this.isEnabled = isEnabled;
         this.user = user;
     }
 
@@ -47,22 +34,22 @@ public class AppUser implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return isAccountNonExpired;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return isAccountNonLocked;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return isCredentialsNonExpired;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return isEnabled;
+        return true;
     }
 }
 
