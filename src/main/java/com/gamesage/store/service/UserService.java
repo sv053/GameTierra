@@ -2,6 +2,7 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
+import com.gamesage.store.domain.repository.FindByLoginRepository;
 import com.gamesage.store.domain.repository.UserUpdateRepository;
 import com.gamesage.store.exception.EntityNotFoundException;
 import com.gamesage.store.paymentapi.PaymentProcessingApi;
@@ -20,11 +21,11 @@ import java.util.List;
 @Service
 public class UserService implements UserDetailsService {
 
-    private final UserUpdateRepository repository;
+    private final FindByLoginRepository repository;
     private final GameService gameService;
     private final PaymentProcessingApi paymentProcessingApi;
 
-    public UserService(@Qualifier("dbUserRepository") UserUpdateRepository repository,
+    public UserService(FindByLoginRepository repository,
                        GameService gameService, PaymentProcessingApi paymentProcessingApi) {
         this.repository = repository;
         this.gameService = gameService;
