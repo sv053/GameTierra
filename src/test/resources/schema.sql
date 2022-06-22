@@ -31,3 +31,4 @@ CREATE TABLE IF NOT EXISTS orders
     FOREIGN KEY (user_id) REFERENCES user (id),
     FOREIGN KEY (game_id) REFERENCES game (id)
 );
+
