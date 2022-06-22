@@ -9,12 +9,16 @@ import java.util.Set;
 
 public class AppUser implements UserDetails {
 
-    private final Set<? extends GrantedAuthority> grantedAuthorities;
+    private Set<? extends GrantedAuthority> grantedAuthorities;
     private final User user;
 
-    public AppUser(Set<? extends GrantedAuthority> grantedAuthorities, User user) {
-        this.grantedAuthorities = grantedAuthorities;
+    public AppUser(User user) {
         this.user = user;
+    }
+
+    public AppUser(Set<? extends GrantedAuthority> grantedAuthorities, User user) {
+        this(user);
+        this.grantedAuthorities = grantedAuthorities;
     }
 
     @Override

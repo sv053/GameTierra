@@ -75,7 +75,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         User domainUser = findByLogin(login);
-        return new AppUser(null, domainUser);
+        return new AppUser(domainUser);
     }
 }
 
