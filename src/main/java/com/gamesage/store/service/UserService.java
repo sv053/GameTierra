@@ -49,9 +49,8 @@ public class UserService implements UserDetailsService {
     }
 
     public User createOne(User userToAdd) {
-        User user = userToAdd;
-        user.setPassword(encoder.encode(userToAdd.getPassword()));
-        return repository.createOne(user);
+        userToAdd.setPassword(encoder.encode(userToAdd.getPassword()));
+        return repository.createOne(userToAdd);
     }
 
     public User updateBalance(User userToUpdate) {
