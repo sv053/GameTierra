@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public class DbUserRepository implements UserFunctionRepository {
@@ -97,6 +98,17 @@ public class DbUserRepository implements UserFunctionRepository {
                 , userToUpdate.getBalance()
                 , userToUpdate.getId());
         return userToUpdate;
+    }
+
+    private String createToken() {
+        return UUID.randomUUID().toString();
+    }
+
+    @Override
+    public Optional<User> assignToken(String login) {
+        Optional<User> user = findByLogin(login);
+        user.get().setToken(createToken());
+        return user;
     }
 
     @Component
