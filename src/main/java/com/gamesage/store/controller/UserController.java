@@ -7,6 +7,7 @@ import com.gamesage.store.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -37,6 +38,11 @@ public class UserController {
     @PostMapping("/{id}/topup")
     public PaymentResponse tryTopUp(@PathVariable int id, @Valid @RequestBody PaymentRequest paymentRequest) {
         return userService.topUpBalance(paymentRequest, id);
+    }
+
+    @GetMapping("/principal")
+    public Principal createStuff(Principal currentUser) {
+        return currentUser;
     }
 }
 

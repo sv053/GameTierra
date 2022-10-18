@@ -25,5 +25,6 @@ public class LoginController {
             return new ResponseEntity<>(user, HttpStatus.OK);
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
+
 }
 

@@ -8,7 +8,5 @@ public interface UserFunctionRepository extends Repository<User, Integer> {
 
     User updateUserBalance(User user);
     Optional<User> findByLogin(String login);
-
-    Optional<User> assignToken(String userlogin);
 }
 
