@@ -1,7 +1,6 @@
 package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.Game;
-import com.gamesage.store.security.config.CurrentlyLoggedUser;
 import com.gamesage.store.security.model.AppUser;
 import com.gamesage.store.service.GameService;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +28,7 @@ public class GameController {
     }
 
     @PostMapping
-    public List<Game> createGames(@RequestBody List<Game> gamesToSave, @CurrentlyLoggedUser AppUser currentUser) {
+    public List<Game> createGames(@RequestBody List<Game> gamesToSave, AppUser currentUser) {
         return gameService.createAll(gamesToSave);
     }
 }

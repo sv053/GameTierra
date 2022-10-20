@@ -2,13 +2,12 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.UserSecurityRepository;
+import com.gamesage.store.domain.repository.UserFunctionRepository;
 import com.gamesage.store.exception.EntityNotFoundException;
 import com.gamesage.store.paymentapi.PaymentProcessingApi;
 import com.gamesage.store.paymentapi.PaymentRequest;
 import com.gamesage.store.paymentapi.PaymentResponse;
 import com.gamesage.store.security.model.AppUser;
-import com.gamesage.store.security.model.VerificationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,12 +20,12 @@ import java.util.List;
 @Service
 public class UserService implements UserDetailsService {
 
-    private final UserSecurityRepository repository;
+    private final UserFunctionRepository repository;
     private final GameService gameService;
     private final PaymentProcessingApi paymentProcessingApi;
     private final BCryptPasswordEncoder encoder;
 
-    public UserService(UserSecurityRepository repository,
+    public UserService(UserFunctionRepository repository,
                        GameService gameService, PaymentProcessingApi paymentProcessingApi, BCryptPasswordEncoder encoder) {
         this.repository = repository;
         this.gameService = gameService;
@@ -45,10 +44,6 @@ public class UserService implements UserDetailsService {
         return repository.findByLogin(login).orElseThrow(() -> new EntityNotFoundException(login));
     }
 
-    public VerificationToken findToken(int userId) {
-        return repository.findToken(userId).orElseThrow(() -> new EntityNotFoundException(String.valueOf(userId)));
-    }
-
     public List<User> findAll() {
         return repository.findAll();
     }
@@ -56,10 +51,6 @@ public class UserService implements UserDetailsService {
     public User createOne(User userToAdd) {
         userToAdd.setPassword(encoder.encode(userToAdd.getPassword()));
         return repository.createOne(userToAdd);
-    }
-
-    public VerificationToken updateToken(int userId) {
-        return repository.createToken(userId);
     }
 
     public User updateBalance(User userToUpdate) {

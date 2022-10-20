@@ -18,7 +18,6 @@ public class User {
     private BigDecimal balance;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-    private String token;
 
     public User(Integer id, String login, Tier tier, BigDecimal balance) {
         this.id = id;
@@ -55,14 +54,6 @@ public class User {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
     public Tier getTier() {

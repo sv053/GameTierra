@@ -2,8 +2,7 @@ package com.gamesage.store.domain.repository.db;
 
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.UserSecurityRepository;
-import com.gamesage.store.security.model.VerificationToken;
+import com.gamesage.store.domain.repository.UserFunctionRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -20,15 +19,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class DbUserRepository implements UserSecurityRepository {
+public class DbUserRepository implements UserFunctionRepository {
 
     private static final String SELECT_USER_QUERY = "SELECT user.id AS user_id, login, balance, " +
             "tier_id, password, name AS tl, tier.percentage AS tp FROM user " +
             "LEFT JOIN tier " +
             "on user.tier_id = tier.id ";
-    private static final String SELECT_TOKEN_QUERY = "SELECT id, token, " +
+    private static final String SELECT_TOKEN_BY_USERID_QUERY = "SELECT id, token, " +
             "FROM auth_token " +
             "WHERE userId = ?";
+    private static final String SELECT_TOKEN_QUERY = "SELECT id, userId, " +
+            "FROM auth_token " +
+            "WHERE token = ?";
     private static final String INSERT_USER_QUERY = "INSERT INTO user (login, balance, tier_id, password) " +
             "VALUES ( ?, ?, ?, ?) ";
     private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ? " +
@@ -38,13 +40,11 @@ public class DbUserRepository implements UserSecurityRepository {
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> userRowMapper;
     private final BCryptPasswordEncoder encoder;
-    private final TokenRowMapper tokenRowMapper;
 
-    public DbUserRepository(JdbcTemplate jdbcTemplate, UserRowMapper userRowMapper, BCryptPasswordEncoder encoder, TokenRowMapper tokenRowMapper) {
+    public DbUserRepository(JdbcTemplate jdbcTemplate, UserRowMapper userRowMapper, BCryptPasswordEncoder encoder) {
         this.jdbcTemplate = jdbcTemplate;
         this.userRowMapper = userRowMapper;
         this.encoder = encoder;
-        this.tokenRowMapper = tokenRowMapper;
     }
 
     @Override
@@ -70,19 +70,6 @@ public class DbUserRepository implements UserSecurityRepository {
                             "WHERE user.login = ?",
                     userRowMapper,
                     login
-            ));
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public Optional<VerificationToken> findToken(int userId) {
-        try {
-            return Optional.ofNullable(jdbcTemplate.queryForObject(
-                    SELECT_TOKEN_QUERY,
-                    tokenRowMapper,
-                    userId
             ));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -121,21 +108,6 @@ public class DbUserRepository implements UserSecurityRepository {
         return userToUpdate;
     }
 
-    @Override
-    public VerificationToken createToken(int userId) {
-        VerificationToken token = new VerificationToken(userId);
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(con -> {
-            PreparedStatement ps = con.prepareStatement(INSERT_USER_TOKEN,
-                    new String[]{"id"});
-            ps.setString(1, token.getToken());
-            ps.setInt(2, token.getUserId());
-            return ps;
-        }, keyHolder);
-        token.setId((Long) keyHolder.getKey());
-        return token;
-    }
-
     @Component
     static class UserRowMapper implements RowMapper<User> {
 
@@ -152,19 +124,6 @@ public class DbUserRepository implements UserSecurityRepository {
                     tier,
                     rs.getBigDecimal("balance"),
                     rs.getString("password"));
-        }
-    }
-
-    @Component
-    static class TokenRowMapper implements RowMapper<VerificationToken> {
-
-        @Override
-        public VerificationToken mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return new VerificationToken(
-                    rs.getLong("id"),
-                    rs.getString("token"),
-                    rs.getInt("user_id")
-            );
         }
     }
 }

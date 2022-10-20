@@ -1,24 +1,39 @@
 package com.gamesage.store.security.model;
 
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+
 import java.sql.Timestamp;
-import java.util.Objects;
 import java.util.UUID;
 
-public class VerificationToken {
+public class AuthToken extends AbstractAuthenticationToken {
 
     private final int userId;
     private long id;
     private String token;
 
-    public VerificationToken(int userId) {
+    public AuthToken(int userId) {
+        super(null);
         this.token = generateToken();
         this.userId = userId;
+        setAuthenticated(false);
     }
 
-    public VerificationToken(long id, String token, int userId) {
+    public AuthToken(long id, String token, int userId) {
+        super(null);
         this.id = id;
         this.token = token;
         this.userId = userId;
+        setAuthenticated(true);
+    }
+
+    @Override
+    public Object getCredentials() {
+        return getToken();
+    }
+
+    @Override
+    public Object getPrincipal() {
+        return getId();
     }
 
     public Long getId() {
@@ -42,11 +57,8 @@ public class VerificationToken {
     }
 
     public String generateToken() {
-        StringBuilder token = new StringBuilder();
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        long currentTimeInMilisecond = timestamp.getTime();
-        return token
-                .append(currentTimeInMilisecond)
+        return new StringBuilder()
+                .append(new Timestamp(System.currentTimeMillis()).getTime())
                 .append("-")
                 .append(UUID.randomUUID())
                 .toString();
@@ -57,24 +69,24 @@ public class VerificationToken {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        VerificationToken that = (VerificationToken) o;
+        AuthToken authToken = (AuthToken) o;
 
-        if (!Objects.equals(token, that.token)) return false;
-        if (userId < 1) return false;
-        return false;
+        if (userId != authToken.userId) return false;
+        if (id != authToken.id) return false;
+        return token != null ? token.equals(authToken.token) : authToken.token == null;
     }
 
     @Override
     public int hashCode() {
-        int result = id != 0 ? 5 : 0;
+        int result = userId;
+        result = 31 * result + (int) (id ^ (id >>> 32));
         result = 31 * result + (token != null ? token.hashCode() : 0);
-        result = 31 * result + userId;
         return result;
     }
 
     @Override
     public String toString() {
-        return "VerificationToken{" +
+        return "AuthToken{" +
                 "id=" + id +
                 ", token='" + token + '\'' +
                 ", userId=" + userId +
