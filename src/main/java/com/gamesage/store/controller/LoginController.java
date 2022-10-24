@@ -1,18 +1,15 @@
 package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.User;
+import com.gamesage.store.security.config.auth.AuthProvider;
 import com.gamesage.store.security.service.AuthService;
-import com.gamesage.store.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/login")
@@ -20,11 +17,11 @@ public class LoginController {
 
     private final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final AuthService authService;
-    private final UserService userService;
+    private final AuthProvider ap;
 
-    public LoginController(AuthService authService, UserService userService) {
+    public LoginController(AuthService authService, AuthProvider ap) {
         this.authService = authService;
-        this.userService = userService;
+        this.ap = ap;
     }
 
     @PostMapping
@@ -41,5 +38,10 @@ public class LoginController {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
+    @GetMapping
+    public String showAuth() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return ap.authenticate(authentication).getCredentials().toString();
+    }
 }
 

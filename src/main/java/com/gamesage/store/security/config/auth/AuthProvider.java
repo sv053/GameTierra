@@ -1,14 +1,14 @@
 package com.gamesage.store.security.config.auth;
 
-import com.gamesage.store.domain.model.User;
 import com.gamesage.store.security.model.AuthToken;
 import com.gamesage.store.security.service.AuthService;
 import com.gamesage.store.service.UserService;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.stereotype.Component;
 
+@Component
 public class AuthProvider implements AuthenticationProvider {
     private final AuthService authService;
     private final UserService userService;
@@ -21,18 +21,18 @@ public class AuthProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication auth) throws AuthenticationException {
         String login = auth.getName();
-        String password = String.valueOf(auth.getCredentials());
+        String token = String.valueOf(auth.getCredentials());
 
-        final AuthToken tokenContainer = (AuthToken) auth;
-        final String token = tokenContainer.getValue();
+//        final String tokenContainer = auth.getCredentials();
+//        final String token = tokenContainer.getValue();
+//
+//        if (null == userService.findToken(token)) {
+//            throw new BadCredentialsException("Invalid token - " + token);
+//        }
 
-        if (null == authService.findToken(token)) {
-            throw new BadCredentialsException("Invalid token - " + token);
-        }
+        //  final User existingUser = userService.findByLogin(login);
 
-        final User user = userService.findByLogin(login);
-
-        return new AuthToken(token, user.getId());
+        return authService.provideTokenForCheckedUser(login);
     }
 
     @Override

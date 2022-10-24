@@ -59,6 +59,12 @@ public class AuthService {
         return user;
     }
 
+    public AuthToken provideTokenForCheckedUser(String login) {
+        User user = userService.findByLogin(login);
+        provideWithToken(user.getId()).getValue();
+        return provideWithToken(user.getId());
+    }
+
     public AuthToken saveToken(int userId) {
         return tokenRepository.persistToken(userId);
     }
