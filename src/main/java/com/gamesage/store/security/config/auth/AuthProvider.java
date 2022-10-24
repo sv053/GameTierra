@@ -20,15 +20,17 @@ public class AuthProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication auth) throws AuthenticationException {
+        String login = auth.getName();
+        String password = String.valueOf(auth.getCredentials());
+
         final AuthToken tokenContainer = (AuthToken) auth;
         final String token = tokenContainer.getValue();
-        int userId = 0, tokenId = 0;
 
         if (null == authService.findToken(token)) {
             throw new BadCredentialsException("Invalid token - " + token);
         }
 
-        final User user = userService.findById(userId);
+        final User user = userService.findByLogin(login);
 
         return new AuthToken(token, user.getId());
     }
