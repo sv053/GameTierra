@@ -6,10 +6,10 @@ import java.util.Optional;
 
 public interface TokenRepository {
 
-    Optional<AuthToken> findToken(int userId);
+    Optional<AuthToken> retrieveByUserId(int userId);
 
-    Optional<AuthToken> findToken(String token);
+    Optional<AuthToken> retrieveByValue(String token);
 
-    AuthToken createToken(int userId);
+    AuthToken persistToken(int userId);
 }
 

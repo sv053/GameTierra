@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class AuthService {
 
@@ -29,12 +31,12 @@ public class AuthService {
         this.tokenRepository = tokenRepository;
     }
 
-    public AuthToken findToken(int userId) {
-        return tokenRepository.findToken(userId).orElseThrow(() -> new EntityNotFoundException(String.valueOf(userId)));
+    public Optional<AuthToken> findToken(int userId) {
+        return tokenRepository.retrieveByUserId(userId);
     }
 
     public AuthToken findToken(String token) {
-        return tokenRepository.findToken(token).orElseThrow(() -> new EntityNotFoundException(String.valueOf(token)));
+        return tokenRepository.retrieveByValue(token).orElseThrow(() -> new EntityNotFoundException(String.valueOf(token)));
     }
 
     public boolean checkIfUserExists(String login, String pass) {
@@ -43,22 +45,22 @@ public class AuthService {
     }
 
     private AuthToken provideWithToken(int userId) {
-        AuthToken token = findToken(userId);
-        if (null == token) {
-            token = updateToken(userId);
+        Optional<AuthToken> token = findToken(userId);
+        AuthToken createdToken = new AuthToken(userId);
+        if (!token.isPresent()) {
+            createdToken = saveToken(userId);
         }
-        return token;
+        return createdToken;
     }
 
     public User provideCheckedUserWithToken(String login) {
         User user = userService.findByLogin(login);
-        updateToken(user.getId());
-        provideWithToken(user.getId()).getToken();
+        provideWithToken(user.getId()).getValue();
         return user;
     }
 
-    public AuthToken updateToken(int userId) {
-        return tokenRepository.createToken(userId);
+    public AuthToken saveToken(int userId) {
+        return tokenRepository.persistToken(userId);
     }
 }
 

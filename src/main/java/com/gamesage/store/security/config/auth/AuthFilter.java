@@ -47,7 +47,7 @@ public class AuthFilter extends AbstractAuthenticationProcessingFilter {
             return null;
         }
 
-        AuthToken token = new AuthToken(Integer.parseInt(httpServletResponse.getHeader("")));
+        AuthToken token = new AuthToken(Integer.parseInt(httpServletResponse.getHeader("x-auth-token")));
         token.setDetails(authenticationDetailsSource.buildDetails(httpServletRequest));
 
         return this.getAuthenticationManager().authenticate(token);

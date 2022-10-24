@@ -3,53 +3,40 @@ package com.gamesage.store.security.model;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
 import java.sql.Timestamp;
+import java.util.Objects;
 import java.util.UUID;
 
 public class AuthToken extends AbstractAuthenticationToken {
 
     private final int userId;
-    private long id;
-    private String token;
+    private final String value;
 
     public AuthToken(int userId) {
         super(null);
-        this.token = generateToken();
+        this.value = generateToken();
         this.userId = userId;
         setAuthenticated(false);
     }
 
-    public AuthToken(long id, String token, int userId) {
+    public AuthToken(String value, int userId) {
         super(null);
-        this.id = id;
-        this.token = token;
+        this.value = value;
         this.userId = userId;
         setAuthenticated(true);
     }
 
     @Override
     public Object getCredentials() {
-        return getToken();
+        return getValue();
     }
 
     @Override
     public Object getPrincipal() {
-        return getId();
+        return getUserId();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken() {
-        this.token = generateToken();
+    public String getValue() {
+        return value;
     }
 
     public int getUserId() {
@@ -57,11 +44,7 @@ public class AuthToken extends AbstractAuthenticationToken {
     }
 
     public String generateToken() {
-        return new StringBuilder()
-                .append(new Timestamp(System.currentTimeMillis()).getTime())
-                .append("-")
-                .append(UUID.randomUUID())
-                .toString();
+        return String.format("%s - %s", new Timestamp(System.currentTimeMillis()).getTime(), UUID.randomUUID());
     }
 
     @Override
@@ -72,23 +55,20 @@ public class AuthToken extends AbstractAuthenticationToken {
         AuthToken authToken = (AuthToken) o;
 
         if (userId != authToken.userId) return false;
-        if (id != authToken.id) return false;
-        return token != null ? token.equals(authToken.token) : authToken.token == null;
+        return Objects.equals(value, authToken.value);
     }
 
     @Override
     public int hashCode() {
         int result = userId;
-        result = 31 * result + (int) (id ^ (id >>> 32));
-        result = 31 * result + (token != null ? token.hashCode() : 0);
+        result = 31 * result + (value != null ? value.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
         return "AuthToken{" +
-                "id=" + id +
-                ", token='" + token + '\'' +
+                ", token='" + value + '\'' +
                 ", userId=" + userId +
                 '}';
     }

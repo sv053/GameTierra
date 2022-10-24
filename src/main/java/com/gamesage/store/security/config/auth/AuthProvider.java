@@ -21,7 +21,7 @@ public class AuthProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication auth) throws AuthenticationException {
         final AuthToken tokenContainer = (AuthToken) auth;
-        final String token = tokenContainer.getToken();
+        final String token = tokenContainer.getValue();
         int userId = 0, tokenId = 0;
 
         if (null == authService.findToken(token)) {
@@ -30,7 +30,7 @@ public class AuthProvider implements AuthenticationProvider {
 
         final User user = userService.findById(userId);
 
-        return new AuthToken(tokenId, token, user.getId());
+        return new AuthToken(token, user.getId());
     }
 
     @Override

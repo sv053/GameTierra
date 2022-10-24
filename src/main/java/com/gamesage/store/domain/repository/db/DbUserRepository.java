@@ -25,18 +25,10 @@ public class DbUserRepository implements UserFunctionRepository {
             "tier_id, password, name AS tl, tier.percentage AS tp FROM user " +
             "LEFT JOIN tier " +
             "on user.tier_id = tier.id ";
-    private static final String SELECT_TOKEN_BY_USERID_QUERY = "SELECT id, token, " +
-            "FROM auth_token " +
-            "WHERE userId = ?";
-    private static final String SELECT_TOKEN_QUERY = "SELECT id, userId, " +
-            "FROM auth_token " +
-            "WHERE token = ?";
     private static final String INSERT_USER_QUERY = "INSERT INTO user (login, balance, tier_id, password) " +
             "VALUES ( ?, ?, ?, ?) ";
     private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ? " +
             "WHERE id = ?";
-    private static final String INSERT_USER_TOKEN = "INSERT INTO auth_token (id, token, user_id) " +
-            " VALUES (?, ?, ?) ";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> userRowMapper;
     private final BCryptPasswordEncoder encoder;

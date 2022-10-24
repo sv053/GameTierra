@@ -1,6 +1,5 @@
 package com.gamesage.store.security.config;
 
-import com.gamesage.store.security.config.auth.AuthFilter;
 import com.gamesage.store.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,12 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.util.matcher.AndRequestMatcher;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,15 +38,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http
-                .addFilterBefore(createCustomFilter(), AnonymousAuthenticationFilter.class)
+                //   .addFilterBefore(createCustomFilter(), AnonymousAuthenticationFilter.class)
                 .csrf().disable()
                 .httpBasic()
                 .and()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/login", "/users")
-                .permitAll()
-                .and()
-                .authorizeRequests()
+//                .antMatchers(HttpMethod.POST, "/login", "/users")
+//                .permitAll()
+//                .and()
+//                .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/games", "/games/**")
                 .permitAll()
                 .and()
@@ -62,21 +56,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .permitAll()
-                .logoutSuccessUrl("/games")
+                //  .logoutSuccessUrl("/games")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID");
     }
 
-    protected AbstractAuthenticationProcessingFilter createCustomFilter() throws Exception {
-        AuthFilter filter = new AuthFilter(new NegatedRequestMatcher(
-                new AndRequestMatcher(
-                        new AntPathRequestMatcher("/login"),
-                        new AntPathRequestMatcher("/games")
-                )
-        ));
-        filter.setAuthenticationManager(authenticationManagerBean());
-        return filter;
-    }
+//    protected AbstractAuthenticationProcessingFilter createCustomFilter() throws Exception {
+//        AuthFilter filter = new AuthFilter(new NegatedRequestMatcher(
+//                new AndRequestMatcher(
+//                        new AntPathRequestMatcher("/login"),
+//                        new AntPathRequestMatcher("/games")
+//                )
+//        ));
+//        filter.setAuthenticationManager(authenticationManagerBean());
+//        return filter;
+//    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) {
