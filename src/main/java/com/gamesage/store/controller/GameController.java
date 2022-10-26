@@ -28,7 +28,8 @@ public class GameController {
 
     @GetMapping
     public List<Game> findAllGames() {
-        logger.error("credentials are " + SecurityContextHolder.getContext().getAuthentication().getCredentials().toString());
+        var v = SecurityContextHolder.getContext();
+        logger.error("credentials are " + v.getAuthentication().getCredentials().toString());
         return gameService.findAll();
     }
 

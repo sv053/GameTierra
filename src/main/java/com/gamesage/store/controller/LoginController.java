@@ -11,6 +11,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("/login")
 public class LoginController {
@@ -24,19 +27,44 @@ public class LoginController {
         this.ap = ap;
     }
 
-    @PostMapping
-    public ResponseEntity<User> login(@RequestBody User user) {
+    @PostMapping("/how")
+    public ResponseEntity<User> login(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
         User existingUser;
         if (authService.checkIfUserExists(user.getLogin(), user.getPassword())) {
 
-            existingUser = authService.provideCheckedUserWithToken(user.getLogin());
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             logger.error("currentUser " + authentication.getPrincipal().toString());
 
-            return new ResponseEntity<>(existingUser, HttpStatus.OK);
+            return ResponseEntity
+                    .ok()
+                    .header("x-auth-token", authentication.getCredentials().toString())
+                    .body((User) authentication.getPrincipal());
         }
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
+
+    @PostMapping("/")
+    public Authentication login1(@RequestBody User user) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        return authentication;
+    }
+
+//    @PostMapping("/")
+//    public AuthToken login(@RequestBody User user) {
+//        AuthToken authToken;
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//        if (authService.checkIfUserExists(user.getLogin(), user.getPassword())) {
+//
+//            existingUser = authService.provideTokenForCheckedUser(user.getLogin());
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//            logger.error("currentUser " + authentication.getPrincipal().toString());
+//
+//            return new ResponseEntity<>(authToken, HttpStatus.OK);
+//        }
+//        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//    }
 
     @GetMapping
     public String showAuth() {

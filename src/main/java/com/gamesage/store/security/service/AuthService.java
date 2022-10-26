@@ -44,24 +44,31 @@ public class AuthService {
         return encoder.matches(pass, storedPass);
     }
 
-    private AuthToken provideWithToken(int userId) {
-        Optional<AuthToken> token = findToken(userId);
-        AuthToken createdToken = new AuthToken(userId);
-        if (!token.isPresent()) {
-            createdToken = saveToken(userId);
-        }
-        return createdToken;
+    public AuthToken provideNewToken(int userId) {
+        return saveToken(userId);
     }
 
-    public User provideCheckedUserWithToken(String login) {
+    public AuthToken provideNewToken(String login) {
         User user = userService.findByLogin(login);
-        provideWithToken(user.getId()).getValue();
-        return user;
+        return provideNewToken(user.getId());
     }
+
+    private AuthToken provideWithToken(int userId) {
+        Optional<AuthToken> token = findToken(userId);
+        if (!token.isPresent()) {
+            return provideNewToken(userId);
+        }
+        return token.get();
+    }
+//
+//    public User provideCheckedUserWithToken(String login) {
+//        User user = userService.findByLogin(login);
+//        provideWithToken(user.getId()).getValue();
+//        return user;
+//    }
 
     public AuthToken provideTokenForCheckedUser(String login) {
         User user = userService.findByLogin(login);
-        provideWithToken(user.getId()).getValue();
         return provideWithToken(user.getId());
     }
 
