@@ -58,12 +58,11 @@ public class DbTokenRepository implements TokenRepository {
     }
 
     @Override
-    public AuthToken persistToken(int userId) {
-        AuthToken token = new AuthToken(userId);
+    public AuthToken persistToken(AuthToken authToken) {
         jdbcTemplate.update(INSERT_USER_TOKEN,
-                token.getValue(),
-                token.getUserId());
-        return token;
+                authToken.getValue(),
+                authToken.getUserId());
+        return authToken;
     }
 
     @Component

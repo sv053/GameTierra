@@ -1,27 +1,35 @@
 package com.gamesage.store.security.model;
 
-import org.springframework.security.authentication.AbstractAuthenticationToken;
+import com.gamesage.store.domain.model.User;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.UUID;
 
-public class AuthToken extends AbstractAuthenticationToken {
+public class AuthToken extends UsernamePasswordAuthenticationToken {
 
     private final int userId;
     private final String value;
 
     public AuthToken(int userId) {
-        super(null);
+        super(null, null);
         this.value = generateToken();
         this.userId = userId;
         setAuthenticated(false);
     }
 
     public AuthToken(String value, int userId) {
-        super(null);
+        super(null, null);
         this.value = value;
         this.userId = userId;
+        setAuthenticated(true);
+    }
+
+    public AuthToken(User user) {
+        super(user.getLogin(), user.getPassword());
+        this.value = generateToken();
+        this.userId = user.getId();
         setAuthenticated(true);
     }
 

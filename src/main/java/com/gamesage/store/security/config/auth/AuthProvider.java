@@ -26,20 +26,21 @@ public class AuthProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication auth) throws AuthenticationException {
-        String login = auth.getName();
+        String login = auth.getPrincipal().toString();
         String password = String.valueOf(auth.getCredentials());
 
-        User user = userService.findByLogin("admin");//(login);
+        User user = userService.findByLogin(login);//(login);
         AuthToken authToken = authService.provideTokenForCheckedUser(login);
 
         UserDetails userDetails = new AppUser(user);
 
-//        if(encoder.matches(password, user.getPassword())) {
-//            return authService.provideTokenForCheckedUser(login);
-//        }
+        if (!encoder.matches(password, user.getPassword())) {
+            return null;
+        }
 
         authToken.setAuthenticated(true);
         authToken.setDetails(userDetails);
+        authService.saveToken(authToken);
         return authToken;
     }
 

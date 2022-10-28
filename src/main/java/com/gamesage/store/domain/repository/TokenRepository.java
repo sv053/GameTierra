@@ -10,6 +10,6 @@ public interface TokenRepository {
 
     Optional<AuthToken> retrieveByValue(String token);
 
-    AuthToken persistToken(int userId);
+    AuthToken persistToken(AuthToken authToken);
 }
 

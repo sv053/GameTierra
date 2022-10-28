@@ -1,9 +1,11 @@
 package com.gamesage.store.security.config.auth;
 
 import com.gamesage.store.security.model.AuthToken;
+import com.gamesage.store.security.service.AuthService;
 import org.h2.util.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -18,25 +20,28 @@ import java.util.Collections;
 public class AuthFilter extends UsernamePasswordAuthenticationFilter {
     public static final String TOKEN_HEADER = "x-auth-token";
     private final AuthProvider authProvider;
+    private final AuthService authService;
 
-    public AuthFilter(AuthProvider authProvider) {
+    public AuthFilter(AuthProvider authProvider, AuthService authService) {
         super(null);
         this.authProvider = authProvider;
+        this.authService = authService;
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
+        var r = request;
         final String req = getTokenValue((HttpServletRequest) request);
-        final String token = ((HttpServletRequest) request).getHeader("x-auth-token");
-        // final String token1 = authProvider
+        final String token = ((HttpServletRequest) request).getHeader(TOKEN_HEADER);
         if (StringUtils.isNullOrEmpty(token)) {
             chain.doFilter(request, response);
             return;
         }
-//        this.setAuthenticationSuccessHandler((request1, response1, authentication) -> {
-//            chain.doFilter(request1, response1);
-//        });
+
+        this.setAuthenticationSuccessHandler((request1, response1, authentication) -> {
+            chain.doFilter(request1, response1);
+        });
 
         super.doFilter(request, response, chain);
     }
@@ -49,7 +54,7 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
             return null;
         }
 
-        AuthToken token = new AuthToken(1);// httpServletResponse.getHeader("x-auth-token"));
+        AuthToken token = authService.provideTokenForCheckedUser(SecurityContextHolder.getContext().getAuthentication().getName());// httpServletResponse.getHeader("x-auth-token"));
         token.setDetails(authenticationDetailsSource.buildDetails(httpServletRequest));
 
         return this.getAuthenticationManager().authenticate(token);
