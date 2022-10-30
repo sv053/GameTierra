@@ -1,15 +1,15 @@
 package com.gamesage.store.domain.repository;
 
-import com.gamesage.store.security.model.AuthToken;
+import com.gamesage.store.domain.repository.model.AuthTokenEntity;
 
 import java.util.Optional;
 
 public interface TokenRepository {
 
-    Optional<AuthToken> retrieveByUserId(int userId);
+    Optional<AuthTokenEntity> retrieveByUserId(int userId);
 
-    Optional<AuthToken> retrieveByValue(String token);
+    Optional<AuthTokenEntity> retrieveByValue(String token);
 
-    AuthToken persistToken(AuthToken authToken);
+    AuthTokenEntity persistToken(AuthTokenEntity authTokenEntity);
 }
 

@@ -3,15 +3,13 @@ package com.gamesage.store.security.service;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.db.DbTokenRepository;
 import com.gamesage.store.domain.repository.db.DbUserRepository;
-import com.gamesage.store.exception.EntityNotFoundException;
-import com.gamesage.store.security.model.AuthToken;
 import com.gamesage.store.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -20,7 +18,6 @@ public class AuthService {
     private final BCryptPasswordEncoder encoder;
     private final UserService userService;
     private final DbTokenRepository tokenRepository;
-
 
     @Autowired
     public AuthService(UserDetailsService userDetailsService, BCryptPasswordEncoder encoder, DbUserRepository userRepository,
@@ -31,39 +28,11 @@ public class AuthService {
         this.tokenRepository = tokenRepository;
     }
 
-    public Optional<AuthToken> findToken(int userId) {
-        return tokenRepository.retrieveByUserId(userId);
-    }
-
-    public AuthToken findToken(String token) {
-        return tokenRepository.retrieveByValue(token).orElseThrow(() -> new EntityNotFoundException(String.valueOf(token)));
-    }
-
-    public boolean checkIfUserExists(String login, String pass) {
-        String storedPass = userDetailsService.loadUserByUsername(login).getPassword();
-        return encoder.matches(pass, storedPass);
-    }
-
-    public AuthToken provideNewToken(String login) {
+    public User findUser(String login, String pass) {
         User user = userService.findByLogin(login);
-        return provideNewToken(login);
-    }
-
-    private AuthToken provideWithToken(int userId) {
-        Optional<AuthToken> token = findToken(userId);
-        if (!token.isPresent()) {
-            return new AuthToken(userId);
-        }
-        return token.get();
-    }
-
-    public AuthToken provideTokenForCheckedUser(String login) {
-        User user = userService.findByLogin(login);
-        return provideWithToken(user.getId());
-    }
-
-    public AuthToken saveToken(AuthToken authToken) {
-        return tokenRepository.persistToken(authToken);
+        if (encoder.matches(pass, user.getPassword()))
+            return user;
+        throw new UsernameNotFoundException("Not found");
     }
 }
 

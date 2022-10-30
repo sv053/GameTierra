@@ -1,7 +1,7 @@
 package com.gamesage.store.domain.repository.db;
 
 import com.gamesage.store.domain.repository.TokenRepository;
-import com.gamesage.store.security.model.AuthToken;
+import com.gamesage.store.domain.repository.model.AuthTokenEntity;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -18,11 +18,12 @@ public class DbTokenRepository implements TokenRepository {
     private static final String SELECT_TOKEN_BY_USERID_QUERY = "SELECT token_value " +
             "FROM token " +
             "WHERE user_id = ?";
-    private static final String SELECT_TOKEN_QUERY = "SELECT user_id " +
+    private static final String SELECT_TOKEN_QUERY = "SELECT user_id, token_value " +
             "FROM token " +
             "WHERE token_value = ?";
     private static final String INSERT_USER_TOKEN = "INSERT INTO token (token_value, user_id) " +
             " VALUES (?, ?) ";
+    private static final String DELETE_TOKEN = "DELETE FROM token WHERE user_id = ?";
     private final JdbcTemplate jdbcTemplate;
     private final TokenRowMapper tokenRowMapper;
 
@@ -32,7 +33,7 @@ public class DbTokenRepository implements TokenRepository {
     }
 
     @Override
-    public Optional<AuthToken> retrieveByUserId(int userId) {
+    public Optional<AuthTokenEntity> retrieveByUserId(int userId) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
                     SELECT_TOKEN_BY_USERID_QUERY,
@@ -45,7 +46,7 @@ public class DbTokenRepository implements TokenRepository {
     }
 
     @Override
-    public Optional<AuthToken> retrieveByValue(String token) {
+    public Optional<AuthTokenEntity> retrieveByValue(String token) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
                     SELECT_TOKEN_QUERY,
@@ -58,21 +59,22 @@ public class DbTokenRepository implements TokenRepository {
     }
 
     @Override
-    public AuthToken persistToken(AuthToken authToken) {
+    public AuthTokenEntity persistToken(AuthTokenEntity authTokenEntity) {
+        jdbcTemplate.update(DELETE_TOKEN, authTokenEntity.getUserId());
         jdbcTemplate.update(INSERT_USER_TOKEN,
-                authToken.getValue(),
-                authToken.getUserId());
-        return authToken;
+                authTokenEntity.getValue(),
+                authTokenEntity.getUserId());
+        return authTokenEntity;
     }
 
     @Component
-    static class TokenRowMapper implements RowMapper<AuthToken> {
+    static class TokenRowMapper implements RowMapper<AuthTokenEntity> {
 
         @Override
-        public AuthToken mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return new AuthToken(
-                    rs.getString("token_value"),
-                    rs.getInt("user_id")
+        public AuthTokenEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
+            return new AuthTokenEntity(
+                    rs.getInt("user_id"),
+                    rs.getString("token_value")
             );
         }
     }

@@ -1,23 +1,16 @@
 package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.security.config.auth.AuthProvider;
-import com.gamesage.store.security.model.AuthToken;
+import com.gamesage.store.domain.repository.model.AuthTokenEntity;
 import com.gamesage.store.security.service.AuthService;
-import com.gamesage.store.service.UserService;
+import com.gamesage.store.service.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/login")
@@ -25,31 +18,23 @@ public class LoginController {
 
     private final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final AuthService authService;
-    public static final String TOKEN_HEADER = "x-auth-token";
-    private final UserService userService;
-    private final AuthProvider authProvider;
+    public static final String TOKEN_HEADER = "X-Auth-Token";
+    private final TokenService tokenService;
 
 
-    public LoginController(AuthService authService, AuthProvider authProvider, UserService userService) {
+    public LoginController(AuthService authService, TokenService tokenService) {
         this.authService = authService;
-        this.authProvider = authProvider;
-        this.userService = userService;
+        this.tokenService = tokenService;
     }
 
     @PostMapping
-    public ResponseEntity<User> login(@RequestBody User user, HttpServletRequest request) {
-        AuthToken authToken = new AuthToken(user);
-        Authentication auth = authProvider.authenticate(authToken);
-
-        SecurityContext sc = SecurityContextHolder.getContext();
-        sc.setAuthentication(auth);
-        HttpSession session = request.getSession(true);
-        session.setAttribute(TOKEN_HEADER, sc);
-
+    public ResponseEntity<User> login(@RequestBody User user) {
+        User authenticated = authService.findUser(user.getLogin(), user.getPassword());
+        AuthTokenEntity tokenEntity = tokenService.generateToken(authenticated);
         return ResponseEntity
                 .ok()
-                .header(TOKEN_HEADER, authToken.getValue())
-                .body(user);
+                .header(TOKEN_HEADER, tokenEntity.getValue())
+                .body(authenticated);
     }
 }
 

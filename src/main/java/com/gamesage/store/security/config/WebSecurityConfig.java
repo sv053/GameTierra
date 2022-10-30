@@ -1,98 +1,66 @@
 package com.gamesage.store.security.config;
 
-import com.gamesage.store.security.config.auth.AuthFilter;
-import com.gamesage.store.security.config.auth.AuthProvider;
-import com.gamesage.store.security.service.AuthService;
-import com.gamesage.store.service.UserService;
+import com.gamesage.store.security.filter.FilterChainExceptionHandler;
+import com.gamesage.store.security.filter.TokenPreAuthenticatedProcessingFilter;
+import com.gamesage.store.security.service.TokenAuthenticatedUserDetailsService;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
+
+import javax.servlet.Filter;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(
-        prePostEnabled = true,
-        securedEnabled = true,
-        jsr250Enabled = true)
-//@EnableWebFluxSecurity
-//@EnableReactiveMethodSecurity
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final UserService userService;
-    private final BCryptPasswordEncoder encoder;
-    private final AuthProvider authProvider;
-    private final AuthService authService;
+    private final TokenAuthenticatedUserDetailsService tokenAuthenticatedUserDetailsService;
+    private final FilterChainExceptionHandler exceptionHandler;
 
-    public WebSecurityConfig(UserService userService, BCryptPasswordEncoder encoder, AuthProvider authProvider, AuthService authService) {
-        this.userService = userService;
-        this.encoder = encoder;
-        this.authProvider = authProvider;
-        this.authService = authService;
+    public WebSecurityConfig(TokenAuthenticatedUserDetailsService tokenAuthenticatedUserDetailsService, FilterChainExceptionHandler exceptionHandler) {
+        this.tokenAuthenticatedUserDetailsService = tokenAuthenticatedUserDetailsService;
+        this.exceptionHandler = exceptionHandler;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
-        http
-                .csrf().disable()
+        http.csrf()
+                .disable()
                 .authorizeRequests()
-                .antMatchers("/login")
-                .permitAll()
+                .antMatchers("/login").anonymous()
+                .antMatchers(HttpMethod.GET, "/users", "/cart", "/users/**", "/cart/**").authenticated()
                 .and()
-                .addFilterBefore(new AuthFilter(authProvider, authService), UsernamePasswordAuthenticationFilter.class)
-                .authorizeRequests()
-                .anyRequest()
-                .fullyAuthenticated()
-                .and()
-                .logout()
-                .permitAll();
+                .addFilter(tokenAuthFilter())
+                .addFilterBefore(exceptionHandler, LogoutFilter.class);
     }
 
-//    public AuthenticationManager usersAuthenticationManager() {
-//        return authentication -> {
-//            User user = userService.findByLogin(authentication.getName());
-//            if (user != null) {
-//                return new UsernamePasswordAuthenticationToken(user, null);
-//            }
-//            throw new EntityNotFoundException(authentication.getName());
-//        };
-//    }
-//
-//    protected AuthenticationManagerResolver<HttpServletRequest> resolver() {
-//        return request -> {
-//            if (request.getPathInfo().startsWith("/users")) {
-//                return usersAuthenticationManager();
-//            }
-//            return usersAuthenticationManager();
-//        };
-//    }
-//
-//    private AuthenticationFilter authenticationFilter() {
-//        AuthenticationFilter filter = new AuthenticationFilter(
-//                resolver(),
-//                authenticationFilter().getAuthenticationConverter());
-//        filter.setSuccessHandler((request, response, auth) -> {});
-//        return filter;
-//    }
-//
-//    @Bean
-//    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-//        return http
-//                .authorizeExchange()
-//                .pathMatchers("/**")
-//                .authenticated()
-//                .and()
-//                .httpBasic()
-//                .disable()
-//                .addFilterAfter(
-//                        new AuthenticationWebFilter((ReactiveAuthenticationManager) resolver()),
-//                        SecurityWebFiltersOrder.REACTOR_CONTEXT
-//                )
-//                .build();
-//    }
+    @Bean
+    public TokenPreAuthenticatedProcessingFilter tokenPreAuthenticatedProcessingFilter() {
+        TokenPreAuthenticatedProcessingFilter tokenPreAuthenticatedFilter = new TokenPreAuthenticatedProcessingFilter();
+        tokenPreAuthenticatedFilter.setAuthenticationManager(tokenAuthenticationManager());
+        return tokenPreAuthenticatedFilter;
+    }
+
+    @Bean
+    public Filter tokenAuthFilter() {
+        TokenPreAuthenticatedProcessingFilter filter = new TokenPreAuthenticatedProcessingFilter();
+        filter.setAuthenticationManager(tokenAuthenticationManager());
+        return filter;
+    }
+
+    @Bean
+    public AuthenticationManager tokenAuthenticationManager() {
+        PreAuthenticatedAuthenticationProvider preAuthProvider = new PreAuthenticatedAuthenticationProvider();
+        preAuthProvider.setPreAuthenticatedUserDetailsService(tokenAuthenticatedUserDetailsService);
+        return new ProviderManager(preAuthProvider);
+    }
 }
 
