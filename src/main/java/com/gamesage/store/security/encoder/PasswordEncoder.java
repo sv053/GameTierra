@@ -1,4 +1,4 @@
-package com.gamesage.store.security.config;
+package com.gamesage.store.security.encoder;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

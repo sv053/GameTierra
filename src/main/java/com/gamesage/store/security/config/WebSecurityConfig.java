@@ -1,16 +1,15 @@
 package com.gamesage.store.security.config;
 
-import com.gamesage.store.security.config.auth.AuthFilter;
-import com.gamesage.store.security.config.auth.AuthProvider;
-import com.gamesage.store.security.service.AuthService;
+import com.gamesage.store.security.auth.filter.AuthenticationLoggingFilter;
+import com.gamesage.store.security.auth.filter.RequestValidationFilter;
+import com.gamesage.store.security.auth.manager.AuthManager;
+import com.gamesage.store.security.auth.provider.AuthProvider;
 import com.gamesage.store.service.UserService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -18,81 +17,44 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
         prePostEnabled = true,
         securedEnabled = true,
         jsr250Enabled = true)
-//@EnableWebFluxSecurity
-//@EnableReactiveMethodSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final UserService userService;
-    private final BCryptPasswordEncoder encoder;
     private final AuthProvider authProvider;
-    private final AuthService authService;
+    private final AuthManager authManager;
+    private final RequestValidationFilter requestValidationFilter;
+    private final AuthenticationLoggingFilter authenticationLoggingFilter;
+    private final UserService userService;
 
-    public WebSecurityConfig(UserService userService, BCryptPasswordEncoder encoder, AuthProvider authProvider, AuthService authService) {
+    public WebSecurityConfig(AuthProvider authProvider, AuthManager authManager, UserService userService,
+                             RequestValidationFilter requestValidationFilter, AuthenticationLoggingFilter authenticationLoggingFilter) {
         this.userService = userService;
-        this.encoder = encoder;
         this.authProvider = authProvider;
-        this.authService = authService;
+        this.authManager = authManager;
+        this.requestValidationFilter = requestValidationFilter;
+        this.authenticationLoggingFilter = authenticationLoggingFilter;
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
-
+    protected void configure(final HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/login")
-                .permitAll()
-                .and()
-                .addFilterBefore(new AuthFilter(authProvider, authService), UsernamePasswordAuthenticationFilter.class)
+                //  .authenticationProvider(authProvider)
+                //  .addFilterBefore(requestValidationFilter, BasicAuthenticationFilter.class)
+                //  .addFilterAfter(authenticationLoggingFilter, BasicAuthenticationFilter.class)
                 .authorizeRequests()
                 .anyRequest()
-                .fullyAuthenticated()
-                .and()
-                .logout()
                 .permitAll();
     }
 
-//    public AuthenticationManager usersAuthenticationManager() {
-//        return authentication -> {
-//            User user = userService.findByLogin(authentication.getName());
+//    public Authentication usersAuthenticationManager() {
+//        AuthManager authManager = new AuthManager();
+//        try {
+//            User user = userService.findByLogin(authManager.authenticate());
 //            if (user != null) {
-//                return new UsernamePasswordAuthenticationToken(user, null);
+//                return authManager.authenticate(new AuthToken(user));
 //            }
-//            throw new EntityNotFoundException(authentication.getName());
-//        };
-//    }
-//
-//    protected AuthenticationManagerResolver<HttpServletRequest> resolver() {
-//        return request -> {
-//            if (request.getPathInfo().startsWith("/users")) {
-//                return usersAuthenticationManager();
-//            }
-//            return usersAuthenticationManager();
-//        };
-//    }
-//
-//    private AuthenticationFilter authenticationFilter() {
-//        AuthenticationFilter filter = new AuthenticationFilter(
-//                resolver(),
-//                authenticationFilter().getAuthenticationConverter());
-//        filter.setSuccessHandler((request, response, auth) -> {});
-//        return filter;
-//    }
-//
-//    @Bean
-//    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-//        return http
-//                .authorizeExchange()
-//                .pathMatchers("/**")
-//                .authenticated()
-//                .and()
-//                .httpBasic()
-//                .disable()
-//                .addFilterAfter(
-//                        new AuthenticationWebFilter((ReactiveAuthenticationManager) resolver()),
-//                        SecurityWebFiltersOrder.REACTOR_CONTEXT
-//                )
-//                .build();
-//    }
+//        } catch (Exception e) {
+//            throw new EntityNotFoundException(e.getMessage());
+//        }
 }
 

@@ -7,7 +7,6 @@ import com.gamesage.store.exception.EntityNotFoundException;
 import com.gamesage.store.security.model.AuthToken;
 import com.gamesage.store.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +15,14 @@ import java.util.Optional;
 @Service
 public class AuthService {
 
-    private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder encoder;
     private final UserService userService;
     private final DbTokenRepository tokenRepository;
 
 
     @Autowired
-    public AuthService(UserDetailsService userDetailsService, BCryptPasswordEncoder encoder, DbUserRepository userRepository,
+    public AuthService(BCryptPasswordEncoder encoder, DbUserRepository userRepository,
                        UserService userService, DbTokenRepository tokenRepository) {
-        this.userDetailsService = userDetailsService;
         this.encoder = encoder;
         this.userService = userService;
         this.tokenRepository = tokenRepository;
@@ -40,7 +37,7 @@ public class AuthService {
     }
 
     public boolean checkIfUserExists(String login, String pass) {
-        String storedPass = userDetailsService.loadUserByUsername(login).getPassword();
+        String storedPass = userService.loadUserByUsername(login).getPassword();
         return encoder.matches(pass, storedPass);
     }
 
