@@ -4,6 +4,7 @@ import com.gamesage.store.domain.model.User;
 import com.gamesage.store.paymentapi.PaymentRequest;
 import com.gamesage.store.paymentapi.PaymentResponse;
 import com.gamesage.store.service.UserService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -20,11 +21,13 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("#returnObject.login == authentication.name or hasAuthority('ADMIN')")
     public User findUserById(@PathVariable Integer id) {
         return userService.findById(id);
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public List<User> findAllUsers() {
         System.out.println();
         return userService.findAll();

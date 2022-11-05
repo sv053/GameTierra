@@ -4,9 +4,13 @@ import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.db.DbTokenRepository;
 import com.gamesage.store.domain.repository.db.DbUserRepository;
 import com.gamesage.store.exception.EntityNotFoundException;
+import com.gamesage.store.security.auth.HeaderName;
 import com.gamesage.store.security.model.AuthToken;
 import com.gamesage.store.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +40,7 @@ public class AuthService {
         return tokenRepository.retrieveByValue(token).orElseThrow(() -> new EntityNotFoundException(String.valueOf(token)));
     }
 
-    public boolean checkIfUserExists(String login, String pass) {
+    public boolean userExists(String login, String pass) {
         String storedPass = userService.loadUserByUsername(login).getPassword();
         return encoder.matches(pass, storedPass);
     }
@@ -44,6 +48,21 @@ public class AuthService {
     public AuthToken provideNewToken(String login) {
         User user = userService.findByLogin(login);
         return provideNewToken(login);
+    }
+
+    public ResponseEntity registerUser(User user) {
+        AuthToken token = null;
+        HttpHeaders responseHeaders = new HttpHeaders();
+        boolean userExists = userExists(user.getLogin(), user.getPassword());
+        if (userExists) {
+            token = provideTokenForCheckedUser(user.getId());
+            saveToken(token);
+            responseHeaders.set(HeaderName.TOKEN_HEADER, token.getValue());
+        }
+        return userExists ? ResponseEntity.ok()
+                .headers(responseHeaders)
+                .body(token.getValue()) :
+                ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     private AuthToken provideWithToken(int userId) {
@@ -54,9 +73,8 @@ public class AuthService {
         return token.get();
     }
 
-    public AuthToken provideTokenForCheckedUser(String login) {
-        User user = userService.findByLogin(login);
-        return provideWithToken(user.getId());
+    public AuthToken provideTokenForCheckedUser(int id) {
+        return provideWithToken(id);
     }
 
     public AuthToken saveToken(AuthToken authToken) {

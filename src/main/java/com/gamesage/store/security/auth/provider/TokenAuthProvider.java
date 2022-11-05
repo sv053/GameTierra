@@ -1,47 +1,49 @@
 package com.gamesage.store.security.auth.provider;
 
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.security.auth.HeaderName;
-import com.gamesage.store.security.auth.manager.AuthManager;
 import com.gamesage.store.security.model.AuthToken;
 import com.gamesage.store.security.service.AuthService;
 import com.gamesage.store.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
 
 @Component
-public class AuthProvider implements AuthenticationProvider {
-    private final AuthService authService;
-    private final UserService userService;
+public class TokenAuthProvider implements AuthenticationProvider {
+    @Autowired
     private final BCryptPasswordEncoder encoder;
+    @Autowired
+    private AuthService authService;
+    @Autowired
+    private UserService userService;
 
-    public AuthProvider(AuthService authService, UserService userService, BCryptPasswordEncoder encoder, AuthManager authManager) {
+    public TokenAuthProvider(AuthService authService, UserService userService, BCryptPasswordEncoder encoder) {
         this.authService = authService;
         this.userService = userService;
         this.encoder = encoder;
     }
 
     @Override
-    public Authentication authenticate(Authentication auth) throws AuthenticationException {
-        final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        final HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
-        String userLogin = auth.getName();
-        String password = auth.getCredentials().toString();
-        if (null == request.getHeader(HeaderName.TOKEN_HEADER)) {
-            UserDetails persistentUser = userService.loadUserByUsername(userLogin);
-            return checkPassword(persistentUser, password);
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        String username = authentication.getName();
+        String password = authentication.getCredentials().toString();
+        User persistentUser = userService.findByLogin(username);
+
+        if (encoder.matches(password, persistentUser.getPassword())) {
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            AuthToken authToken = new AuthToken(persistentUser);
+            authToken.setDetails(userService.loadUserByUsername(username));
+
+            return authToken;
         }
-        throw new BadCredentialsException("Bad credentials");
+        return authentication;
     }
 
     @Override

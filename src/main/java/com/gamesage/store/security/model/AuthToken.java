@@ -1,5 +1,6 @@
 package com.gamesage.store.security.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gamesage.store.domain.model.User;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
@@ -10,13 +11,14 @@ import java.util.UUID;
 public class AuthToken extends AbstractAuthenticationToken {
 
     private final int userId;
+    @JsonProperty
     private final String value;
 
     public AuthToken(int userId) {
         super(null);
         this.value = generateToken();
         this.userId = userId;
-        setAuthenticated(true);
+        setAuthenticated(false);
     }
 
     public AuthToken(String value, int userId) {
