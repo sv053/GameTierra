@@ -27,7 +27,7 @@ public class TransactionFilter extends AbstractAuthenticationProcessingFilter {
 
     public TransactionFilter(String defaultUrl, AuthManager authManager, AuthService authService) {
         super(defaultUrl);
-
+        super.setAuthenticationManager(authManager);
         this.authManager = authManager;
         this.authService = authService;
     }

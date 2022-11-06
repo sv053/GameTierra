@@ -2,13 +2,11 @@ package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.security.service.AuthService;
-import com.gamesage.store.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,17 +14,10 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/login")
 public class LoginController {
 
-    private final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final AuthService authService;
-    private final BCryptPasswordEncoder encoder;
-    private final AuthenticationManager authManager;
-    private final UserService userService;
 
-    public LoginController(AuthService authService, BCryptPasswordEncoder encoder, AuthenticationManager authManager, UserService userService) {
+    public LoginController(AuthService authService) {
         this.authService = authService;
-        this.encoder = encoder;
-        this.authManager = authManager;
-        this.userService = userService;
     }
 
     @PostMapping
@@ -34,9 +25,9 @@ public class LoginController {
         return authService.registerUser(user);
     }
 
-    @GetMapping("/auth")
-    public String checkAuth() {
-        return "auth string";
+    @PostMapping("/auth")
+    public ResponseEntity<?> checkAuth(@RequestBody User user, HttpServletRequest request) {
+        return authService.registerUser(user);
     }
 }
 

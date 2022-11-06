@@ -4,6 +4,7 @@ import com.gamesage.store.security.auth.HeaderName;
 import com.gamesage.store.security.auth.manager.AuthManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 
 import javax.servlet.FilterChain;
@@ -21,6 +22,10 @@ public class PreAuthenticationFilter extends AbstractPreAuthenticatedProcessingF
 
     private AuthManager authManager;
 
+    public PreAuthenticationFilter(AuthenticationManager authManager) {
+        super.setAuthenticationManager(authManager);
+    }
+
     private String getTokenValue(HttpServletRequest httpServletRequest) {
         return Collections.list(httpServletRequest.getHeaderNames()).stream()
                 .filter(header -> header.equalsIgnoreCase(HeaderName.TOKEN_HEADER))
@@ -37,7 +42,7 @@ public class PreAuthenticationFilter extends AbstractPreAuthenticatedProcessingF
 
         if (requestId == null || requestId.isBlank()) {
             httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            logger.error(servletRequest.toString());
+            logger.info(servletRequest.toString());
             return;
         }
         filterChain.doFilter(servletRequest, servletResponse);

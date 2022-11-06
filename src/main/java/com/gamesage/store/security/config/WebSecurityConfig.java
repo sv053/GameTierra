@@ -6,6 +6,7 @@ import com.gamesage.store.security.auth.manager.AuthManager;
 import com.gamesage.store.security.service.AuthService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -33,36 +34,32 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.
-                csrf().disable().
-                sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
-                and().
-                authorizeRequests().
-                antMatchers("/login").
-                permitAll().
-                and().
-                authorizeRequests()
-                .anyRequest()
-                .authenticated()
+                csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .antMatcher("/users")
+                .authorizeRequests() //
+                .anyRequest().authenticated() //
                 .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(unauthorizedEntryPoint());
 
         http
-                .addFilterAfter(preAuthenticationFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new PreAuthenticationFilter(authenticationManagerBean()), BasicAuthenticationFilter.class)
                 .addFilterAfter(transactionFilter(), BasicAuthenticationFilter.class);
     }
 
     @Bean
-    public PreAuthenticationFilter preAuthenticationFilter() {
-        PreAuthenticationFilter filter = new PreAuthenticationFilter();
-        return filter;
-    }
-
-    @Bean
     public TransactionFilter transactionFilter() {
-        TransactionFilter filter = new TransactionFilter("/login", authManager, authService);
+        TransactionFilter filter = new TransactionFilter("/users", authManager, authService);
+        filter.setFilterProcessesUrl("/users/**");
         return filter;
     }
 

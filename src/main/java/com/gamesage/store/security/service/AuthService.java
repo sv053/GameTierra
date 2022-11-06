@@ -56,7 +56,6 @@ public class AuthService {
         boolean userExists = userExists(user.getLogin(), user.getPassword());
         if (userExists) {
             token = provideTokenForCheckedUser(user.getId());
-            saveToken(token);
             responseHeaders.set(HeaderName.TOKEN_HEADER, token.getValue());
         }
         return userExists ? ResponseEntity.ok()
@@ -68,7 +67,7 @@ public class AuthService {
     private AuthToken provideWithToken(int userId) {
         Optional<AuthToken> token = findToken(userId);
         if (!token.isPresent()) {
-            return new AuthToken(userId);
+            return saveToken(new AuthToken(userId));
         }
         return token.get();
     }

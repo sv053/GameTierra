@@ -15,13 +15,13 @@ import java.util.Optional;
 @Repository
 public class DbTokenRepository implements TokenRepository {
 
-    private static final String SELECT_TOKEN_BY_USERID_QUERY = "SELECT token_value " +
-            "FROM token " +
-            "WHERE user_id = ?";
-    private static final String SELECT_TOKEN_QUERY = "SELECT user_id " +
-            "FROM token " +
-            "WHERE token_value = ?";
-    private static final String INSERT_USER_TOKEN = "INSERT INTO token (token_value, user_id) " +
+    private static final String SELECT_TOKEN_BY_USERID_QUERY = "SELECT token_value, user_id " +
+            " FROM token " +
+            " WHERE user_id = ? ";
+    private static final String SELECT_TOKEN_QUERY = "SELECT token_value, user_id " +
+            " FROM token " +
+            " WHERE token_value = ? ";
+    private static final String INSERT_USER_TOKEN = " INTO token (token_value, user_id) " +
             " VALUES (?, ?) ";
     private final JdbcTemplate jdbcTemplate;
     private final TokenRowMapper tokenRowMapper;

@@ -32,3 +32,10 @@ CREATE TABLE IF NOT EXISTS orders
     FOREIGN KEY (game_id) REFERENCES game (id)
 );
 
+CREATE TABLE IF NOT EXISTS token
+(
+    'user_id'     INTEGER,
+    'token_value' TEXT,
+    PRIMARY KEY ('user_id'),
+    CONSTRAINT 'user_fk' FOREIGN KEY ('user_id') REFERENCES 'user' ('id') ON DELETE CASCADE
+);
