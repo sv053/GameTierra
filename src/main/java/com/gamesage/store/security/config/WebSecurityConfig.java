@@ -1,5 +1,6 @@
 package com.gamesage.store.security.config;
 
+import com.gamesage.store.security.auth.HeaderName;
 import com.gamesage.store.security.auth.filter.PreAuthenticationFilter;
 import com.gamesage.store.security.auth.filter.TransactionFilter;
 import com.gamesage.store.security.auth.manager.AuthManager;
@@ -14,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -40,13 +42,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.
-                csrf().disable()
+        http
+                .headers()
+                .addHeaderWriter(new StaticHeadersWriter(HeaderName.TOKEN_HEADER, ""))
+                .and()
+                .csrf().and().cors().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .antMatcher("/users")
-                .authorizeRequests() //
-                .anyRequest().authenticated() //
+                .authorizeRequests()
+                .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(unauthorizedEntryPoint());

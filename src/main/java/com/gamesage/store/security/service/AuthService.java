@@ -45,9 +45,17 @@ public class AuthService {
         return encoder.matches(pass, storedPass);
     }
 
-    public AuthToken provideNewToken(String login) {
-        User user = userService.findByLogin(login);
-        return provideNewToken(login);
+    private AuthToken provideWithToken(int userId) {
+        Optional<AuthToken> token = findToken(userId);
+        return token.orElseGet(() -> saveToken(new AuthToken(userId)));
+    }
+
+    public AuthToken provideTokenForCheckedUser(int id) {
+        return provideWithToken(id);
+    }
+
+    public AuthToken saveToken(AuthToken authToken) {
+        return tokenRepository.persistToken(authToken);
     }
 
     public ResponseEntity registerUser(User user) {
@@ -57,27 +65,12 @@ public class AuthService {
         if (userExists) {
             token = provideTokenForCheckedUser(user.getId());
             responseHeaders.set(HeaderName.TOKEN_HEADER, token.getValue());
+
         }
         return userExists ? ResponseEntity.ok()
                 .headers(responseHeaders)
                 .body(token.getValue()) :
                 ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-
-    private AuthToken provideWithToken(int userId) {
-        Optional<AuthToken> token = findToken(userId);
-        if (!token.isPresent()) {
-            return saveToken(new AuthToken(userId));
-        }
-        return token.get();
-    }
-
-    public AuthToken provideTokenForCheckedUser(int id) {
-        return provideWithToken(id);
-    }
-
-    public AuthToken saveToken(AuthToken authToken) {
-        return tokenRepository.persistToken(authToken);
     }
 }
 

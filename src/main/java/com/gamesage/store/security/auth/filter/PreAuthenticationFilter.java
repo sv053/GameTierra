@@ -40,13 +40,14 @@ public class PreAuthenticationFilter extends AbstractPreAuthenticatedProcessingF
         var httpRequest = (HttpServletRequest) servletRequest;
         String requestId = getTokenValue(httpRequest);
 
+        httpResponse.setHeader(
+                HeaderName.TOKEN_HEADER, requestId);
         if (requestId == null || requestId.isBlank()) {
             httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             logger.info(servletRequest.toString());
             return;
         }
         filterChain.doFilter(servletRequest, servletResponse);
-
     }
 
     @Override

@@ -41,6 +41,9 @@ public class TransactionFilter extends AbstractAuthenticationProcessingFilter {
         if (((HttpServletRequest) request).getHeader(HeaderName.TOKEN_HEADER) != null) {
 
             attemptAuthentication(httpRequest, httpResponse);
+            HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+            httpServletResponse.setHeader(
+                    "Baeldung-Example-Filter-Header", "Value-Filter");
         }
         chain.doFilter(request, response);
     }
