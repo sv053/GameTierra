@@ -1,5 +1,6 @@
 package com.gamesage.store.domain.repository.db;
 
+import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.TokenRepository;
 import com.gamesage.store.security.model.AuthToken;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -61,7 +62,7 @@ public class DbTokenRepository implements TokenRepository {
     public AuthToken persistToken(AuthToken authToken) {
         jdbcTemplate.update(INSERT_USER_TOKEN,
                 authToken.getValue(),
-                authToken.getUserId());
+                authToken.getUser().getId());
         return authToken;
     }
 
@@ -70,10 +71,12 @@ public class DbTokenRepository implements TokenRepository {
 
         @Override
         public AuthToken mapRow(ResultSet rs, int rowNum) throws SQLException {
+            User user = new User(rs.getInt("user_id"),
+                    "", null, null);
             return new AuthToken(
+                    user,
                     rs.getString("token_value"),
-                    rs.getInt("user_id")
-            );
+                    null);
         }
     }
 }
