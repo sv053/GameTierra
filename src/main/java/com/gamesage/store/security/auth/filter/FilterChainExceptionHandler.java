@@ -17,7 +17,6 @@ public class FilterChainExceptionHandler extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(FilterChainExceptionHandler.class);
 
-    //    private final HandlerExceptionResolver resolver;
     private HandlerExceptionResolver resolver;
 
     public FilterChainExceptionHandler() {

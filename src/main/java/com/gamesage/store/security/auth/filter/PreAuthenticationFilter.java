@@ -2,6 +2,7 @@ package com.gamesage.store.security.auth.filter;
 
 import com.gamesage.store.security.auth.HeaderName;
 import com.gamesage.store.security.model.AuthToken;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,9 +11,8 @@ public class PreAuthenticationFilter extends AbstractPreAuthenticatedProcessingF
 
     @Override
     protected Object getPreAuthenticatedPrincipal(HttpServletRequest httpServletRequest) {
-
         String token = httpServletRequest.getHeader(HeaderName.TOKEN_HEADER);
-        return token.isEmpty() ? null : new AuthToken(token);
+        return token == null ? ResponseEntity.notFound() : new AuthToken(token);
     }
 
     @Override

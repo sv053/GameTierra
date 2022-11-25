@@ -9,11 +9,11 @@ public class GameTierra {
 
     public static void main(String[] args) {
         ApplicationContext ctx = SpringApplication.run(GameTierra.class);
-
-        String[] beanNames = ctx.getBeanDefinitionNames();
-        for (String beanName : beanNames) {
-            System.out.println(beanName);
-        }
+//
+//        String[] beanNames = ctx.getBeanDefinitionNames();
+//        for (String beanName : beanNames) {
+//            System.out.println(beanName);
+//        }
     }
 }
 
