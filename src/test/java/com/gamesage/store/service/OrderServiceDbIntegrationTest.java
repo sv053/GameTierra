@@ -67,6 +67,51 @@ class OrderServiceDbIntegrationTest {
         );
     }
 
+    @Test
+    void buyGame_gameIsBought_Success() {
+        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
+
+        assertTrue(result.isBought());
+    }
+
+    @Test
+    void buyGame_targetGameIsCorrect_Success() {
+        PurchaseIntent expectedPurchase =
+                new PurchaseIntent
+                        .Builder(game)
+                        .gameIsBought(true)
+                        .buyer(user)
+                        .message(PurchaseIntent.PurchaseMessage.PURCHASE_SUCCESSFUL)
+                        .orderDateTime(LocalDateTime.now())
+                        .build();
+        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
+
+        assertEquals(expectedPurchase.getTargetGame(), result.getTargetGame());
+    }
+
+    @Test
+    void buyGame_BuyerIsCorrect_Success() {
+        PurchaseIntent expectedPurchase =
+                new PurchaseIntent
+                        .Builder(game)
+                        .gameIsBought(true)
+                        .buyer(user)
+                        .message(PurchaseIntent.PurchaseMessage.PURCHASE_SUCCESSFUL)
+                        .orderDateTime(LocalDateTime.now())
+                        .build();
+        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
+
+        assertEquals(expectedPurchase.getBuyer(), result.getBuyer());
+    }
+
+    @Test
+    void buyGame_PurchaseTimeIsOk_Success() {
+        LocalDateTime beforeDateTime = LocalDateTime.now();
+        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
+
+        assertBetweenTimePoints(beforeDateTime, result.getOrderDateTime());
+    }
+
     void assertBetweenTimePoints(LocalDateTime firstDateTime, LocalDateTime dateTime) {
         assertTrue(firstDateTime.isBefore(dateTime) && dateTime.isBefore(LocalDateTime.now()));
     }
