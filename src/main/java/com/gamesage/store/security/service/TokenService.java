@@ -1,6 +1,5 @@
 package com.gamesage.store.security.service;
 
-import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.TokenRepository;
 import com.gamesage.store.exception.EntityNotFoundException;
 import com.gamesage.store.security.model.AuthToken;
@@ -23,26 +22,25 @@ public class TokenService {
         this.userService = userService;
     }
 
-    public Optional<AuthToken> findToken(int userId) {
-        return tokenRepository.retrieveByUserId(userId);
+    public Optional<AuthToken> findTokenByLogin(String userLogin) {
+        return tokenRepository.findByUserLogin(userLogin);
     }
 
     public AuthToken findToken(String token) {
-        return tokenRepository.retrieveByValue(token).orElseThrow(() -> new EntityNotFoundException(String.valueOf(token)));
+        return tokenRepository.findByValue(token).orElseThrow(() -> new EntityNotFoundException(String.valueOf(token)));
     }
 
-    public AuthToken saveToken(AuthToken authToken) {
-        return tokenRepository.persistToken(authToken);
+    public AuthToken saveToken(AuthToken AuthToken) {
+        return tokenRepository.saveToken(AuthToken);
     }
 
     public UserDetails findUserDetailsByTokenValue(String tokenValue) {
-        AuthToken entity = tokenRepository.retrieveByValue(tokenValue).orElseThrow(() -> new IllegalArgumentException("Token not found " + tokenValue));
-        User user = userService.findById(entity.getUser().getId());
-        return userService.loadUserByUsername(user.getLogin());
+        AuthToken entity = findToken(tokenValue);
+        return userService.loadUserByUsername(entity.getUserLogin());
     }
 
     public String generateToken() {
-        return String.format("%s - %s", new Timestamp(System.currentTimeMillis()).getTime(), UUID.randomUUID());
+        return String.format("%s-%s", new Timestamp(System.currentTimeMillis()).getTime(), UUID.randomUUID());
     }
 }
 

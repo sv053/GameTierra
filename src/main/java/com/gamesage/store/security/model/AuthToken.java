@@ -1,46 +1,26 @@
 package com.gamesage.store.security.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.gamesage.store.domain.model.User;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 
-public class AuthToken extends AbstractAuthenticationToken {
+public class AuthToken {
 
-    private final User user;
+    private final String userLogin;
     @JsonProperty
     private final String value;
 
-    public AuthToken(String tokenValue) {
-        this(null, tokenValue, Collections.emptyList());
-    }
-
-    public AuthToken(User user, String tokenValue, Collection<? extends GrantedAuthority> authorities) {
-        super(authorities);
+    public AuthToken(String tokenValue, String userLogin) {
         this.value = tokenValue;
-        this.user = user;
+        this.userLogin = userLogin;
     }
 
-    @Override
-    public Object getCredentials() {
-        return getValue();
-    }
-
-    @Override
-    public Object getPrincipal() {
-        return getUser();
+    public String getUserLogin() {
+        return userLogin;
     }
 
     public String getValue() {
         return value;
-    }
-
-    public User getUser() {
-        return user;
     }
 
     @Override
@@ -49,19 +29,19 @@ public class AuthToken extends AbstractAuthenticationToken {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         AuthToken thatToken = (AuthToken) o;
-        return Objects.equals(user, thatToken.getUser());
+        return Objects.equals(userLogin, thatToken.getUserLogin());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), user);
+        return Objects.hash(super.hashCode(), value);
     }
 
     @Override
     public String toString() {
         return "AuthToken{" +
                 ", token='" + value + '\'' +
-                ", user=" + user.toString() +
+                ", userLogin=" + userLogin +
                 '}';
     }
 }

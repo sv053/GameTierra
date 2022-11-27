@@ -22,7 +22,6 @@ public class User {
     public User(Integer id, String login, Tier tier, BigDecimal balance) {
         this.id = id;
         this.login = login;
-        this.password = password;
         this.tier = tier;
         this.balance = balance;
         games = new HashSet<>();

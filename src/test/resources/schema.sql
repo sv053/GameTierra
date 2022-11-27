@@ -36,6 +36,8 @@ CREATE TABLE IF NOT EXISTS token
 (
     'user_id'     INTEGER,
     'token_value' TEXT,
+    'user_login'  TEXT,
     PRIMARY KEY ('user_id'),
     CONSTRAINT 'user_fk' FOREIGN KEY ('user_id') REFERENCES 'user' ('id') ON DELETE CASCADE
 );
+

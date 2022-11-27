@@ -1,6 +1,5 @@
 package com.gamesage.store.domain.repository.db;
 
-import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.TokenRepository;
 import com.gamesage.store.security.model.AuthToken;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -16,13 +15,16 @@ import java.util.Optional;
 @Repository
 public class DbTokenRepository implements TokenRepository {
 
-    private static final String SELECT_TOKEN_BY_USERID_QUERY = "SELECT token_value, user_id " +
+    private static final String SELECT_TOKEN_BY_USERID_QUERY = "SELECT token_value, user_login " +
             " FROM token " +
             " WHERE user_id = ? ";
-    private static final String SELECT_TOKEN_QUERY = "SELECT token_value, user_id " +
+    private static final String SELECT_TOKEN_BY_USER_LOGIN = "SELECT token_value, user_login " +
+            " FROM token " +
+            " WHERE user_login = ? ";
+    private static final String SELECT_TOKEN_QUERY = "SELECT token_value, user_login " +
             " FROM token " +
             " WHERE token_value = ? ";
-    private static final String INSERT_USER_TOKEN = " INTO token (token_value, user_id) " +
+    private static final String INSERT_USER_TOKEN = "INSERT INTO token (token_value, user_login) " +
             " VALUES (?, ?) ";
     private final JdbcTemplate jdbcTemplate;
     private final TokenRowMapper tokenRowMapper;
@@ -33,12 +35,12 @@ public class DbTokenRepository implements TokenRepository {
     }
 
     @Override
-    public Optional<AuthToken> retrieveByUserId(int userId) {
+    public Optional<AuthToken> findByUserLogin(String login) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
-                    SELECT_TOKEN_BY_USERID_QUERY,
+                    SELECT_TOKEN_BY_USER_LOGIN,
                     tokenRowMapper,
-                    userId
+                    login
             ));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -46,7 +48,7 @@ public class DbTokenRepository implements TokenRepository {
     }
 
     @Override
-    public Optional<AuthToken> retrieveByValue(String token) {
+    public Optional<AuthToken> findByValue(String token) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
                     SELECT_TOKEN_QUERY,
@@ -59,11 +61,11 @@ public class DbTokenRepository implements TokenRepository {
     }
 
     @Override
-    public AuthToken persistToken(AuthToken authToken) {
+    public AuthToken saveToken(AuthToken AuthToken) {
         jdbcTemplate.update(INSERT_USER_TOKEN,
-                authToken.getValue(),
-                authToken.getUser().getId());
-        return authToken;
+                AuthToken.getValue(),
+                AuthToken.getUserLogin());
+        return AuthToken;
     }
 
     @Component
@@ -71,12 +73,9 @@ public class DbTokenRepository implements TokenRepository {
 
         @Override
         public AuthToken mapRow(ResultSet rs, int rowNum) throws SQLException {
-            User user = new User(rs.getInt("user_id"),
-                    "", null, null);
             return new AuthToken(
-                    user,
                     rs.getString("token_value"),
-                    null);
+                    rs.getString("user_login"));
         }
     }
 }

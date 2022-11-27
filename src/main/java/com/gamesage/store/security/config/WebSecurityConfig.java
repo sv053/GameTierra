@@ -1,5 +1,6 @@
 package com.gamesage.store.security.config;
 
+import com.gamesage.store.security.auth.filter.FilterChainExceptionHandler;
 import com.gamesage.store.security.auth.filter.PreAuthenticationFilter;
 import com.gamesage.store.security.service.AuthService;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 
 @Configuration
@@ -27,14 +29,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
+    public AuthenticationManager authenticationManagerBean() {
         PreAuthenticatedAuthenticationProvider preAuthenticatedAuthProvider = new PreAuthenticatedAuthenticationProvider();
         preAuthenticatedAuthProvider.setPreAuthenticatedUserDetailsService(authService);
         return new ProviderManager(preAuthenticatedAuthProvider);
     }
 
     @Bean
-    public PreAuthenticationFilter transactionFilter() throws Exception {
+    public PreAuthenticationFilter preAuthenticationFilter() throws Exception {
         PreAuthenticationFilter filter = new PreAuthenticationFilter();
         filter.setAuthenticationManager(authenticationManagerBean());
         return filter;
@@ -46,11 +48,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-              //  .antMatchers(HttpMethod.POST, "/login").permitAll()
                 .antMatchers(HttpMethod.GET, "/games", "/games/**").permitAll()
                 .antMatchers("/users", "/users/**").authenticated()
                 .and()
-                .addFilter(transactionFilter());
+                .addFilter(preAuthenticationFilter())
+                .addFilterBefore(new FilterChainExceptionHandler(), LogoutFilter.class);
     }
 
     @Override

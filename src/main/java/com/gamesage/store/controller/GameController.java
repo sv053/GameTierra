@@ -2,8 +2,6 @@ package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.service.GameService;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,12 +23,10 @@ public class GameController {
 
     @GetMapping
     public List<Game> findAllGames() {
-        var v = SecurityContextHolder.getContext();
         return gameService.findAll();
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
     public List<Game> createGames(@RequestBody List<Game> gamesToSave) {
         return gameService.createAll(gamesToSave);
     }

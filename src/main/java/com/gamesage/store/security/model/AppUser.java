@@ -18,6 +18,10 @@ public class AppUser implements UserDetails {
         grantedAuthorities = new HashSet<>();
     }
 
+    public User getUser() {
+        return user;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return grantedAuthorities;
