@@ -1,7 +1,6 @@
 package com.gamesage.store.security.service;
 
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.security.model.AppUser;
 import com.gamesage.store.security.model.AuthToken;
 import com.gamesage.store.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +29,9 @@ public class AuthService implements AuthenticationUserDetailsService<PreAuthenti
 
     public String loginUser(User user) {
         String tokenValue = "";
-        AppUser foundUser = (AppUser) userService.loadUserByUsername(user.getLogin());
-        if (foundUser != null) {
-            tokenValue = provideWithToken(foundUser.getUser()).getValue();
+        boolean userExists = userExists(user.getLogin(), user.getPassword());
+        if (userExists) {
+            tokenValue = provideWithToken(user).getValue();
         }
         return tokenValue;
     }
