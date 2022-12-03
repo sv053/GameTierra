@@ -1,13 +1,10 @@
-package com.gamesage.store.security.model;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package com.gamesage.store.domain.model;
 
 import java.util.Objects;
 
 public class AuthToken {
 
     private final String userLogin;
-    @JsonProperty
     private final String value;
 
     public AuthToken(String tokenValue, String userLogin) {

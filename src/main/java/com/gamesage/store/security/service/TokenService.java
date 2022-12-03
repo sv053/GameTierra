@@ -1,8 +1,8 @@
 package com.gamesage.store.security.service;
 
+import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.repository.TokenRepository;
 import com.gamesage.store.exception.EntityNotFoundException;
-import com.gamesage.store.security.model.AuthToken;
 import com.gamesage.store.service.UserService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;

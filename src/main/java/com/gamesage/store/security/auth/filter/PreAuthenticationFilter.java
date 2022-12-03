@@ -10,7 +10,8 @@ public class PreAuthenticationFilter extends AbstractPreAuthenticatedProcessingF
 
     @Override
     protected Object getPreAuthenticatedPrincipal(HttpServletRequest httpServletRequest) {
-        return new SSAuthToken(httpServletRequest.getHeader(HeaderName.TOKEN_HEADER));
+        String token = httpServletRequest.getHeader(HeaderName.TOKEN_HEADER);
+        return token == null ? new SSAuthToken("") : new SSAuthToken(token);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.gamesage.store.domain.repository;
 
-import com.gamesage.store.security.model.AuthToken;
+import com.gamesage.store.domain.model.AuthToken;
 
 import java.util.Optional;
 

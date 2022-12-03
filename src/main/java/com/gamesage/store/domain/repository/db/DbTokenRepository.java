@@ -1,7 +1,7 @@
 package com.gamesage.store.domain.repository.db;
 
+import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.repository.TokenRepository;
-import com.gamesage.store.security.model.AuthToken;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
