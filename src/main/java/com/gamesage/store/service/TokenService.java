@@ -11,11 +11,9 @@ import java.util.Optional;
 public class TokenService {
 
     private final TokenRepository tokenRepository;
-    private final UserService userService;
 
-    public TokenService(TokenRepository tokenRepository, UserService userService) {
+    public TokenService(TokenRepository tokenRepository) {
         this.tokenRepository = tokenRepository;
-        this.userService = userService;
     }
 
     public Optional<AuthToken> findTokenByLogin(String userLogin) {
