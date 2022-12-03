@@ -27,7 +27,5 @@ public class TokenService {
     public AuthToken saveToken(AuthToken AuthToken) {
         return tokenRepository.saveToken(AuthToken);
     }
-
-
 }
 
