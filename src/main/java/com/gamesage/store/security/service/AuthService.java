@@ -29,13 +29,10 @@ public class AuthService implements AuthenticationUserDetailsService<PreAuthenti
         this.tokenService = tokenService;
     }
 
-    public String loginUser(User user) {
-        String tokenValue = "";
-        boolean userExists = userExists(user.getLogin(), user.getPassword());
-        if (userExists) {
-            tokenValue = provideWithToken(user).getValue();
-        }
-        return tokenValue;
+    public AuthToken authenticateUser(User user) {
+        return userExists(user.getLogin(), user.getPassword()) ?
+                provideWithToken(user) :
+                null;
     }
 
     private AuthToken provideWithToken(User user) {

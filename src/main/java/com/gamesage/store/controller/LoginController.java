@@ -23,7 +23,7 @@ public class LoginController {
     public ResponseEntity<User> login(@RequestBody User user) {
         return ResponseEntity.ok()
                 .headers(httpHeaders ->
-                        httpHeaders.set(HeaderName.TOKEN_HEADER, authService.loginUser(user)))
+                        httpHeaders.set(HeaderName.TOKEN_HEADER, authService.authenticateUser(user).getValue()))
                 .body(user);
     }
 }
