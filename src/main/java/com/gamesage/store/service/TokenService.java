@@ -3,7 +3,6 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.repository.TokenRepository;
 import com.gamesage.store.exception.EntityNotFoundException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -31,9 +30,6 @@ public class TokenService {
         return tokenRepository.saveToken(AuthToken);
     }
 
-    public UserDetails findUserDetailsByTokenValue(String tokenValue) {
-        AuthToken entity = findToken(tokenValue);
-        return userService.loadUserByUsername(entity.getUserLogin());
-    }
+
 }
 

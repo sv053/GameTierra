@@ -13,7 +13,6 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -40,13 +39,17 @@ public class AuthService implements AuthenticationUserDetailsService<PreAuthenti
     }
 
     private AuthToken provideWithToken(User user) {
-        Optional<AuthToken> token = tokenService.findTokenByLogin(user.getLogin());
-        return token.orElse(tokenService.saveToken(new AuthToken(generateToken(), user.getLogin())));
+        return tokenService.findTokenByLogin(user.getLogin())
+                .orElse(tokenService.saveToken(new AuthToken(generateToken(), user.getLogin())));
     }
 
-    @Override
+    public UserDetails findUserDetailsByTokenValue(String tokenValue) {
+        AuthToken entity = tokenService.findToken(tokenValue);
+        return userService.loadUserByUsername(entity.getUserLogin());
+    }
+
     public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
-        return tokenService.findUserDetailsByTokenValue((String) token.getCredentials());
+        return findUserDetailsByTokenValue((String) token.getCredentials());
     }
 
     public boolean userExists(String login, String pass) {
