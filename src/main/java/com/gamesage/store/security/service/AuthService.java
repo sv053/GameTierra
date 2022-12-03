@@ -2,6 +2,7 @@ package com.gamesage.store.security.service;
 
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.User;
+import com.gamesage.store.service.TokenService;
 import com.gamesage.store.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
@@ -11,7 +12,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthService implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
@@ -38,7 +41,7 @@ public class AuthService implements AuthenticationUserDetailsService<PreAuthenti
 
     private AuthToken provideWithToken(User user) {
         Optional<AuthToken> token = tokenService.findTokenByLogin(user.getLogin());
-        return token.orElseGet(() -> tokenService.saveToken(new AuthToken(tokenService.generateToken(), user.getLogin())));
+        return token.orElse(tokenService.saveToken(new AuthToken(generateToken(), user.getLogin())));
     }
 
     @Override
@@ -49,6 +52,10 @@ public class AuthService implements AuthenticationUserDetailsService<PreAuthenti
     public boolean userExists(String login, String pass) {
         String storedPass = userService.loadUserByUsername(login).getPassword();
         return encoder.matches(pass, storedPass);
+    }
+
+    public String generateToken() {
+        return String.format("%s-%s", new Timestamp(System.currentTimeMillis()).getTime(), UUID.randomUUID());
     }
 }
 
