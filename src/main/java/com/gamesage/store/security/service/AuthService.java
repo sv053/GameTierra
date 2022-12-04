@@ -2,6 +2,7 @@ package com.gamesage.store.security.service;
 
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.User;
+import com.gamesage.store.exception.WrongCredentialsException;
 import com.gamesage.store.service.TokenService;
 import com.gamesage.store.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +31,17 @@ public class AuthService implements AuthenticationUserDetailsService<PreAuthenti
     }
 
     public AuthToken authenticateUser(User user) {
-        return userExists(user.getLogin(), user.getPassword()) ?
-                provideWithToken(user) :
-                null;
+        try {
+            UserDetails foundUser = findUserByCredentials(user.getLogin(), user.getPassword());
+            return provideWithToken(foundUser.getUsername());
+        } catch (Exception e) {
+            throw new WrongCredentialsException();
+        }
     }
 
-    private AuthToken provideWithToken(User user) {
-        return tokenService.findTokenByLogin(user.getLogin())
-                .orElse(tokenService.saveToken(new AuthToken(generateToken(), user.getLogin())));
+    private AuthToken provideWithToken(String login) {
+        return tokenService.findTokenByLogin(login)
+                .orElse(tokenService.saveToken(new AuthToken(generateToken(), login)));
     }
 
     public UserDetails findUserDetailsByTokenValue(String tokenValue) {
@@ -45,13 +49,14 @@ public class AuthService implements AuthenticationUserDetailsService<PreAuthenti
         return userService.loadUserByUsername(entity.getUserLogin());
     }
 
+    @Override
     public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
         return findUserDetailsByTokenValue((String) token.getCredentials());
     }
 
-    public boolean userExists(String login, String pass) {
-        String storedPass = userService.loadUserByUsername(login).getPassword();
-        return encoder.matches(pass, storedPass);
+    public UserDetails findUserByCredentials(String login, String pass) {
+        UserDetails storedUser = userService.loadUserByUsername(login);
+        return encoder.matches(pass, storedUser.getPassword()) ? storedUser : null;
     }
 
     public String generateToken() {

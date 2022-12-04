@@ -4,6 +4,7 @@ import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.UserFunctionRepository;
 import com.gamesage.store.exception.EntityNotFoundException;
+import com.gamesage.store.exception.WrongCredentialsException;
 import com.gamesage.store.paymentapi.PaymentProcessingApi;
 import com.gamesage.store.paymentapi.PaymentRequest;
 import com.gamesage.store.paymentapi.PaymentResponse;
@@ -41,7 +42,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User findByLogin(String login) {
-        return repository.findByLogin(login).orElseThrow(() -> new EntityNotFoundException(login));
+        return repository.findByLogin(login).orElseThrow(WrongCredentialsException::new);
     }
 
     public List<User> findAll() {
