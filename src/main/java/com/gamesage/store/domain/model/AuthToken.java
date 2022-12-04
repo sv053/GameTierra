@@ -24,9 +24,9 @@ public class AuthToken {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
         AuthToken thatToken = (AuthToken) o;
-        return Objects.equals(userLogin, thatToken.getUserLogin());
+        return Objects.equals(userLogin, thatToken.getUserLogin())
+                && Objects.equals(value, thatToken.getValue());
     }
 
     @Override

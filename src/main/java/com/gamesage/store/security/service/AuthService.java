@@ -54,12 +54,12 @@ public class AuthService implements AuthenticationUserDetailsService<PreAuthenti
         return findUserDetailsByTokenValue((String) token.getCredentials());
     }
 
-    public UserDetails findUserByCredentials(String login, String pass) {
+    private UserDetails findUserByCredentials(String login, String pass) {
         UserDetails storedUser = userService.loadUserByUsername(login);
         return encoder.matches(pass, storedUser.getPassword()) ? storedUser : null;
     }
 
-    public String generateToken() {
+    private String generateToken() {
         return String.format("%s-%s", new Timestamp(System.currentTimeMillis()).getTime(), UUID.randomUUID());
     }
 }

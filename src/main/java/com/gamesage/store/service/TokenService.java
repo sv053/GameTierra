@@ -2,7 +2,7 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.repository.TokenRepository;
-import com.gamesage.store.exception.EntityNotFoundException;
+import com.gamesage.store.exception.WrongCredentialsException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -21,7 +21,7 @@ public class TokenService {
     }
 
     public AuthToken findToken(String token) {
-        return tokenRepository.findByValue(token).orElseThrow(() -> new EntityNotFoundException(String.valueOf(token)));
+        return tokenRepository.findByValue(token).orElseThrow(() -> new WrongCredentialsException());
     }
 
     public AuthToken saveToken(AuthToken AuthToken) {
