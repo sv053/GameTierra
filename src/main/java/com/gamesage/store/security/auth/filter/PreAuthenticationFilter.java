@@ -1,6 +1,5 @@
 package com.gamesage.store.security.auth.filter;
 
-import com.gamesage.store.exception.WrongCredentialsException;
 import com.gamesage.store.security.auth.HeaderName;
 import com.gamesage.store.security.model.SSAuthToken;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
@@ -11,8 +10,9 @@ public class PreAuthenticationFilter extends AbstractPreAuthenticatedProcessingF
 
     @Override
     protected Object getPreAuthenticatedPrincipal(HttpServletRequest httpServletRequest) {
-        String token = httpServletRequest.getHeader(HeaderName.TOKEN_HEADER);
-        return token == null ? new WrongCredentialsException() : new SSAuthToken(token);
+        String token = "";
+        token += httpServletRequest.getHeader(HeaderName.TOKEN_HEADER);
+        return new SSAuthToken(token);
     }
 
     @Override
