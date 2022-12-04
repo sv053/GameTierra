@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 class AuthTokenTest {
 
     @Test
-    void equals_sameValuesSameLogins_true() {
+    void equals_SameValuesSameLogins_True() {
         AuthToken token1 = new AuthToken("enkey", "costa");
         AuthToken token2 = new AuthToken("enkey", "costa");
 
@@ -16,7 +16,7 @@ class AuthTokenTest {
     }
 
     @Test
-    void equals_sameValuesDiffLogins_false() {
+    void equals_SameValuesDiffLogins_False() {
         AuthToken token1 = new AuthToken("enkey", "costa");
         AuthToken token2 = new AuthToken("enkey", "diffcostasol");
 
@@ -24,7 +24,7 @@ class AuthTokenTest {
     }
 
     @Test
-    void equals_diffValuesSameLogins_false() {
+    void equals_DiffValuesSameLogins_False() {
         AuthToken token1 = new AuthToken("key", "costa");
         AuthToken token2 = new AuthToken("diffkey", "costa");
 
@@ -32,7 +32,7 @@ class AuthTokenTest {
     }
 
     @Test
-    void equals_diffValuesDiffLogins_false() {
+    void equals_DiffValuesDiffLogins_False() {
         AuthToken token1 = new AuthToken("key", "costa");
         AuthToken token2 = new AuthToken("diffkey", "diffcosta");
 

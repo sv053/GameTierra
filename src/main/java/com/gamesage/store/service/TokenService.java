@@ -21,7 +21,7 @@ public class TokenService {
     }
 
     public AuthToken findToken(String token) {
-        return tokenRepository.findByValue(token).orElseThrow(() -> new WrongCredentialsException());
+        return tokenRepository.findByValue(token).orElseThrow(WrongCredentialsException::new);
     }
 
     public AuthToken saveToken(AuthToken AuthToken) {

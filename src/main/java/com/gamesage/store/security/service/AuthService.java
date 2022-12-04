@@ -56,7 +56,12 @@ public class AuthService implements AuthenticationUserDetailsService<PreAuthenti
 
     private UserDetails findUserByCredentials(String login, String pass) {
         UserDetails storedUser = userService.loadUserByUsername(login);
-        return encoder.matches(pass, storedUser.getPassword()) ? storedUser : null;
+        try {
+            encoder.matches(pass, storedUser.getPassword());
+            return storedUser;
+        } catch (NullPointerException e) {
+            throw new WrongCredentialsException();
+        }
     }
 
     private String generateToken() {
