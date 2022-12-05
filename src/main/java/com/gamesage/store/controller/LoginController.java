@@ -22,8 +22,7 @@ public class LoginController {
     @PostMapping
     public ResponseEntity<User> login(@RequestBody User user) {
         return ResponseEntity.ok()
-                .headers(httpHeaders ->
-                        httpHeaders.set(HeaderName.TOKEN_HEADER, authService.authenticateUser(user).getValue()))
+                .header(HeaderName.TOKEN_HEADER, authService.authenticateUser(user).getValue())
                 .body(user);
     }
 }
