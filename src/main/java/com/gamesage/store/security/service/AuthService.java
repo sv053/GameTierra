@@ -31,12 +31,8 @@ public class AuthService implements AuthenticationUserDetailsService<PreAuthenti
     }
 
     public AuthToken authenticateUser(User user) {
-        try {
-            UserDetails foundUser = findUserByCredentials(user.getLogin(), user.getPassword());
-            return provideWithToken(foundUser.getUsername());
-        } catch (Exception e) {
-            throw new WrongCredentialsException();
-        }
+        UserDetails foundUser = findUserByCredentials(user.getLogin(), user.getPassword());
+        return provideWithToken(foundUser.getUsername());
     }
 
     private AuthToken provideWithToken(String login) {
@@ -44,24 +40,25 @@ public class AuthService implements AuthenticationUserDetailsService<PreAuthenti
                 .orElseGet(() -> tokenService.createToken(new AuthToken(generateToken(), login)));
     }
 
-    public UserDetails findUserDetailsByTokenValue(String tokenValue) {
-        AuthToken entity = tokenService.findToken(tokenValue);
-        return userService.loadUserByUsername(entity.getUserLogin());
-    }
-
     @Override
     public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
         return findUserDetailsByTokenValue((String) token.getCredentials());
     }
 
+    public UserDetails findUserDetailsByTokenValue(String tokenValue) {
+        AuthToken entity = tokenService.findToken(tokenValue);
+        return userService.loadUserByUsername(entity.getUserLogin());
+    }
+
     private UserDetails findUserByCredentials(String login, String pass) {
-        UserDetails storedUser = userService.loadUserByUsername(login);
-        try {
-            encoder.matches(pass, storedUser.getPassword());
-            return storedUser;
-        } catch (NullPointerException e) {
+        UserDetails user = userService.loadUserByUsername(login);
+        if (!isPasswordCorrect(pass, user.getPassword()))
             throw new WrongCredentialsException();
-        }
+        return user;
+    }
+
+    private boolean isPasswordCorrect(String rawPass, String encodedPass) {
+        return encoder.matches(rawPass, encodedPass);
     }
 
     private String generateToken() {
