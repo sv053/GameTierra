@@ -4,12 +4,8 @@ import com.gamesage.store.domain.model.AuthToken;
 
 import java.util.Optional;
 
-public interface TokenRepository {
+public interface TokenRepository extends Repository<AuthToken, String> {
 
     Optional<AuthToken> findByValue(String token);
-
-    Optional<AuthToken> findByUserLogin(String login);
-
-    AuthToken saveToken(AuthToken AuthToken);
 }
 

@@ -28,7 +28,7 @@ class TokenServiceDbIntegrationTest {
                 3, "SILVER", 10.d), BigDecimal.TEN);
         userService.createOne(userWithoutToken);
         AuthToken tokenToCreate = new AuthToken("ftyytgiuhiuhiuh", userWithoutToken.getLogin());
-        AuthToken tokenToFind = tokenService.saveToken(tokenToCreate);
+        AuthToken tokenToFind = tokenService.createToken(tokenToCreate);
         AuthToken foundToken = tokenService.findToken(tokenToCreate.getValue());
 
         assertEquals(tokenToFind, foundToken);
@@ -40,7 +40,7 @@ class TokenServiceDbIntegrationTest {
                 3, "SILVER", 10.d), BigDecimal.TEN);
         userService.createOne(userWithoutToken);
         AuthToken token = new AuthToken("ftyytgiuhiuhiuh", userWithoutToken.getLogin());
-        AuthToken tokenToFind = tokenService.saveToken(token);
+        AuthToken tokenToFind = tokenService.createToken(token);
         AuthToken foundToken = tokenService.findTokenByLogin(token.getUserLogin()).get();
 
         assertEquals(tokenToFind, foundToken);
@@ -57,7 +57,7 @@ class TokenServiceDbIntegrationTest {
                 3, "SILVER", 10.d), BigDecimal.TEN);
         userService.createOne(user);
         AuthToken token = new AuthToken("ftyzrdtcfjyiuh", user.getLogin());
-        tokenService.saveToken(token);
+        tokenService.createToken(token);
         AuthToken foundToken = tokenService.findTokenByLogin(token.getUserLogin()).get();
 
         assertNotNull(foundToken);

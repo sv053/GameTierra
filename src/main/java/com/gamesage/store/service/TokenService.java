@@ -17,15 +17,15 @@ public class TokenService {
     }
 
     public Optional<AuthToken> findTokenByLogin(String userLogin) {
-        return tokenRepository.findByUserLogin(userLogin);
+        return tokenRepository.findById(userLogin);
     }
 
     public AuthToken findToken(String token) {
         return tokenRepository.findByValue(token).orElseThrow(WrongCredentialsException::new);
     }
 
-    public AuthToken saveToken(AuthToken AuthToken) {
-        return tokenRepository.saveToken(AuthToken);
+    public AuthToken createToken(AuthToken authToken) {
+        return tokenRepository.createOne(authToken);
     }
 }
 

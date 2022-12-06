@@ -10,14 +10,14 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class DbTokenRepository implements TokenRepository {
 
-    private static final String SELECT_TOKEN_BY_USERID_QUERY = "SELECT token_value, user_login " +
-            " FROM token " +
-            " WHERE user_id = ? ";
+    private static final String SELECT_ALL_TOKENS_QUERY = "SELECT token_value, user_login " +
+            " FROM token ";
     private static final String SELECT_TOKEN_BY_USER_LOGIN = "SELECT token_value, user_login " +
             " FROM token " +
             " WHERE user_login = ? ";
@@ -35,7 +35,12 @@ public class DbTokenRepository implements TokenRepository {
     }
 
     @Override
-    public Optional<AuthToken> findByUserLogin(String login) {
+    public List<AuthToken> findAll() {
+        return jdbcTemplate.query(SELECT_ALL_TOKENS_QUERY, tokenRowMapper);
+    }
+
+    @Override
+    public Optional<AuthToken> findById(String login) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
                     SELECT_TOKEN_BY_USER_LOGIN,
@@ -61,7 +66,7 @@ public class DbTokenRepository implements TokenRepository {
     }
 
     @Override
-    public AuthToken saveToken(AuthToken AuthToken) {
+    public AuthToken createOne(AuthToken AuthToken) {
         jdbcTemplate.update(INSERT_USER_TOKEN,
                 AuthToken.getValue(),
                 AuthToken.getUserLogin());

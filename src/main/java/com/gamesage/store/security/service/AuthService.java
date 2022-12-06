@@ -41,7 +41,7 @@ public class AuthService implements AuthenticationUserDetailsService<PreAuthenti
 
     private AuthToken provideWithToken(String login) {
         return tokenService.findTokenByLogin(login)
-                .orElseGet(() -> tokenService.saveToken(new AuthToken(generateToken(), login)));
+                .orElseGet(() -> tokenService.createToken(new AuthToken(generateToken(), login)));
     }
 
     public UserDetails findUserDetailsByTokenValue(String tokenValue) {
