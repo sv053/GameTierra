@@ -106,16 +106,16 @@ class OrderServiceIntegrationTest {
 
     @Test
     void buyGame_PurchaseTimeIsOk_Success() {
-        LocalDateTime beforeDateTime = LocalDateTime.now();
+        LocalDateTime before = LocalDateTime.now();
         PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
 
-        assertBetweenTimePoints(beforeDateTime, result.getOrderDateTime());
+        assertBetweenTimePoints(before, result.getOrderDateTime());
     }
 
     void assertBetweenTimePoints(LocalDateTime firstDateTime, LocalDateTime dateTime) {
+        LocalDateTime after = LocalDateTime.now();
         assertTrue(firstDateTime.isBefore(dateTime)
-                && (dateTime.isBefore(LocalDateTime.now())
-                || dateTime.isEqual(LocalDateTime.now()))
+                && (dateTime.isBefore(after) || dateTime.isEqual(after))
         );
     }
 }
