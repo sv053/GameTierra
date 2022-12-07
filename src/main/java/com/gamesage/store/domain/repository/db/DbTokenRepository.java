@@ -66,11 +66,11 @@ public class DbTokenRepository implements TokenRepository {
     }
 
     @Override
-    public AuthToken createOne(AuthToken AuthToken) {
+    public AuthToken createOne(AuthToken authToken) {
         jdbcTemplate.update(INSERT_USER_TOKEN,
-                AuthToken.getValue(),
-                AuthToken.getUserLogin());
-        return AuthToken;
+                authToken.getValue(),
+                authToken.getUserLogin());
+        return authToken;
     }
 
     @Component
