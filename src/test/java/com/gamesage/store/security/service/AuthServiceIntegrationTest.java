@@ -35,6 +35,7 @@ class AuthServiceIntegrationTest {
                 3, "SILVER", 10.d), BigDecimal.TEN
         ));
         assertNotNull(foundToken);
+        assertNotNull(foundToken.getValue());
         assertEquals(user.getLogin(), foundToken.getUserLogin());
     }
 
