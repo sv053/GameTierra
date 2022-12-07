@@ -3,6 +3,7 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
+import com.gamesage.store.exception.EntityNotFoundException;
 import com.gamesage.store.exception.WrongCredentialsException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
-class TokenServiceDbIntegrationTest {
+class TokenServiceIntegrationTest {
 
     @Autowired
     private TokenService tokenService;
@@ -41,7 +43,8 @@ class TokenServiceDbIntegrationTest {
         userService.createOne(userWithoutToken);
         AuthToken token = new AuthToken("ftyytgiuhiuhiuh", userWithoutToken.getLogin());
         AuthToken tokenToFind = tokenService.createToken(token);
-        AuthToken foundToken = tokenService.findTokenByLogin(token.getUserLogin()).get();
+        AuthToken foundToken = tokenService.findTokenByLogin(token.getUserLogin())
+                .orElseThrow(() -> new EntityNotFoundException(token.getUserLogin()));
 
         assertEquals(tokenToFind, foundToken);
     }
@@ -58,9 +61,10 @@ class TokenServiceDbIntegrationTest {
         userService.createOne(user);
         AuthToken token = new AuthToken("ftyzrdtcfjyiuh", user.getLogin());
         tokenService.createToken(token);
-        AuthToken foundToken = tokenService.findTokenByLogin(token.getUserLogin()).get();
+        AuthToken foundToken = tokenService.findTokenByLogin(token.getUserLogin())
+                .orElseThrow(() -> new EntityNotFoundException(token.getUserLogin()));
 
-        assertNotNull(foundToken);
+        assertEquals(token, foundToken);
     }
 }
 

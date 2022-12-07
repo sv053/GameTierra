@@ -12,8 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -26,12 +25,17 @@ class AuthServiceIntegrationTest {
 
     @Test
     void authenticateUser_Success() {
-        User user = new User(null, "user11111", "lerida", new Tier(
+        User user = new User(0, "user11111", "lerida", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
-        User createdUser = userService.createOne(user);
-        AuthToken foundToken = authService.authenticateUser(createdUser);
+        userService.createOne(user);
+        assertNotNull(userService.findByLogin(user.getLogin()));
 
+        AuthToken foundToken = authService.authenticateUser(new User(
+                0, "user11111", "lerida", new Tier(
+                3, "SILVER", 10.d), BigDecimal.TEN
+        ));
         assertNotNull(foundToken);
+        assertEquals(user.getLogin(), foundToken.getUserLogin());
     }
 
     @Test

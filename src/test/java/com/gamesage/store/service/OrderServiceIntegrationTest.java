@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class OrderServiceDbIntegrationTest {
+class OrderServiceIntegrationTest {
 
     @Autowired
     private OrderService orderService;
@@ -113,7 +113,10 @@ class OrderServiceDbIntegrationTest {
     }
 
     void assertBetweenTimePoints(LocalDateTime firstDateTime, LocalDateTime dateTime) {
-        assertTrue(firstDateTime.isBefore(dateTime) && dateTime.isBefore(LocalDateTime.now()));
+        assertTrue(firstDateTime.isBefore(dateTime)
+                && (dateTime.isBefore(LocalDateTime.now())
+                || dateTime.isEqual(LocalDateTime.now()))
+        );
     }
 }
 

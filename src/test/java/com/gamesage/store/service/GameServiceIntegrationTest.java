@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class GameServiceDbIntegrationTest {
+class GameServiceIntegrationTest {
 
     @Autowired
     private GameService gameService;

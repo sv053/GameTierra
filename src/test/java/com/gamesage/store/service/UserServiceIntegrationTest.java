@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class UserServiceDbIntegrationTest {
+class UserServiceIntegrationTest {
 
     @Autowired
     private UserService userService;

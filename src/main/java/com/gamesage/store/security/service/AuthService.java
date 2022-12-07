@@ -52,13 +52,9 @@ public class AuthService implements AuthenticationUserDetailsService<PreAuthenti
 
     private UserDetails findUserByCredentials(String login, String pass) {
         UserDetails user = userService.loadUserByUsername(login);
-        if (!isPasswordCorrect(pass, user.getPassword()))
+        if (!encoder.matches(pass, user.getPassword()))
             throw new WrongCredentialsException();
         return user;
-    }
-
-    private boolean isPasswordCorrect(String rawPass, String encodedPass) {
-        return encoder.matches(rawPass, encodedPass);
     }
 
     private String generateToken() {
