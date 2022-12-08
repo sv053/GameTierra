@@ -5,7 +5,6 @@ import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.TokenService;
 import com.gamesage.store.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -23,8 +22,8 @@ public class AuthService {
     }
 
     public AuthToken authenticateUser(User user) {
-        UserDetails foundUser = userService.findUserByCredentials(user.getLogin(), user.getPassword());
-        return provideWithToken(foundUser.getUsername());
+        User foundUser = userService.findUserByCredentials(user.getLogin(), user.getPassword());
+        return provideWithToken(foundUser.getLogin());
     }
 
     private AuthToken provideWithToken(String login) {

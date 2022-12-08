@@ -93,8 +93,8 @@ public class UserService implements UserDetailsService, AuthenticationUserDetail
         return loadUserByUsername(entity.getUserLogin());
     }
 
-    public UserDetails findUserByCredentials(String login, String pass) {
-        UserDetails user = loadUserByUsername(login);
+    public User findUserByCredentials(String login, String pass) {
+        User user = findByLogin(login);
         if (!encoder.matches(pass, user.getPassword()))
             throw new WrongCredentialsException();
         return user;
