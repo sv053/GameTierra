@@ -22,7 +22,7 @@ public class AuthService {
     }
 
     public AuthToken authenticateUser(User user) {
-        User foundUser = userService.findUserByCredentials(user.getLogin(), user.getPassword());
+        User foundUser = userService.findByCredentials(user.getLogin(), user.getPassword());
         return provideWithToken(foundUser.getLogin());
     }
 

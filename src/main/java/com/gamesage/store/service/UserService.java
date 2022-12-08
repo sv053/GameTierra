@@ -50,6 +50,13 @@ public class UserService implements UserDetailsService, AuthenticationUserDetail
         return repository.findByLogin(login).orElseThrow(WrongCredentialsException::new);
     }
 
+    public User findByCredentials(String login, String pass) {
+        User user = findByLogin(login);
+        if (!encoder.matches(pass, user.getPassword()))
+            throw new WrongCredentialsException();
+        return user;
+    }
+
     public List<User> findAll() {
         return repository.findAll();
     }
@@ -87,13 +94,6 @@ public class UserService implements UserDetailsService, AuthenticationUserDetail
     public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
         AuthToken tokenEntity = tokenService.findToken((String) token.getCredentials());
         return loadUserByUsername(tokenEntity.getUserLogin());
-    }
-
-    public User findUserByCredentials(String login, String pass) {
-        User user = findByLogin(login);
-        if (!encoder.matches(pass, user.getPassword()))
-            throw new WrongCredentialsException();
-        return user;
     }
 }
 

@@ -34,7 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public PreAuthenticationFilter preAuthenticationFilter() throws Exception {
+    public PreAuthenticationFilter preAuthenticationFilter() {
         PreAuthenticationFilter filter = new PreAuthenticationFilter();
         filter.setAuthenticationManager(authenticationManagerBean());
         return filter;

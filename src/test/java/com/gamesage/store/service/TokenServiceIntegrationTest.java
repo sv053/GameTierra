@@ -45,7 +45,7 @@ class TokenServiceIntegrationTest {
         Optional<AuthToken> foundToken = tokenService.findTokenByLogin(token.getUserLogin());
 
         assertTrue(foundToken.isPresent());
-        assertEquals(tokenToFind, foundToken.orElse(null));
+        assertEquals(Optional.of(tokenToFind), foundToken);
     }
 
     @Test
@@ -62,7 +62,7 @@ class TokenServiceIntegrationTest {
         tokenService.createToken(token);
         Optional<AuthToken> foundToken = tokenService.findTokenByLogin(token.getUserLogin());
 
-        assertEquals(token, foundToken.orElse(null));
+        assertEquals(Optional.of(token), foundToken);
     }
 }
 
