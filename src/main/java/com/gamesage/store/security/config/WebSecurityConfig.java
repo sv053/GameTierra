@@ -45,13 +45,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/login").permitAll()
-                .antMatchers(HttpMethod.GET, "/games", "/games/**").permitAll()
-                .and().authorizeRequests()
-                .antMatchers("/users", "/users/**").authenticated()
+                .antMatchers("/login").anonymous()
+                .antMatchers(HttpMethod.GET, "/users", "/cart", "/users/**", "/cart/**").authenticated()
                 .and()
                 .addFilter(preAuthenticationFilter())
-                .addFilterAfter(new FilterChainExceptionHandler(), LogoutFilter.class);
+                .addFilterBefore(new FilterChainExceptionHandler(), LogoutFilter.class);
     }
 }
 

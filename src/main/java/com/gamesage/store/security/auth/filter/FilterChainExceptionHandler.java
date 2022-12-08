@@ -1,8 +1,5 @@
 package com.gamesage.store.security.auth.filter;
 
-import com.gamesage.store.exception.WrongCredentialsException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -15,8 +12,6 @@ import java.io.IOException;
 
 @Component
 public class FilterChainExceptionHandler extends OncePerRequestFilter {
-
-    private static final Logger logger = LoggerFactory.getLogger(FilterChainExceptionHandler.class);
 
     private HandlerExceptionResolver resolver;
 
@@ -31,10 +26,8 @@ public class FilterChainExceptionHandler extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
-        } catch (WrongCredentialsException e) {
-            filterChain.doFilter(request, response);
         } catch (Exception e) {
-            logger.error("Spring Security Filter Chain Exception:", e);
+            super.logger.error("Spring Security Filter Chain Exception:", e);
             resolver.resolveException(request, response, null, e);
         }
     }
