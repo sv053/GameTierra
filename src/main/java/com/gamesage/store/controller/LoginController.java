@@ -21,8 +21,9 @@ public class LoginController {
 
     @PostMapping
     public ResponseEntity<User> login(@RequestBody User user) {
+        String token = authService.authenticateUser(user).getValue();
         return ResponseEntity.ok()
-                .header(HeaderName.TOKEN_HEADER, authService.authenticateUser(user).getValue())
+                .header(HeaderName.TOKEN_HEADER, token)
                 .body(user);
     }
 }
