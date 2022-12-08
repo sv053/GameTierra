@@ -3,7 +3,6 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.exception.EntityNotFoundException;
 import com.gamesage.store.exception.WrongCredentialsException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +10,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -43,10 +42,10 @@ class TokenServiceIntegrationTest {
         userService.createOne(userWithoutToken);
         AuthToken token = new AuthToken("ftyytgiuhiuhiuh", userWithoutToken.getLogin());
         AuthToken tokenToFind = tokenService.createToken(token);
-        AuthToken foundToken = tokenService.findTokenByLogin(token.getUserLogin())
-                .orElseThrow(() -> new EntityNotFoundException(token.getUserLogin()));
+        Optional<AuthToken> foundToken = tokenService.findTokenByLogin(token.getUserLogin());
 
-        assertEquals(tokenToFind, foundToken);
+        assertTrue(foundToken.isPresent());
+        assertEquals(tokenToFind, foundToken.get());
     }
 
     @Test
@@ -61,10 +60,9 @@ class TokenServiceIntegrationTest {
         userService.createOne(user);
         AuthToken token = new AuthToken("ftyzrdtcfjyiuh", user.getLogin());
         tokenService.createToken(token);
-        AuthToken foundToken = tokenService.findTokenByLogin(token.getUserLogin())
-                .orElseThrow(() -> new EntityNotFoundException(token.getUserLogin()));
+        Optional<AuthToken> foundToken = tokenService.findTokenByLogin(token.getUserLogin());
 
-        assertEquals(token, foundToken);
+        assertEquals(token, foundToken.get());
     }
 }
 
