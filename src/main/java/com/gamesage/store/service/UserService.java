@@ -1,5 +1,6 @@
 package com.gamesage.store.service;
 
+import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.UserFunctionRepository;
@@ -9,27 +10,31 @@ import com.gamesage.store.paymentapi.PaymentProcessingApi;
 import com.gamesage.store.paymentapi.PaymentRequest;
 import com.gamesage.store.paymentapi.PaymentResponse;
 import com.gamesage.store.security.model.AppUser;
+import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService implements UserDetailsService, AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
 
     private final UserFunctionRepository repository;
     private final GameService gameService;
+    private final TokenService tokenService;
     private final PaymentProcessingApi paymentProcessingApi;
     private final BCryptPasswordEncoder encoder;
 
     public UserService(UserFunctionRepository repository,
-                       GameService gameService, PaymentProcessingApi paymentProcessingApi, BCryptPasswordEncoder encoder) {
+                       GameService gameService, TokenService tokenService, PaymentProcessingApi paymentProcessingApi, BCryptPasswordEncoder encoder) {
         this.repository = repository;
         this.gameService = gameService;
+        this.tokenService = tokenService;
         this.paymentProcessingApi = paymentProcessingApi;
         this.encoder = encoder;
     }
@@ -76,6 +81,23 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         User domainUser = findByLogin(login);
         return new AppUser(domainUser);
+    }
+
+    @Override
+    public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
+        return findUserDetailsByTokenValue((String) token.getCredentials());
+    }
+
+    public UserDetails findUserDetailsByTokenValue(String tokenValue) {
+        AuthToken entity = tokenService.findToken(tokenValue);
+        return loadUserByUsername(entity.getUserLogin());
+    }
+
+    public UserDetails findUserByCredentials(String login, String pass) {
+        UserDetails user = loadUserByUsername(login);
+        if (!encoder.matches(pass, user.getPassword()))
+            throw new WrongCredentialsException();
+        return user;
     }
 }
 

@@ -2,7 +2,7 @@ package com.gamesage.store.security.config;
 
 import com.gamesage.store.security.auth.filter.FilterChainExceptionHandler;
 import com.gamesage.store.security.auth.filter.PreAuthenticationFilter;
-import com.gamesage.store.security.service.AuthService;
+import com.gamesage.store.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,16 +19,16 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final AuthService authService;
+    private final UserService userService;
 
-    public WebSecurityConfig(AuthService authService) {
-        this.authService = authService;
+    public WebSecurityConfig(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
     public AuthenticationManager authenticationManagerBean() {
         PreAuthenticatedAuthenticationProvider preAuthenticatedAuthProvider = new PreAuthenticatedAuthenticationProvider();
-        preAuthenticatedAuthProvider.setPreAuthenticatedUserDetailsService(authService);
+        preAuthenticatedAuthProvider.setPreAuthenticatedUserDetailsService(userService);
         return new ProviderManager(preAuthenticatedAuthProvider);
     }
 

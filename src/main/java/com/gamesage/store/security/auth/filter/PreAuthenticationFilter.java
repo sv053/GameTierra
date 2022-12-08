@@ -11,7 +11,7 @@ public class PreAuthenticationFilter extends AbstractPreAuthenticatedProcessingF
     @Override
     protected Object getPreAuthenticatedPrincipal(HttpServletRequest httpServletRequest) {
         String token = httpServletRequest.getHeader(HeaderName.TOKEN_HEADER);
-        if (null == token) {
+        if (null == token || token.isEmpty()) {
             throw new WrongCredentialsException();
         }
         return token;
