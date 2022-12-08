@@ -13,7 +13,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.UUID;
 
 @Service
@@ -58,7 +57,7 @@ public class AuthService implements AuthenticationUserDetailsService<PreAuthenti
     }
 
     private String generateToken() {
-        return String.format("%s-%s", new Timestamp(System.currentTimeMillis()).getTime(), UUID.randomUUID());
+        return String.format("%s-%s", System.currentTimeMillis(), UUID.randomUUID());
     }
 }
 
