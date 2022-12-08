@@ -13,10 +13,7 @@ import java.io.IOException;
 @Component
 public class FilterChainExceptionHandler extends OncePerRequestFilter {
 
-    private HandlerExceptionResolver resolver;
-
-    public FilterChainExceptionHandler() {
-    }
+    private final HandlerExceptionResolver resolver;
 
     public FilterChainExceptionHandler(HandlerExceptionResolver handlerExceptionResolver) {
         this.resolver = handlerExceptionResolver;

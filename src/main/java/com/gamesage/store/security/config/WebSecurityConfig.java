@@ -11,7 +11,6 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 
@@ -20,9 +19,11 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserService userService;
+    private final FilterChainExceptionHandler exceptionHandler;
 
-    public WebSecurityConfig(UserService userService) {
+    public WebSecurityConfig(UserService userService, FilterChainExceptionHandler exceptionHandler) {
         this.userService = userService;
+        this.exceptionHandler = exceptionHandler;
     }
 
     @Override
@@ -43,13 +44,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers("/login").anonymous()
                 .antMatchers(HttpMethod.GET, "/users", "/cart", "/users/**", "/cart/**").authenticated()
                 .and()
                 .addFilter(preAuthenticationFilter())
-                .addFilterBefore(new FilterChainExceptionHandler(), LogoutFilter.class);
+                .addFilterBefore(exceptionHandler, LogoutFilter.class);
     }
 }
 
