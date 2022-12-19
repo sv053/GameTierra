@@ -11,7 +11,7 @@ class UserTest {
 
     @Test
     void addGame() {
-        User user = new User(null, null, SampleData.TIERS.get(1), BigDecimal.valueOf(87.5));
+        User user = new User(null, null, null, SampleData.TIERS.get(1), BigDecimal.valueOf(87.5));
         Game game = new Game(1, "SKYRIM", BigDecimal.valueOf(87.88d));
 
         assertTrue(user.addGame(game));
@@ -21,7 +21,7 @@ class UserTest {
     @Test
     void withdrawBalance() {
         BigDecimal balance = BigDecimal.valueOf(123.15);
-        User user = new User(null, null, SampleData.TIERS.get(4), balance);
+        User user = new User(null, null, null, SampleData.TIERS.get(4), balance);
         user.withdrawBalance(BigDecimal.ONE);
         assertEquals(user.withdrawBalance(BigDecimal.ONE), user.getBalance());
     }
@@ -29,27 +29,27 @@ class UserTest {
     @Test
     void depositBalance() {
         BigDecimal initialBalance = BigDecimal.valueOf(123.15);
-        User user = new User(null, null, SampleData.TIERS.get(2), initialBalance);
+        User user = new User(null, null, null, SampleData.TIERS.get(2), initialBalance);
         user.depositBalance(BigDecimal.ONE);
         assertEquals(user.getBalance(), initialBalance.add(BigDecimal.ONE));
     }
 
     @Test
     void canPay() {
-        User user = new User(null, null, SampleData.TIERS.get(2), BigDecimal.ONE);
+        User user = new User(null, null, null, SampleData.TIERS.get(2), BigDecimal.ONE);
         assertTrue(user.canPay(BigDecimal.ONE));
     }
 
     @Test
     void cannotPay() {
-        User user = new User(null, null, SampleData.TIERS.get(2), BigDecimal.ONE);
+        User user = new User(null, null, null, SampleData.TIERS.get(2), BigDecimal.ONE);
         assertFalse(user.canPay(BigDecimal.TEN));
     }
 
     @Test
     void hasGame() {
         Game game = new Game(1, "SKYRIM", BigDecimal.valueOf(87.88d));
-        User user = new User(null, null, SampleData.TIERS.get(1), BigDecimal.valueOf(123.15d));
+        User user = new User(null, null, null, SampleData.TIERS.get(1), BigDecimal.valueOf(123.15d));
         user.addGame(game);
 
         assertTrue(user.hasGame(game));
@@ -57,7 +57,7 @@ class UserTest {
 
     @Test
     void doesNotHaveGame() {
-        User user = new User(null, null, SampleData.TIERS.get(1), BigDecimal.valueOf(123));
+        User user = new User(null, null, null, SampleData.TIERS.get(1), BigDecimal.valueOf(123));
         Game alienGame = new Game(1, "SKYRIM", BigDecimal.valueOf(87.88d));
 
         assertFalse(user.hasGame(alienGame));
@@ -65,36 +65,36 @@ class UserTest {
 
     @Test
     void hashCode_sameIdsSameLogins_True() {
-        User pedro = new User(8, "relampago", null, null);
-        User pablo = new User(8, "relampago", null, null);
+        User pedro = new User(8, "relampago", "key1", null, null);
+        User pablo = new User(8, "relampago", "key2", null, null);
         assertEquals(pedro, pablo);
     }
 
     @Test
     void hashCode_differentIdsSameLogins_False() {
-        User pedro = new User(7, "relampago", null, null);
-        User pablo = new User(4, "relampago", null, null);
+        User pedro = new User(7, "relampago", "key1", null, null);
+        User pablo = new User(4, "relampago", "key2", null, null);
         assertNotEquals(pedro, pablo);
     }
 
     @Test
     void equals_sameIdsSameLogins_True() {
-        User pedro = new User(3, "murcielago", null, null);
-        User pablo = new User(3, "murcielago", null, null);
+        User pedro = new User(3, "murcielago", "key1", null, null);
+        User pablo = new User(3, "murcielago", "key2", null, null);
         assertEquals(pedro, pablo);
     }
 
     @Test
     void equals_differentIdsSameLogins_False() {
-        User pedro = new User(7, "relampago", null, null);
-        User pablo = new User(7, "murcielago", null, null);
+        User pedro = new User(7, "relampago", "key1", null, null);
+        User pablo = new User(7, "murcielago", "key1", null, null);
         assertNotEquals(pedro, pablo);
     }
 
     @Test
     void equals_sameIdsDifferentLogins_True() {
-        User pedro = new User(3, "murcielago", null, null);
-        User pablo = new User(3, "relampago", null, null);
+        User pedro = new User(3, "murcielago", "key1", null, null);
+        User pablo = new User(3, "relampago", "key1", null, null);
         assertNotEquals(pedro, pablo);
     }
 }

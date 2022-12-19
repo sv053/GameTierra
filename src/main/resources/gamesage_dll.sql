@@ -38,5 +38,13 @@ CREATE TABLE IF NOT EXISTS 'orders'
     CONSTRAINT 'game_fk' FOREIGN KEY ('game_id') REFERENCES 'game' ('id') ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS 'token'
+(
+    'user_id'     INTEGER,
+    'token_value' TEXT,
+    PRIMARY KEY ('user_id'),
+    CONSTRAINT 'user_fk' FOREIGN KEY ('user_id') REFERENCES 'user' ('id') ON DELETE CASCADE
+);
+
 COMMIT;
 

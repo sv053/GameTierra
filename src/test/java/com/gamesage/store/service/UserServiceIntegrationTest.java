@@ -20,16 +20,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class UserServiceDbIntegrationTest {
+class UserServiceIntegrationTest {
 
     @Autowired
     private UserService userService;
 
     @Test
     void findById_Success() {
-        User user = new User(null, "aquamarina", new Tier(
+        User user = new User(null, "aquamarina", "delmar", new Tier(
                 3, null, 10.d), BigDecimal.TEN);
-
         User userToFind = userService.createOne(user);
         User foundUser = userService.findById(userToFind.getId());
 
@@ -44,11 +43,11 @@ class UserServiceDbIntegrationTest {
     @Test
     void findAll_Success() {
         List<User> usersToAdd = new ArrayList<>();
-        usersToAdd.add(userService.createOne(new User(null, "primero", new Tier(
+        usersToAdd.add(userService.createOne(new User(null, "primero", "key1", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN)));
-        usersToAdd.add(userService.createOne(new User(null, "segundo", new Tier(
+        usersToAdd.add(userService.createOne(new User(null, "segundo", "key2", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN)));
-        usersToAdd.add(userService.createOne(new User(null, "tercero", new Tier(
+        usersToAdd.add(userService.createOne(new User(null, "tercero", "key3", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN)));
         List<User> users = userService.findAll();
 
@@ -57,7 +56,7 @@ class UserServiceDbIntegrationTest {
 
     @Test
     void createUser_Success() {
-        User user = new User(null, "loco", new Tier(
+        User user = new User(null, "loco", "lerida", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
         User addedUser = userService.createOne(user);
         List<User> users = userService.findAll();
@@ -69,7 +68,7 @@ class UserServiceDbIntegrationTest {
     @Test
     void updateUserBalance_Success() {
         BigDecimal balance = BigDecimal.TEN;
-        User user = userService.createOne(new User(null, "loco", new Tier(
+        User user = userService.createOne(new User(null, "luara", "cuarto", new Tier(
                 3, "SILVER", 10.d), balance));
         assertEquals(balance, user.getBalance());
 
@@ -96,7 +95,7 @@ class UserServiceDbIntegrationTest {
     @Test
     void topUpBalance_Success_RightUserId() {
         BigDecimal balance = BigDecimal.TEN;
-        User user = userService.createOne(new User(null, "loco", new Tier(
+        User user = userService.createOne(new User(null, "lsla", "canaria", new Tier(
                 3, "SILVER", 10.d), balance));
 
         BigDecimal amount = BigDecimal.TEN;

@@ -17,7 +17,7 @@ class UserRepositoryTest {
 
     @Test
     void findUser_Success() {
-        User user = new User(8, "thunder", null, null);
+        User user = new User(8, "thunder", "inparadise", null, null);
         UserRepository repository = new UserRepository();
         repository.createOne(user);
         Optional<User> foundUser = repository.findById(user.getId());

@@ -56,6 +56,7 @@ public class DbUserRepository implements UserFunctionRepository {
     @Override
     public Optional<User> findByLogin(String login) {
         try {
+
             return Optional.ofNullable(jdbcTemplate.queryForObject(
                     SELECT_USER_QUERY +
                             "WHERE user.login = ?",
@@ -86,9 +87,10 @@ public class DbUserRepository implements UserFunctionRepository {
         }, keyHolder);
         return new User(keyHolder.getKeyAs(Integer.class),
                 userToAdd.getLogin(),
+                userToAdd.getPassword(),
                 userToAdd.getTier(),
-                userToAdd.getBalance(),
-                userToAdd.getPassword());
+                userToAdd.getBalance()
+        );
     }
 
     @Override
@@ -112,9 +114,10 @@ public class DbUserRepository implements UserFunctionRepository {
             return new User(
                     rs.getInt("user_id"),
                     rs.getString("login"),
+                    rs.getString("password"),
                     tier,
-                    rs.getBigDecimal("balance"),
-                    rs.getString("password"));
+                    rs.getBigDecimal("balance")
+            );
         }
     }
 }

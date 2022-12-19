@@ -23,7 +23,7 @@ public class DbOrderRepository implements Repository<Order, Integer> {
     private static final String INSERT_ORDER = "INSERT INTO orders (user_id, game_id, order_datetime) " +
             "VALUES (?, ?, ?) ";
     private static final String SELECT_ALL_ORDERS_QUERY = "SELECT orders.id AS id, user_id, game_id, order_datetime, " +
-            "user.login, user.tier_id, user.balance, game.name, game.price" +
+            "user.login, user.password, user.tier_id, user.balance, game.name, game.price" +
             " FROM user" +
             " LEFT JOIN orders" +
             " ON  user.id = orders.user_id" +
@@ -88,9 +88,10 @@ public class DbOrderRepository implements Repository<Order, Integer> {
             User user = new User(
                     rs.getInt("user_id"),
                     rs.getString("login"),
+                    rs.getString("password"),
                     tier,
-                    rs.getBigDecimal("balance"),
-                    rs.getString("password"));
+                    rs.getBigDecimal("balance")
+            );
 
             Game game = new Game(
                     rs.getInt("game_id"),

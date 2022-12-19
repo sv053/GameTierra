@@ -29,9 +29,9 @@ public class User {
 
     public User(@JsonProperty("id") Integer id,
                 @JsonProperty("login") String login,
+                @JsonProperty("password") String password,
                 @JsonProperty("tier") Tier tier,
-                @JsonProperty("balance") BigDecimal balance,
-                @JsonProperty("password") String password) {
+                @JsonProperty("balance") BigDecimal balance) {
         this(id, login, tier, balance);
         this.password = password;
     }

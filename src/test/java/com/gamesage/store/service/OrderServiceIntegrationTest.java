@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class OrderServiceDbIntegrationTest {
+class OrderServiceIntegrationTest {
 
     @Autowired
     private OrderService orderService;
@@ -29,7 +29,7 @@ class OrderServiceDbIntegrationTest {
 
     @BeforeEach
     void init() {
-        User userToCreate = new User(null, "aqua", new Tier(
+        User userToCreate = new User(null, "aqua", "marina", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
         user = userService.createOne(userToCreate);
         game = gameService.createOne(new Game("future in the past", BigDecimal.TEN));
@@ -67,8 +67,56 @@ class OrderServiceDbIntegrationTest {
         );
     }
 
+    @Test
+    void buyGame_gameIsBought_Success() {
+        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
+
+        assertTrue(result.isBought());
+    }
+
+    @Test
+    void buyGame_targetGameIsCorrect_Success() {
+        PurchaseIntent expectedPurchase =
+                new PurchaseIntent
+                        .Builder(game)
+                        .gameIsBought(true)
+                        .buyer(user)
+                        .message(PurchaseIntent.PurchaseMessage.PURCHASE_SUCCESSFUL)
+                        .orderDateTime(LocalDateTime.now())
+                        .build();
+        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
+
+        assertEquals(expectedPurchase.getTargetGame(), result.getTargetGame());
+    }
+
+    @Test
+    void buyGame_BuyerIsCorrect_Success() {
+        PurchaseIntent expectedPurchase =
+                new PurchaseIntent
+                        .Builder(game)
+                        .gameIsBought(true)
+                        .buyer(user)
+                        .message(PurchaseIntent.PurchaseMessage.PURCHASE_SUCCESSFUL)
+                        .orderDateTime(LocalDateTime.now())
+                        .build();
+        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
+
+        assertEquals(expectedPurchase.getBuyer(), result.getBuyer());
+    }
+
+    @Test
+    void buyGame_PurchaseTimeIsOk_Success() {
+        LocalDateTime before = LocalDateTime.now();
+        PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
+
+        assertBetweenTimePoints(before, result.getOrderDateTime());
+    }
+
     void assertBetweenTimePoints(LocalDateTime firstDateTime, LocalDateTime dateTime) {
-        assertTrue(firstDateTime.isBefore(dateTime) && dateTime.isBefore(LocalDateTime.now()));
+        LocalDateTime after = LocalDateTime.now();
+        assertTrue(firstDateTime.isBefore(dateTime)
+                && (dateTime.isBefore(after) || dateTime.isEqual(after))
+        );
     }
 }
 

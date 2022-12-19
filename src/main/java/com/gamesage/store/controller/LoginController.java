@@ -1,8 +1,8 @@
 package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.User;
+import com.gamesage.store.security.auth.HeaderName;
 import com.gamesage.store.security.service.AuthService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,9 +21,10 @@ public class LoginController {
 
     @PostMapping
     public ResponseEntity<User> login(@RequestBody User user) {
-        if (authService.checkIfUserExists(user.getLogin(), user.getPassword()))
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        String token = authService.authenticateUser(user).getValue();
+        return ResponseEntity.ok()
+                .header(HeaderName.TOKEN_HEADER, token)
+                .body(user);
     }
 }
 
