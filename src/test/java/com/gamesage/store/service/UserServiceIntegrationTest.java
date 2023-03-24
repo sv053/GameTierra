@@ -5,6 +5,7 @@ import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.exception.EntityNotFoundException;
 import com.gamesage.store.paymentapi.PaymentRequest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +25,14 @@ class UserServiceIntegrationTest {
 
     @Autowired
     private UserService userService;
+
+    @BeforeEach
+    void init() {
+        User userToCreate = new User(null, "aqua", "marina", new Tier(
+                3, "SILVER", 10.d), BigDecimal.TEN);
+        User user = userService.createOne(userToCreate);
+//        game = gameService.createOne(new Game("future in the past", BigDecimal.TEN));
+    }
 
     @Test
     void findById_Success() {

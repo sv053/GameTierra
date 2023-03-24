@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
@@ -31,12 +30,10 @@ public class DbUserRepository implements UserFunctionRepository {
             "WHERE id = ?";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> userRowMapper;
-    private final BCryptPasswordEncoder encoder;
 
-    public DbUserRepository(JdbcTemplate jdbcTemplate, UserRowMapper userRowMapper, BCryptPasswordEncoder encoder) {
+    public DbUserRepository(JdbcTemplate jdbcTemplate, UserRowMapper userRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.userRowMapper = userRowMapper;
-        this.encoder = encoder;
     }
 
     @Override
