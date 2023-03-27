@@ -30,6 +30,9 @@ class GameControllerTest {
     @Autowired
     private GameService gameService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
     void shouldFindGameById() throws Exception {
         Game game = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
@@ -55,22 +58,24 @@ class GameControllerTest {
 
     @Test
     void shouldFindAllGames() throws Exception {
+        // Arrange
         Game game1 = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
         Game game2 = new Game(2, "THE_LAST_OF_US", BigDecimal.valueOf(7.28d));
 
+        // Act
         List<Game> games = Arrays.asList(game1, game2);
+        List<Game> savedGames = gameService.createAll(games);
 
-        gameService.createAll(games);
-
+        // Assert
         mockMvc.perform(get("/games"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].id").value(games.get(0).getId()))
-                .andExpect(jsonPath("$[0].name").value(game1.getName()))
-                .andExpect(jsonPath("$[0].price").value(game1.getPrice()))
-                .andExpect(jsonPath("$[1].id").value(games.get(1).getId()))
-                .andExpect(jsonPath("$[1].name").value(game2.getName()))
-                .andExpect(jsonPath("$[1].price").value(game2.getPrice()));
+                .andExpect(jsonPath("$[0].id").value(savedGames.get(0).getId()))
+                .andExpect(jsonPath("$[0].name").value(savedGames.get(0).getName()))
+                .andExpect(jsonPath("$[0].price").value(savedGames.get(0).getPrice()))
+                .andExpect(jsonPath("$[1].id").value(savedGames.get(1).getId()))
+                .andExpect(jsonPath("$[1].name").value(savedGames.get(1).getName()))
+                .andExpect(jsonPath("$[1].price").value(savedGames.get(1).getPrice()));
     }
 
     @Test
@@ -80,8 +85,7 @@ class GameControllerTest {
 
         List<Game> gamesToSave = Arrays.asList(game1, game2);
 
-        ObjectMapper mapper = new ObjectMapper();
-        String gamesToSaveJson = mapper.writeValueAsString(gamesToSave);
+        String gamesToSaveJson = objectMapper.writeValueAsString(gamesToSave);
 
         mockMvc.perform(post("/games")
                         .contentType(MediaType.APPLICATION_JSON)

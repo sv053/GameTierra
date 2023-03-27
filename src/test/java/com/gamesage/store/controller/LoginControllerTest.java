@@ -1,9 +1,12 @@
 package com.gamesage.store.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
+import com.gamesage.store.service.TokenService;
 import com.gamesage.store.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,9 +15,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,7 +37,27 @@ class LoginControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    UserService userService;
+    private UserService userService;
+    @Autowired
+    private TokenService tokenService;
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private String userJson;
+
+    @BeforeEach
+    void setup() {
+        userJson = "{\"id\": 2, " +
+                " \"login\": \"admin\", " +
+                " \"password\": \"letmein\", " +
+                " \"tier\": { " +
+                " \"cashbackPercentage\": 0.0, " +
+                " \"id\": 1, " +
+                " \"level\": \"FREE\" " +
+                "}, " +
+                "\"balance\": 815.16, " +
+                "\"games\": []}";
+    }
 
     @Test
     void givenCorrectCreds_shouldLoginAndReturn200() throws Exception {
@@ -39,22 +66,32 @@ class LoginControllerTest {
 
         userService.createOne(userWithRightCreds);
 
-        mockMvc.perform(post(API_ENDPOINT)
-                        .contentType(APPLICATION_JSON_UTF8)
-                        .content(new ObjectMapper().writeValueAsString(userWithRightCreds))
-                        .accept(APPLICATION_JSON_UTF8))
+        String tokenResponseValue = mockMvc.perform(post(API_ENDPOINT)
+                        .content(userJson)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andReturn();
+                .andReturn()
+                .getResponse()
+                .getHeader("X-Auth-Token");
+
+        Optional<AuthToken> token = tokenService.findTokenByLogin(userWithRightCreds.getLogin());
+        String tokenValue = "";
+        if (token.isPresent()) {
+            tokenValue = token.get().getValue();
+        }
+
+        assertNotNull(tokenResponseValue);
+        assertEquals(tokenValue, tokenResponseValue);
     }
 
     @Test
     void givenUserDoesNotExist_shouldNotLoginAndReturn401() throws Exception {
-        User userWithRightCreds = new User(111, "admin", "letmein", new Tier(
+        User userWithWrongCreds = new User(111, "admin", "letmein", new Tier(
                 1, "FREE", 0.d), BigDecimal.TEN);
 
         mockMvc.perform(post(API_ENDPOINT)
                         .contentType(APPLICATION_JSON_UTF8)
-                        .content(new ObjectMapper().writeValueAsString(userWithRightCreds))
+                        .content(objectMapper.writeValueAsString(userWithWrongCreds))
                         .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().isUnauthorized())
                 .andReturn();
@@ -64,13 +101,22 @@ class LoginControllerTest {
     void givenCorrectLoginAndWrongKey_shouldReturn401() throws Exception {
         User userWithRightCreds = new User(1, "admin", "letmein", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
-        userService.createOne(userWithRightCreds);
+        User savedUser = userService.createOne(userWithRightCreds);
 
-        User userWithWrongCredsJson = new User(null, "admin", "neverletmein", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN);
+        Field password = User.class.getDeclaredField("password");
+        password.setAccessible(true);
+        String passValue = (String) password.get(savedUser);
 
-        ObjectMapper mapper = new ObjectMapper();
-        String userJson = mapper.writeValueAsString(userWithWrongCredsJson);
+        userJson = "{\"id\": 2, " +
+                " \"login\": \"admin\", " +
+                " \"password\": \" " + passValue + " \", " +
+                " \"tier\": { " +
+                " \"cashbackPercentage\": 0.0, " +
+                " \"id\": 1, " +
+                " \"level\": \"FREE\" " +
+                "}, " +
+                "\"balance\": 815.16, " +
+                "\"games\": []}";
 
         mockMvc.perform(post(API_ENDPOINT)
                         .contentType(APPLICATION_JSON_UTF8)
@@ -89,7 +135,7 @@ class LoginControllerTest {
         User userWithWrongCreds = new User(2, "hijacker", "letmein", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
 
-        String userJson = new ObjectMapper().writeValueAsString(userWithWrongCreds);
+        String userJson = objectMapper.writeValueAsString(userWithWrongCreds);
         mockMvc.perform(post(API_ENDPOINT)
                         .contentType(APPLICATION_JSON_UTF8)
                         .content(userJson)

@@ -3,18 +3,18 @@ package com.gamesage.store.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
-import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.Card;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.paymentapi.PaymentRequest;
-import com.gamesage.store.service.TokenService;
 import com.gamesage.store.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -23,11 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.Base64;
-import java.util.Optional;
+import java.util.LinkedHashMap;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -46,77 +44,83 @@ class UserControllerTest {
     @Autowired
     private UserService userService;
     @Autowired
-    private TokenService tokenService;
-    @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private String userJson;
+
+    @BeforeEach
+    void setup() {
+        userJson = "{\"id\": 2, " +
+                " \"login\": \"admin\", " +
+                " \"password\": \"letmein\", " +
+                " \"tier\": { " +
+                " \"cashbackPercentage\": 0.0, " +
+                " \"id\": 1, " +
+                " \"level\": \"FREE\" " +
+                "}, " +
+                "\"balance\": 815.16, " +
+                "\"games\": []}";
+    }
 
     @Test
     void givenAuthorizedUser_whenFindAllUsers_thenSuccess() throws Exception {
-        User firstUserToAdd = new User(1, "first", "firstPass", new Tier(
+        User firstUserToAdd = new User(null, "admin", "letmein", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
-        User secondUserToAdd = new User(2, "second", "secondPass", new Tier(
+        User secondUserToAdd = new User(null, "second", "secondPass", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
 
-        userService.createOne(firstUserToAdd);
-        userService.createOne(secondUserToAdd);
+        User firstSavedUser = userService.createOne(firstUserToAdd);
+        User secondSavedUser = userService.createOne(secondUserToAdd);
 
-        mockMvc.perform(post(API_LOGIN_ENDPOINT)
-                        .content(new ObjectMapper().writeValueAsString(firstUserToAdd))
+        MockHttpServletResponse response = mockMvc.perform(post(API_LOGIN_ENDPOINT)
+                        .content(userJson)
                         .contentType(APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk());
-
-        Optional<AuthToken> token = tokenService.findTokenByLogin(firstUserToAdd.getLogin());
-        String tokenValue = "";
-        if (token.isPresent()) {
-            tokenValue = token.get().getValue();
-        }
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
 
         mockMvc.perform(MockMvcRequestBuilders.get(API_USER_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Auth-Token", tokenValue))
+                        .header("X-Auth-Token", response.getHeader("X-Auth-Token")))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(jsonPath("$", hasSize(userService.findAll().size())))
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$[0].login").value(containsString(firstUserToAdd.getLogin())))
-                .andExpect(jsonPath("$[1].login").value(containsString(secondUserToAdd.getLogin())));
+                .andExpect(jsonPath("$[0].login").value(containsString(firstSavedUser.getLogin())))
+                .andExpect(jsonPath("$[1].login").value(containsString(secondSavedUser.getLogin())));
     }
 
     @Test
-    void givenUnauthorizedUser_whenFindAllUsers_then403() throws Exception {
+    void givenUserWithoutToken_whenFindAllUsers_then403() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(API_USER_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
-    void givenUser_whenCreateOne_thenSuccess() throws Exception {
-        User user = new User(888, "lilu", "multipass", new Tier(
+    void givenUnauthorizedUser_whenFindAllUsers_then401() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(API_USER_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Auth-Token", "11111"))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+    }
+
+    @Test
+    void createOne_thenSuccess() throws Exception {
+        User user = new User(888, "admin", "multipass", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
-        User savedUser = userService.createOne(user);
-        mockMvc.perform(post(API_LOGIN_ENDPOINT)
-                        .content(new ObjectMapper().writeValueAsString(user))
-                        .contentType(APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk());
 
-        String userJson = new ObjectMapper().writeValueAsString(user);
-
-        Optional<AuthToken> token = tokenService.findTokenByLogin(user.getLogin());
-
-        String tokenValue = "";
-        if (token.isPresent()) {
-            tokenValue = token.get().getValue();
-        }
         mockMvc.perform(MockMvcRequestBuilders.post(API_USER_ENDPOINT)
-                        .header("X-Auth-Token", tokenValue)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-//                .andExpect(jsonPath("$", isA(LinkedHashMap.class)))
-//                .andExpect(jsonPath("$", aMapWithSize(1)))
-//                .andExpect(jsonPath("$.login").exists())
-//                .andExpect(jsonPath("$.login", notNullValue()))
-//                .andExpect(jsonPath("$.login").value(savedUser.getLogin()));
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(jsonPath("$", isA(LinkedHashMap.class)))
+                .andExpect(jsonPath("$", aMapWithSize(5)))
+                .andExpect(jsonPath("$.login").exists())
+                .andExpect(jsonPath("$.login", notNullValue()))
+                .andExpect(jsonPath("$.login").value(user.getLogin()));
     }
 
     @Test
@@ -126,10 +130,9 @@ class UserControllerTest {
                 LocalDate.now().plusDays(1L),
                 111);
         PaymentRequest paymentRequest = new PaymentRequest(BigDecimal.ONE, card);
-        ObjectMapper objectMapper = new ObjectMapper();
+
         objectMapper.registerModule(new JSR310Module());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
 
         mockMvc.perform(MockMvcRequestBuilders.post(API_USER_ENDPOINT + "/2/topup")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -138,8 +141,8 @@ class UserControllerTest {
     }
 
     @Test
-    void givenAuthorizedUser_whenTryTopUp_thenSuccess() throws Exception {
-        User userWithRightCreds = new User(1, "third", "letmein", new Tier(
+    void givenUser_whenTryTopUp_thenSuccess() throws Exception {
+        User userWithRightCreds = new User(1, "admin", "letmein", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
         userService.createOne(userWithRightCreds);
 
@@ -148,12 +151,10 @@ class UserControllerTest {
                 LocalDate.now().plusDays(1L),
                 111);
         PaymentRequest paymentRequest = new PaymentRequest(BigDecimal.ONE, card);
-        ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JSR310Module());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
         mockMvc.perform(MockMvcRequestBuilders.post(API_USER_ENDPOINT + "/{id}/topup", 1)
-                        .header("Authorization", "Basic " + Base64.getEncoder().encodeToString(("@Test").getBytes()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(paymentRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
