@@ -1,5 +1,6 @@
 package com.gamesage.store.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
@@ -48,31 +49,30 @@ class UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private String userJson;
+    private final String userJson = "{\"id\": 2, " +
+            " \"login\": \"admin\", " +
+            " \"password\": \"letmein\", " +
+            " \"tier\": { " +
+            " \"cashbackPercentage\": 0.0, " +
+            " \"id\": 1, " +
+            " \"level\": \"FREE\" " +
+            "}, " +
+            "\"balance\": 815.16, " +
+            "\"games\": []}";
+
+    private User user;
 
     @BeforeEach
-    void setup() {
-        userJson = "{\"id\": 2, " +
-                " \"login\": \"admin\", " +
-                " \"password\": \"letmein\", " +
-                " \"tier\": { " +
-                " \"cashbackPercentage\": 0.0, " +
-                " \"id\": 1, " +
-                " \"level\": \"FREE\" " +
-                "}, " +
-                "\"balance\": 815.16, " +
-                "\"games\": []}";
+    void setup() throws JsonProcessingException {
+        user = objectMapper.readValue(userJson, User.class);
     }
 
     @Test
     void givenAuthorizedUser_whenFindAllUsers_thenSuccess() throws Exception {
-        User firstUserToAdd = new User(null, "admin", "letmein", new Tier(
+        User savedUser = userService.createOne(user);
+        User secondUser = new User(null, "second", "secondPass", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
-        User secondUserToAdd = new User(null, "second", "secondPass", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN);
-
-        User firstSavedUser = userService.createOne(firstUserToAdd);
-        User secondSavedUser = userService.createOne(secondUserToAdd);
+        User secondSavedUser = userService.createOne(secondUser);
 
         MockHttpServletResponse response = mockMvc.perform(post(API_LOGIN_ENDPOINT)
                         .content(userJson)
@@ -88,7 +88,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$", hasSize(userService.findAll().size())))
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$[0].login").value(containsString(firstSavedUser.getLogin())))
+                .andExpect(jsonPath("$[0].login").value(containsString(savedUser.getLogin())))
                 .andExpect(jsonPath("$[1].login").value(containsString(secondSavedUser.getLogin())));
     }
 
@@ -109,9 +109,6 @@ class UserControllerTest {
 
     @Test
     void createOne_thenSuccess() throws Exception {
-        User user = new User(888, "admin", "multipass", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN);
-
         mockMvc.perform(MockMvcRequestBuilders.post(API_USER_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
@@ -127,14 +124,14 @@ class UserControllerTest {
     void givenExistingUser_whenTryTopUp_thenEntityNotFound() throws Exception {
         Card card = new Card(156l,
                 "Jack Black",
-                LocalDate.now().plusDays(1L),
+                LocalDate.of(2025, 3, 30),
                 111);
         PaymentRequest paymentRequest = new PaymentRequest(BigDecimal.ONE, card);
 
         objectMapper.registerModule(new JSR310Module());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-        mockMvc.perform(MockMvcRequestBuilders.post(API_USER_ENDPOINT + "/2/topup")
+        mockMvc.perform(MockMvcRequestBuilders.post(API_USER_ENDPOINT + "/99999/topup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(paymentRequest)))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -142,19 +139,16 @@ class UserControllerTest {
 
     @Test
     void givenUser_whenTryTopUp_thenSuccess() throws Exception {
-        User userWithRightCreds = new User(1, "admin", "letmein", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN);
-        userService.createOne(userWithRightCreds);
-
+        User savedUser = userService.createOne(user);
         Card card = new Card(156l,
                 "Jack Black",
-                LocalDate.now().plusDays(1L),
+                LocalDate.of(2025, 3, 30),
                 111);
         PaymentRequest paymentRequest = new PaymentRequest(BigDecimal.ONE, card);
         objectMapper.registerModule(new JSR310Module());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-        mockMvc.perform(MockMvcRequestBuilders.post(API_USER_ENDPOINT + "/{id}/topup", 1)
+        mockMvc.perform(MockMvcRequestBuilders.post(API_USER_ENDPOINT + "/{id}/topup", savedUser.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(paymentRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk());

@@ -86,12 +86,9 @@ class LoginControllerTest {
 
     @Test
     void givenUserDoesNotExist_shouldNotLoginAndReturn401() throws Exception {
-        User userWithWrongCreds = new User(111, "admin", "letmein", new Tier(
-                1, "FREE", 0.d), BigDecimal.TEN);
-
         mockMvc.perform(post(API_ENDPOINT)
                         .contentType(APPLICATION_JSON_UTF8)
-                        .content(objectMapper.writeValueAsString(userWithWrongCreds))
+                        .content(userJson)
                         .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().isUnauthorized())
                 .andReturn();
@@ -99,9 +96,9 @@ class LoginControllerTest {
 
     @Test
     void givenCorrectLoginAndWrongKey_shouldReturn401() throws Exception {
-        User userWithRightCreds = new User(1, "admin", "letmein", new Tier(
+        User user = new User(1, "admin", "letmein", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
-        User savedUser = userService.createOne(userWithRightCreds);
+        User savedUser = userService.createOne(user);
 
         Field password = User.class.getDeclaredField("password");
         password.setAccessible(true);
@@ -128,14 +125,10 @@ class LoginControllerTest {
 
     @Test
     void givenWrongLoginAndCorrectKey_shouldReturn401() throws Exception {
-        User userWithRightCreds = new User(1, "admin", "letmein", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN);
-        userService.createOne(userWithRightCreds);
-
         User userWithWrongCreds = new User(2, "hijacker", "letmein", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
-
         String userJson = objectMapper.writeValueAsString(userWithWrongCreds);
+
         mockMvc.perform(post(API_ENDPOINT)
                         .contentType(APPLICATION_JSON_UTF8)
                         .content(userJson)

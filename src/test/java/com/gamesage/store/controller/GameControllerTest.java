@@ -58,15 +58,11 @@ class GameControllerTest {
 
     @Test
     void shouldFindAllGames() throws Exception {
-        // Arrange
         Game game1 = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
         Game game2 = new Game(2, "THE_LAST_OF_US", BigDecimal.valueOf(7.28d));
-
-        // Act
         List<Game> games = Arrays.asList(game1, game2);
         List<Game> savedGames = gameService.createAll(games);
 
-        // Assert
         mockMvc.perform(get("/games"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -80,8 +76,8 @@ class GameControllerTest {
 
     @Test
     void shouldCreateGamesWithUserRightCreds() throws Exception {
-        Game game1 = new Game(8, "THE_WITCHER", BigDecimal.valueOf(17.28d));
-        Game game2 = new Game(9, "THE_LAST_OF_US", BigDecimal.ONE);
+        Game game1 = new Game(null, "THE_WITCHER", BigDecimal.valueOf(17.28d));
+        Game game2 = new Game(null, "THE_LAST_OF_US", BigDecimal.ONE);
 
         List<Game> gamesToSave = Arrays.asList(game1, game2);
 
