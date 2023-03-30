@@ -36,7 +36,6 @@ class GameControllerTest {
     @Test
     void shouldFindGameById() throws Exception {
         Game game = new Game(1, "THE_WITCHER", BigDecimal.valueOf(17.28d));
-
         Game createdGame = gameService.createOne(game);
 
         mockMvc.perform(get("/games/{gameId}", createdGame.getId()))

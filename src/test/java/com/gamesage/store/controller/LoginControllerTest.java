@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -96,13 +95,9 @@ class LoginControllerTest {
 
     @Test
     void givenCorrectLoginAndWrongKey_shouldReturn401() throws Exception {
-        User user = new User(1, "admin", "letmein", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN);
+        User user = objectMapper.readValue(userJson, User.class);
         User savedUser = userService.createOne(user);
-
-        Field password = User.class.getDeclaredField("password");
-        password.setAccessible(true);
-        String passValue = (String) password.get(savedUser);
+        String passValue = savedUser.getPassword();
 
         userJson = "{\"id\": 2, " +
                 " \"login\": \"admin\", " +
