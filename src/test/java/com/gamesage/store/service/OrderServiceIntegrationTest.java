@@ -112,10 +112,11 @@ class OrderServiceIntegrationTest {
         assertBetweenTimePoints(before, result.getOrderDateTime());
     }
 
-    void assertBetweenTimePoints(LocalDateTime firstDateTime, LocalDateTime dateTime) {
-        LocalDateTime after = LocalDateTime.now();
-        assertTrue(firstDateTime.isBefore(dateTime)
-                && (dateTime.isBefore(after) || dateTime.isEqual(after))
+    void assertBetweenTimePoints(LocalDateTime initDateTime, LocalDateTime orderDateTime) {
+        LocalDateTime afterOrderDateTime = LocalDateTime.now();
+        assertTrue(
+                (initDateTime.isBefore(orderDateTime) || initDateTime.isEqual(orderDateTime))
+                        && (orderDateTime.isBefore(afterOrderDateTime) || orderDateTime.isEqual(afterOrderDateTime))
         );
     }
 }
