@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
-//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OrderControllerIntegrationTest {
 
     private static final String API_LOGIN_ENDPOINT = "/login";
@@ -43,7 +44,7 @@ class OrderControllerIntegrationTest {
             BigDecimal.valueOf(1000));
     private final String USER_JSON = new Gson().toJson(user, User.class);
     private final Game GAME = new Game("THE_LAST_OF_US", BigDecimal.valueOf(7.28d));
-    private String TOKEN;
+    String TOKEN;
 
     @Autowired
     private MockMvc mockMvc;
@@ -57,8 +58,8 @@ class OrderControllerIntegrationTest {
 //    private Gson gson;
 
     @BeforeAll
-    static void setup() throws Exception {
-        // TOKEN = loginAndGetToken();
+    void setup() throws Exception {
+        TOKEN = loginAndGetToken();
     }
 
     @Test
@@ -87,7 +88,7 @@ class OrderControllerIntegrationTest {
         orderService.buyGame(savedGame.getId(), savedUser.getId());
 
         mockMvc.perform(get(API_ORDER_ENDPOINT)
-                        .header(TOKEN_HEADER_TITLE, tokenValue)
+                        .header(TOKEN_HEADER_TITLE, TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.*.user.login", Matchers.containsInAnyOrder(savedUser.getLogin())))
@@ -104,7 +105,7 @@ class OrderControllerIntegrationTest {
         Order order = orderService.findAll().get(0);
 
         mockMvc.perform(get(ORDER_ID_ENDPOINT, order.getId())
-                        .header(TOKEN_HEADER_TITLE, tokenValue)
+                        .header(TOKEN_HEADER_TITLE, TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.user.login").value(savedUser.getLogin()))
@@ -120,7 +121,7 @@ class OrderControllerIntegrationTest {
         String tokenValue = loginAndGetToken();
 
         mockMvc.perform(post(ORDER_BUY_ENDPOINT, savedGame.getId(), savedUser.getId())
-                        .header(TOKEN_HEADER_TITLE, tokenValue)
+                        .header(TOKEN_HEADER_TITLE, TOKEN)
                         .content(USER_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
