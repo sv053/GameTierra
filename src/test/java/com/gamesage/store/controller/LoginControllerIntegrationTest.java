@@ -5,6 +5,7 @@ import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.TokenService;
 import com.gamesage.store.service.UserService;
+import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,7 +18,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -28,6 +29,11 @@ class LoginControllerIntegrationTest {
 
     private static final String API_ENDPOINT = "/login";
 
+    private final Tier tier = new Tier(5, "PLATINUM", 30.0);
+    private final User user = new User(1, "testuser", "testpass", tier,
+            BigDecimal.valueOf(1000));
+    public final String USER_JSON = new Gson().toJson(user, User.class);
+
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -35,17 +41,12 @@ class LoginControllerIntegrationTest {
     @Autowired
     private TokenService tokenService;
 
-    private final Tier tier = new Tier(5, "PLATINUM", 30.0);
-    private final User user = new User(1, "testuser", "testpass", tier,
-            BigDecimal.valueOf(1000));
-    private final String userJson = user.toString();
-
     @Test
     void givenCorrectCreds_shouldLoginAndReturn200() throws Exception {
         userService.createOne(user);
         String tokenHeaderName = "X-Auth-Token";
         String tokenResponseValue = mockMvc.perform(post(API_ENDPOINT)
-                        .content(userJson)
+                        .content(USER_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn()
@@ -53,9 +54,9 @@ class LoginControllerIntegrationTest {
                 .getHeader(tokenHeaderName);
 
         Optional<AuthToken> token = tokenService.findTokenByLogin(user.getLogin());
-        String tokenValue = token.isPresent() ? token.get().getValue() : "";
+        String tokenValue = token.map(AuthToken::getValue).orElse("");
 
-        assertNotNull(tokenResponseValue);
+        assertNotEquals("", tokenValue);
         assertEquals(tokenValue, tokenResponseValue);
     }
 
@@ -63,17 +64,9 @@ class LoginControllerIntegrationTest {
     void givenUserCredsDoNotExist_shouldNotLoginAndReturn401() throws Exception {
         mockMvc.perform(post(API_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(userJson))
+                        .content(USER_JSON))
                 .andExpect(status().isUnauthorized())
                 .andReturn();
-    }
-
-    @Test
-    void givenCorrectLoginAndWrongCreds_shouldReturn401() throws Exception {
-        mockMvc.perform(post(API_ENDPOINT)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(userJson))
-                .andExpect(status().isUnauthorized());
     }
 }
 

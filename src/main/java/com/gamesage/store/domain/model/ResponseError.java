@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ResponseError {
 
-    CVC_ERROR("Отказ сети проводить операцию или неправильный CVV-код"),
-    INVALID_CARD_NUMBER("Некорректный номер карты"),
-    FORMAT_ERROR("Повторите попытку позже"),
-    EXPIRED_CARD("Истёк срок действия карты"),
-    INSUFFICIENT_FUNDS("Недостаточно средств");
+    CVC_ERROR("Network refusal to perform the operation or incorrect CVV code"),
+    INVALID_CARD_NUMBER("Incorrect card number"),
+    FORMAT_ERROR("Please try again later"),
+    EXPIRED_CARD("Expired card"),
+    INSUFFICIENT_FUNDS("Insufficient funds");
 
     @JsonValue
     private final String cardErrorMessage;

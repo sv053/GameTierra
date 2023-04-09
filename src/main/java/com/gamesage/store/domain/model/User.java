@@ -113,17 +113,14 @@ public class User {
 
     @Override
     public String toString() {
-        return
-                "{\"id\":               " + id + ", " +
-                        " \"login\":            \"" + login + "\", " +
-                        " \"password\":         \"" + password + "\", " +
-                        " \"tier\": { " +
-                        " \"cashbackPercentage\":   " + tier.getCashbackPercentage() + ", " +
-                        " \"id\":                   " + tier.getId() + ", " +
-                        " \"level\":                " + tier.getId() +
-                        "}, " +
-                        "\"balance\":           " + balance + ", " +
-                        "\"games\": []}";
+        return "\nUser{"
+                + "id=" + id
+                + ", login=" + login
+                + ", tier=" + tier
+                + ", cashback=" + tier.getCashbackPercentage() * 100 + "%}"
+                + ", balance=$" + balance
+                + ", \ngames=\n" + getGames()
+                + '}';
     }
 }
 

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService, AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
@@ -62,6 +63,10 @@ public class UserService implements UserDetailsService, AuthenticationUserDetail
     }
 
     public User createOne(User userToAdd) {
+        Optional<User> alreadyExistedUser = repository.findByLogin(userToAdd.getLogin());
+        if (alreadyExistedUser.isPresent()) {
+            return alreadyExistedUser.get();
+        }
         userToAdd.setPassword(encoder.encode(userToAdd.getPassword()));
         return repository.createOne(userToAdd);
     }

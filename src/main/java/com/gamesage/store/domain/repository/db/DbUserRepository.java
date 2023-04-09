@@ -53,7 +53,6 @@ public class DbUserRepository implements UserFunctionRepository {
     @Override
     public Optional<User> findByLogin(String login) {
         try {
-
             return Optional.ofNullable(jdbcTemplate.queryForObject(
                     SELECT_USER_QUERY +
                             "WHERE user.login = ?",
