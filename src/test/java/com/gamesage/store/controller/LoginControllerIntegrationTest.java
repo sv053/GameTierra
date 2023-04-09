@@ -6,7 +6,9 @@ import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.TokenService;
 import com.gamesage.store.service.UserService;
 import com.google.gson.Gson;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,14 +27,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LoginControllerIntegrationTest {
 
     private static final String API_ENDPOINT = "/login";
-
-    private final Tier tier = new Tier(5, "PLATINUM", 30.0);
-    private final User user = new User(1, "testuser", "testpass", tier,
-            BigDecimal.valueOf(1000));
-    public final String USER_JSON = new Gson().toJson(user, User.class);
+    public static final String TOKEN_HEADER_NAME = "X-Auth-Token";
+    public String USER_JSON;
+    private User user;
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,18 +41,27 @@ class LoginControllerIntegrationTest {
     private UserService userService;
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private Gson gson;
+
+    @BeforeAll
+    void setup() {
+        Tier tier = new Tier(5, "PLATINUM", 30.0);
+        user = new User(null, "testuser", "testpass", tier,
+                BigDecimal.valueOf(1000));
+        USER_JSON = gson.toJson(user, User.class);
+    }
 
     @Test
     void givenCorrectCreds_shouldLoginAndReturn200() throws Exception {
         userService.createOne(user);
-        String tokenHeaderName = "X-Auth-Token";
         String tokenResponseValue = mockMvc.perform(post(API_ENDPOINT)
                         .content(USER_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
-                .getHeader(tokenHeaderName);
+                .getHeader(TOKEN_HEADER_NAME);
 
         Optional<AuthToken> token = tokenService.findTokenByLogin(user.getLogin());
         String tokenValue = token.map(AuthToken::getValue).orElse("");

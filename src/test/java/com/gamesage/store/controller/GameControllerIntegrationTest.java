@@ -4,7 +4,9 @@ import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.service.GameService;
 import com.google.gson.Gson;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,27 +26,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
-//@ExtendWith(GameControllerIntegrationTest.TestInstancePostProcessor.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class GameControllerIntegrationTest {
 
     private static final String API_GAME_ENDPOINT = "/games";
     private static final String GAME_ID_ENDPOINT = "/games/{gameId}";
 
-    private final Game game = new Game("THE_LAST_OF_US", BigDecimal.valueOf(7.28d));
-    private final Game anotherGame = new Game("THE_WITCHER", BigDecimal.valueOf(17.28d));
-    private final List<Game> games = Arrays.asList(game, anotherGame);
-    public final String GAMES_JSON = new Gson().toJson(games);
+    public String GAMES_JSON;
+    private Game game;
+    private Game anotherGame;
+    private List<Game> games;
     private Game savedGame;
 
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private GameService gameService;
+    @Autowired
+    private Gson gson;
 
-//    @BeforeAll
-//    public void setUp() {
-//        savedGame = gameService.createOne(game);
-//    }
+    @BeforeAll
+    void setUp() {
+        game = new Game("THE_LAST_OF_US", BigDecimal.valueOf(7.28d));
+        anotherGame = new Game("THE_WITCHER", BigDecimal.valueOf(17.28d));
+        games = Arrays.asList(game, anotherGame);
+        GAMES_JSON = gson.toJson(games);
+    }
 
     @Test
     void shouldFindGameById() throws Exception {
@@ -97,13 +104,5 @@ public class GameControllerIntegrationTest {
                     .andExpect(jsonPath(jsonPathPrefix + "price").value(savedGame.getPrice()));
         }
     }
-
-//    public class TestInstancePostProcessor implements BeforeAllCallback {
-//        @Override
-//        public void beforeAll(ExtensionContext context) {
-//            GameControllerIntegrationTest testInstance = (GameControllerIntegrationTest) context.getRequiredTestInstance();
-//            testInstance.setUp();
-//        }
-//    }
 }
 

@@ -10,7 +10,9 @@ import com.gamesage.store.domain.model.User;
 import com.gamesage.store.paymentapi.PaymentRequest;
 import com.gamesage.store.service.UserService;
 import com.google.gson.Gson;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +24,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -32,25 +35,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserControllerIntegrationTest {
 
     public static final String TOKEN_HEADER_NAME = "X-Auth-Token";
     private static final String API_USER_ENDPOINT = "/users";
     private static final String TOPUP_ENDPOINT = "/users/{userId}/topup";
-    private final Card cardWithWrongNumber = new Card(156L,
-            "Jack Black",
-            LocalDate.of(2025, 3, 30),
-            111);
-    private final Card cardWithCorrectNumber = new Card(1567123425635896L,
-            "Jack Black",
-            LocalDate.of(2025, 3, 30),
-            111);
-    private final PaymentRequest errorPaymentRequest = new PaymentRequest(BigDecimal.ONE, cardWithWrongNumber);
-    private final PaymentRequest okPaymentRequest = new PaymentRequest(BigDecimal.ONE, cardWithCorrectNumber);
-    private final Tier tier = new Tier(5, "PLATINUM", 30.0);
-    private final User user = new User(1, "testuser", "testpass", tier,
-            BigDecimal.valueOf(1000));
-    private final String USER_JSON = new Gson().toJson(user);
+
+    private Card cardWithWrongNumber;
+    private Card cardWithCorrectNumber;
+    private PaymentRequest errorPaymentRequest;
+    private PaymentRequest okPaymentRequest;
+    private User user;
+    private String USER_JSON;
+    private String TOKEN;
+    private User savedUser;
 
     @Autowired
     private UserService userService;
@@ -58,19 +57,39 @@ class UserControllerIntegrationTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private Gson gson;
+
+    @BeforeAll
+    void setup() throws Exception {
+        Tier tier = new Tier(5, "PLATINUM", 30.0);
+        user = new User(null, "testuser", "testpass", tier,
+                BigDecimal.valueOf(1000.0));
+        USER_JSON = gson.toJson(user, User.class);
+        savedUser = userService.createOne(user);
+        cardWithWrongNumber = new Card(156L,
+                "Jack Black",
+                LocalDate.of(2025, 3, 30),
+                111);
+        cardWithCorrectNumber = new Card(1567123425635896L,
+                "Jack Black",
+                LocalDate.of(2025, 3, 30),
+                111);
+        errorPaymentRequest = new PaymentRequest(BigDecimal.ONE, cardWithWrongNumber);
+        okPaymentRequest = new PaymentRequest(BigDecimal.ONE, cardWithCorrectNumber);
+        TOKEN = loginAndGetToken();
+    }
 
     @Test
     void givenAuthorizedUser_whenFindAllUsers_thenSuccess() throws Exception {
-        User savedUser = userService.createOne(user);
         User secondUser = new User(null, "second", "secondPass", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
         User secondSavedUser = userService.createOne(secondUser);
         List<User> savedUsers = List.of(savedUser, secondSavedUser);
-        String token = loginAndGetToken();
 
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get(API_USER_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(TOKEN_HEADER_NAME, token))
+                        .header(TOKEN_HEADER_NAME, TOKEN))
                 .andExpect(status().isOk());
 
         for (int i = 0; i < savedUsers.size(); i++) {
@@ -102,7 +121,7 @@ class UserControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(USER_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(jsonPath("$.balance").value(user.getBalance()))
+                .andExpect(jsonPath("$.balance").value(user.getBalance().setScale(1, RoundingMode.HALF_UP)))
                 .andExpect(jsonPath("$.login").value(user.getLogin()))
                 .andExpect(jsonPath("$.tier.level").value(user.getTier().getLevel()))
                 .andExpect(jsonPath("$.balance").value(user.getBalance()))

@@ -39,12 +39,12 @@ class OrderControllerIntegrationTest {
     private static final String WRONG_TOKEN_HEADER = "unknownTokenValue";
     private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
 
-    private final Tier tier = new Tier(5, "PLATINUM", 30.0);
-    private final User user = new User(null, "testuser", "testpass", tier,
-            BigDecimal.valueOf(1000));
-    private final String USER_JSON = new Gson().toJson(user, User.class);
-    private final Game GAME = new Game("THE_LAST_OF_US", BigDecimal.valueOf(7.28d));
-    String TOKEN;
+    private User user;
+    private String USER_JSON;
+    private Game GAME;
+    private String TOKEN;
+    private User savedUser;
+    private Game savedGame;
 
     @Autowired
     private MockMvc mockMvc;
@@ -54,11 +54,18 @@ class OrderControllerIntegrationTest {
     private GameService gameService;
     @Autowired
     private OrderService orderService;
-//    @Autowired
-//    private Gson gson;
+    @Autowired
+    private Gson gson;
 
     @BeforeAll
     void setup() throws Exception {
+        Tier tier = new Tier(5, "PLATINUM", 30.0);
+        user = new User(null, "testuser", "testpass", tier,
+                BigDecimal.valueOf(1000));
+        USER_JSON = gson.toJson(user, User.class);
+        GAME = new Game("THE_LAST_OF_US", BigDecimal.valueOf(7.28d));
+        savedUser = userService.createOne(user);
+        savedGame = gameService.createOne(GAME);
         TOKEN = loginAndGetToken();
     }
 
@@ -81,10 +88,6 @@ class OrderControllerIntegrationTest {
 
     @Test
     void givenRightCreds_shouldFindAllOrders() throws Exception {
-        User savedUser = userService.createOne(user);
-        Game savedGame = gameService.createOne(GAME);
-        String tokenValue = loginAndGetToken();
-
         orderService.buyGame(savedGame.getId(), savedUser.getId());
 
         mockMvc.perform(get(API_ORDER_ENDPOINT)
@@ -97,9 +100,6 @@ class OrderControllerIntegrationTest {
 
     @Test
     void givenRightCreds_shouldFindOrderById() throws Exception {
-        User savedUser = userService.createOne(user);
-        Game savedGame = gameService.createOne(GAME);
-        String tokenValue = loginAndGetToken();
         orderService.buyGame(savedGame.getId(), savedUser.getId());
 
         Order order = orderService.findAll().get(0);
@@ -116,10 +116,6 @@ class OrderControllerIntegrationTest {
 
     @Test
     void givenRightCreds_shouldBuyGame() throws Exception {
-        User savedUser = userService.createOne(user);
-        Game savedGame = gameService.createOne(GAME);
-        String tokenValue = loginAndGetToken();
-
         mockMvc.perform(post(ORDER_BUY_ENDPOINT, savedGame.getId(), savedUser.getId())
                         .header(TOKEN_HEADER_TITLE, TOKEN)
                         .content(USER_JSON)
@@ -134,9 +130,6 @@ class OrderControllerIntegrationTest {
 
     @Test
     void givenWrongCreds_shouldNotBuyGame() throws Exception {
-        User savedUser = userService.createOne(user);
-        Game savedGame = gameService.createOne(GAME);
-
         mockMvc.perform(post(ORDER_BUY_ENDPOINT, savedGame.getId(), savedUser.getId())
                         .header(TOKEN_HEADER_TITLE, WRONG_TOKEN_HEADER)
                         .content(USER_JSON)
