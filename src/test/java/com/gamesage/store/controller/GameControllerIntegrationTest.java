@@ -1,8 +1,9 @@
 package com.gamesage.store.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.service.GameService;
-import com.google.gson.Gson;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -43,14 +44,14 @@ public class GameControllerIntegrationTest {
     @Autowired
     private GameService gameService;
     @Autowired
-    private Gson gson;
+    private ObjectMapper objectMapper;
 
     @BeforeAll
-    void setUp() {
+    void setUp() throws JsonProcessingException {
         game = new Game("THE_LAST_OF_US", BigDecimal.valueOf(7.28d));
         anotherGame = new Game("THE_WITCHER", BigDecimal.valueOf(17.28d));
         games = Arrays.asList(game, anotherGame);
-        GAMES_JSON = gson.toJson(games);
+        GAMES_JSON = objectMapper.writeValueAsString(games);
     }
 
     @Test

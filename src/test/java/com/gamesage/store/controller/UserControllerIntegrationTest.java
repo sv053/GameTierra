@@ -9,7 +9,6 @@ import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.paymentapi.PaymentRequest;
 import com.gamesage.store.service.UserService;
-import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -42,14 +41,22 @@ class UserControllerIntegrationTest {
     private static final String API_USER_ENDPOINT = "/users";
     private static final String TOPUP_ENDPOINT = "/users/{userId}/topup";
 
-    private Card cardWithWrongNumber;
-    private Card cardWithCorrectNumber;
-    private PaymentRequest errorPaymentRequest;
-    private PaymentRequest okPaymentRequest;
-    private User user;
+    private final Card cardWithWrongNumber = new Card(156L,
+            "Jack Black",
+            LocalDate.of(2025, 3, 30),
+            111);
+    private final Card cardWithCorrectNumber = new Card(1567123425635896L,
+            "Jack Black",
+            LocalDate.of(2025, 3, 30),
+            111);
+    private final PaymentRequest errorPaymentRequest = new PaymentRequest(BigDecimal.ONE, cardWithWrongNumber);
+    private final PaymentRequest okPaymentRequest = new PaymentRequest(BigDecimal.ONE, cardWithCorrectNumber);
+    private final Tier tier = new Tier(5, "PLATINUM", 30.0);
+    private final User user = new User(null, "testuser", "testpass", tier,
+            BigDecimal.valueOf(1000.0));
+    private User savedUser;
     private String USER_JSON;
     private String TOKEN;
-    private User savedUser;
 
     @Autowired
     private UserService userService;
@@ -57,26 +64,14 @@ class UserControllerIntegrationTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
-    @Autowired
-    private Gson gson;
 
     @BeforeAll
     void setup() throws Exception {
-        Tier tier = new Tier(5, "PLATINUM", 30.0);
-        user = new User(null, "testuser", "testpass", tier,
-                BigDecimal.valueOf(1000.0));
-        USER_JSON = gson.toJson(user, User.class);
+        USER_JSON = objectMapper.writeValueAsString(user);
+        objectMapper
+                .registerModule(new JavaTimeModule())
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         savedUser = userService.createOne(user);
-        cardWithWrongNumber = new Card(156L,
-                "Jack Black",
-                LocalDate.of(2025, 3, 30),
-                111);
-        cardWithCorrectNumber = new Card(1567123425635896L,
-                "Jack Black",
-                LocalDate.of(2025, 3, 30),
-                111);
-        errorPaymentRequest = new PaymentRequest(BigDecimal.ONE, cardWithWrongNumber);
-        okPaymentRequest = new PaymentRequest(BigDecimal.ONE, cardWithCorrectNumber);
         TOKEN = loginAndGetToken();
     }
 
@@ -131,7 +126,6 @@ class UserControllerIntegrationTest {
 
     @Test
     void givenExistingUser_whenTryTopUp_thenEntityNotFound() throws Exception {
-        configureDateMapper();
         mockMvc.perform(MockMvcRequestBuilders.post(TOPUP_ENDPOINT, 999)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(okPaymentRequest)))
@@ -140,9 +134,6 @@ class UserControllerIntegrationTest {
 
     @Test
     void givenUser_whenTryTopUp_thenTopupFails() throws Exception {
-        User savedUser = userService.createOne(user);
-        configureDateMapper();
-
         mockMvc.perform(MockMvcRequestBuilders.post(TOPUP_ENDPOINT, savedUser.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(errorPaymentRequest)))
@@ -154,9 +145,6 @@ class UserControllerIntegrationTest {
 
     @Test
     void givenUser_whenTryTopUp_thenSuccess() throws Exception {
-        User savedUser = userService.createOne(user);
-        configureDateMapper();
-
         mockMvc.perform(MockMvcRequestBuilders.post(TOPUP_ENDPOINT, savedUser.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(okPaymentRequest)))
@@ -164,12 +152,6 @@ class UserControllerIntegrationTest {
                 .andExpect(jsonPath("$.transactionId").value("cdy-5r3fiy-6ki6-6nbvh8g"))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.responseError").isEmpty());
-    }
-
-    private void configureDateMapper() {
-        objectMapper
-                .registerModule(new JavaTimeModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     }
 
     private String loginAndGetToken() throws Exception {

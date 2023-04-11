@@ -1,11 +1,12 @@
 package com.gamesage.store.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.TokenService;
 import com.gamesage.store.service.UserService;
-import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -17,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -31,9 +31,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class LoginControllerIntegrationTest {
 
     private static final String API_ENDPOINT = "/login";
-    public static final String TOKEN_HEADER_NAME = "X-Auth-Token";
-    public String USER_JSON;
-    private User user;
+    private static final String TOKEN_HEADER_NAME = "X-Auth-Token";
+    private static String USER_JSON;
+
+    private final Tier tier = new Tier(5, "PLATINUM", 30.0);
+    private final User user = new User(null, "testuser", "testpass", tier,
+            BigDecimal.valueOf(1000));
 
     @Autowired
     private MockMvc mockMvc;
@@ -42,14 +45,12 @@ class LoginControllerIntegrationTest {
     @Autowired
     private TokenService tokenService;
     @Autowired
-    private Gson gson;
+    private ObjectMapper objectMapper;
 
     @BeforeAll
-    void setup() {
-        Tier tier = new Tier(5, "PLATINUM", 30.0);
-        user = new User(null, "testuser", "testpass", tier,
-                BigDecimal.valueOf(1000));
-        USER_JSON = gson.toJson(user, User.class);
+    void setup() throws JsonProcessingException {
+
+        USER_JSON = objectMapper.writeValueAsString(user);
     }
 
     @Test
@@ -63,8 +64,9 @@ class LoginControllerIntegrationTest {
                 .getResponse()
                 .getHeader(TOKEN_HEADER_NAME);
 
-        Optional<AuthToken> token = tokenService.findTokenByLogin(user.getLogin());
-        String tokenValue = token.map(AuthToken::getValue).orElse("");
+        String tokenValue = tokenService.findTokenByLogin(user.getLogin())
+                .map(AuthToken::getValue)
+                .orElse("");
 
         assertNotEquals("", tokenValue);
         assertEquals(tokenValue, tokenResponseValue);

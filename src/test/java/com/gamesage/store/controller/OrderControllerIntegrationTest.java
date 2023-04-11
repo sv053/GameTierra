@@ -1,5 +1,8 @@
 package com.gamesage.store.controller;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Order;
 import com.gamesage.store.domain.model.Tier;
@@ -7,7 +10,6 @@ import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.GameService;
 import com.gamesage.store.service.OrderService;
 import com.gamesage.store.service.UserService;
-import com.google.gson.Gson;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.math.BigDecimal;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -38,11 +42,16 @@ class OrderControllerIntegrationTest {
     private static final String ORDER_BUY_ENDPOINT = "/cart/{gameId}/{userId}";
     private static final String WRONG_TOKEN_HEADER = "unknownTokenValue";
     private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
+    private static final String USER_JSON_FILE_PATH = "src/main/resources/user.txt";
 
-    private User user;
+    private final Tier tier = new Tier(5, "PLATINUM", 30.0);
+    private final User user = new User(null, "admin", "letmein", tier,
+            BigDecimal.valueOf(1000));
+    private final Game game = new Game("THE_LAST_OF_US", BigDecimal.valueOf(7.28d));
+
     private String USER_JSON;
-    private Game GAME;
     private String TOKEN;
+
     private User savedUser;
     private Game savedGame;
 
@@ -55,17 +64,21 @@ class OrderControllerIntegrationTest {
     @Autowired
     private OrderService orderService;
     @Autowired
-    private Gson gson;
+    private ObjectMapper objectMapper;
 
     @BeforeAll
     void setup() throws Exception {
-        Tier tier = new Tier(5, "PLATINUM", 30.0);
-        user = new User(null, "testuser", "testpass", tier,
-                BigDecimal.valueOf(1000));
-        USER_JSON = gson.toJson(user, User.class);
-        GAME = new Game("THE_LAST_OF_US", BigDecimal.valueOf(7.28d));
+
         savedUser = userService.createOne(user);
-        savedGame = gameService.createOne(GAME);
+        savedGame = gameService.createOne(game);
+
+        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(USER_JSON_FILE_PATH));
+        String reading = "";
+        while ((reading = bufferedReader.readLine()) != null) {
+            USER_JSON += reading;
+        }
         TOKEN = loginAndGetToken();
     }
 
@@ -91,7 +104,7 @@ class OrderControllerIntegrationTest {
         orderService.buyGame(savedGame.getId(), savedUser.getId());
 
         mockMvc.perform(get(API_ORDER_ENDPOINT)
-                        .header(TOKEN_HEADER_TITLE, TOKEN)
+                        .header(TOKEN_HEADER_TITLE, "TOKEN")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.*.user.login", Matchers.containsInAnyOrder(savedUser.getLogin())))

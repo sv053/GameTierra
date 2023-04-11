@@ -1,0 +1,12 @@
+{
+  "id": 1,
+  "login": "admin",
+  "password": "letmein",
+  "tier": {
+    "cashbackPercentage": 0.3,
+    "id": 5,
+    "level": "PLATINUM"
+  },
+  "balance": 1000.00,
+  "games": []
+}
