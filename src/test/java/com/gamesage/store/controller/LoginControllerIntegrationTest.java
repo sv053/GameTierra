@@ -1,9 +1,7 @@
 package com.gamesage.store.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamesage.store.domain.model.AuthToken;
-import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.TokenService;
 import com.gamesage.store.service.UserService;
@@ -17,10 +15,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,11 +32,9 @@ class LoginControllerIntegrationTest {
 
     private static final String API_ENDPOINT = "/login";
     private static final String TOKEN_HEADER_NAME = "X-Auth-Token";
-    private static String USER_JSON;
+    private static final String USER_JSON_FILE_PATH = "src/test/resources/notSavedUser.json";
 
-    private final Tier tier = new Tier(5, "PLATINUM", 30.0);
-    private final User user = new User(null, "testuser", "testpass", tier,
-            BigDecimal.valueOf(1000));
+    private String userJson;
 
     @Autowired
     private MockMvc mockMvc;
@@ -48,35 +46,35 @@ class LoginControllerIntegrationTest {
     private ObjectMapper objectMapper;
 
     @BeforeAll
-    void setup() throws JsonProcessingException {
-
-        USER_JSON = objectMapper.writeValueAsString(user);
+    void setup() throws IOException {
+        userJson = Files.readString(Path.of(USER_JSON_FILE_PATH));
     }
 
     @Test
     void givenCorrectCreds_shouldLoginAndReturn200() throws Exception {
+        User user = objectMapper.readValue(userJson, User.class);
         userService.createOne(user);
         String tokenResponseValue = mockMvc.perform(post(API_ENDPOINT)
-                        .content(USER_JSON)
+                        .content(userJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getHeader(TOKEN_HEADER_NAME);
 
-        String tokenValue = tokenService.findTokenByLogin(user.getLogin())
-                .map(AuthToken::getValue)
-                .orElse("");
+        Optional<String> tokenValue = tokenService.findTokenByLogin(user.getLogin())
+                .map(AuthToken::getValue);
 
-        assertNotEquals("", tokenValue);
-        assertEquals(tokenValue, tokenResponseValue);
+        assertNotNull(tokenResponseValue);
+        assertFalse(tokenResponseValue.isBlank());
+        assertEquals(tokenValue, Optional.of(tokenResponseValue));
     }
 
     @Test
     void givenUserCredsDoNotExist_shouldNotLoginAndReturn401() throws Exception {
         mockMvc.perform(post(API_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(USER_JSON))
+                        .content(userJson))
                 .andExpect(status().isUnauthorized())
                 .andReturn();
     }

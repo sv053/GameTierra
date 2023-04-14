@@ -65,7 +65,7 @@ public class UserService implements UserDetailsService, AuthenticationUserDetail
     public User createOne(User userToAdd) {
         Optional<User> alreadyExistedUser = repository.findByLogin(userToAdd.getLogin());
         if (alreadyExistedUser.isPresent()) {
-            return alreadyExistedUser.get();
+            throw new WrongCredentialsException();
         }
         userToAdd.setPassword(encoder.encode(userToAdd.getPassword()));
         return repository.createOne(userToAdd);

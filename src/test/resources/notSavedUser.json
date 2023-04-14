@@ -1,0 +1,11 @@
+{
+  "login": "none",
+  "password": "wrongkey",
+  "tier": {
+    "cashbackPercentage": 0.0,
+    "id": 1,
+    "name": "FREE"
+  },
+  "balance": 815.16,
+  "games": []
+}

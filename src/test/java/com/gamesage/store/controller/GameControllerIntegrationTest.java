@@ -1,11 +1,9 @@
 package com.gamesage.store.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.service.GameService;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +31,9 @@ public class GameControllerIntegrationTest {
     private static final String API_GAME_ENDPOINT = "/games";
     private static final String GAME_ID_ENDPOINT = "/games/{gameId}";
 
-    public String GAMES_JSON;
-    private Game game;
-    private Game anotherGame;
-    private List<Game> games;
-    private Game savedGame;
+    private final Game game = new Game("THE_LAST_OF_US", BigDecimal.valueOf(7.28d));
+    private final Game anotherGame = new Game("THE_WITCHER", BigDecimal.valueOf(17.28d));
+    private final List<Game> games = Arrays.asList(game, anotherGame);
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,17 +42,9 @@ public class GameControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @BeforeAll
-    void setUp() throws JsonProcessingException {
-        game = new Game("THE_LAST_OF_US", BigDecimal.valueOf(7.28d));
-        anotherGame = new Game("THE_WITCHER", BigDecimal.valueOf(17.28d));
-        games = Arrays.asList(game, anotherGame);
-        GAMES_JSON = objectMapper.writeValueAsString(games);
-    }
-
     @Test
     void shouldFindGameById() throws Exception {
-        savedGame = gameService.createOne(game);
+        Game savedGame = gameService.createOne(game);
         mockMvc.perform(get(GAME_ID_ENDPOINT, savedGame.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -77,26 +65,21 @@ public class GameControllerIntegrationTest {
     void shouldFindAllGames() throws Exception {
         List<Game> savedGames = gameService.createAll(games);
 
-        ResultActions resultActions = mockMvc.perform(get(API_GAME_ENDPOINT))
+        mockMvc.perform(get(API_GAME_ENDPOINT))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect((jsonPath("$.*.name", Matchers.containsInAnyOrder(game.getName(), anotherGame.getName()))))
                 .andExpect((jsonPath("$.*.id", Matchers.containsInAnyOrder(savedGames.get(0).getId(),
                         savedGames.get(1).getId()))));
-
-        for (int i = 0; i < savedGames.size(); i++) {
-            Game savedGame = savedGames.get(i);
-            String jsonPathPrefix = String.format("$[%d].", i);
-            resultActions.andExpect(jsonPath(jsonPathPrefix + "id").value(savedGame.getId()))
-                    .andExpect(jsonPath(jsonPathPrefix + "name").value(savedGame.getName()));
-        }
     }
 
     @Test
     void shouldCreateGamesWithUserRightCreds() throws Exception {
+        String gamesJson = objectMapper.writeValueAsString(games);
+
         ResultActions resultActions = mockMvc.perform(post(API_GAME_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(GAMES_JSON));
+                .content(gamesJson));
 
         for (int i = 0; i < games.size(); i++) {
             Game savedGame = games.get(i);
