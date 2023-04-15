@@ -9,8 +9,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,10 +34,12 @@ class LoginControllerIntegrationTest {
 
     private static final String API_ENDPOINT = "/login";
     private static final String TOKEN_HEADER_NAME = "X-Auth-Token";
-    private static final String USER_JSON_FILE_PATH = "src/test/resources/notSavedUser.json";
 
     private String userJson;
+    private User user;
 
+    @Value("classpath:request/user/test.json")
+    private Resource userJsonResource;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -47,12 +51,13 @@ class LoginControllerIntegrationTest {
 
     @BeforeAll
     void setup() throws IOException {
-        userJson = Files.readString(Path.of(USER_JSON_FILE_PATH));
+        userJson = Files.readString(Path.of(userJsonResource.getURI()));
+        user = objectMapper.readValue(userJson, User.class);
     }
 
     @Test
     void givenCorrectCreds_shouldLoginAndReturn200() throws Exception {
-        User user = objectMapper.readValue(userJson, User.class);
+        userService.removeUserByLogin(user.getLogin());
         userService.createOne(user);
         String tokenResponseValue = mockMvc.perform(post(API_ENDPOINT)
                         .content(userJson)
@@ -72,6 +77,8 @@ class LoginControllerIntegrationTest {
 
     @Test
     void givenUserCredsDoNotExist_shouldNotLoginAndReturn401() throws Exception {
+        userService.removeUserByLogin(user.getLogin());
+
         mockMvc.perform(post(API_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))

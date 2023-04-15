@@ -4,16 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Order;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.domain.repository.db.DbUserRepository;
 import com.gamesage.store.service.GameService;
 import com.gamesage.store.service.OrderService;
 import com.gamesage.store.service.UserService;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -22,9 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -39,16 +43,17 @@ class OrderControllerIntegrationTest {
     private static final String ORDER_BUY_ENDPOINT = "/cart/{gameId}/{userId}";
     private static final String WRONG_TOKEN_HEADER = "unknownTokenValue";
     private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
-    private static final String USER_JSON_FILE_PATH = "src/test/resources/user.json";
 
     private final Game game = new Game("THE_LAST_OF_US", BigDecimal.valueOf(7.28d));
-    @Autowired
-    DbUserRepository userRepository;
+    private final Game gameOneMore = new Game("THE_LAST_OF_THEM", BigDecimal.valueOf(7.28d));
+
     private String userJson;
     private String token;
     private User savedUser;
     private Game savedGame;
-    private User user;
+
+    @Value("classpath:request/user/test.json")
+    private Resource userJsonResource;
     @Autowired
     private UserService userService;
     @Autowired
@@ -57,17 +62,16 @@ class OrderControllerIntegrationTest {
     private OrderService orderService;
     @Autowired
     private ObjectMapper objectMapper;
-    //    @Value("classpath:request/user/test.json")
-//    private Resource userJsonResource;
     @Autowired
     private MockMvc mockMvc;
 
     @BeforeAll
     void setup() throws Exception {
-//        userJson = Files.readString(Path.of(userJsonResource.getURI()));
-        userJson = Files.readString(Path.of(USER_JSON_FILE_PATH));
-        user = objectMapper.readValue(userJson, User.class);
-        token = loginAndGetToken();
+        userJson = Files.readString(Path.of(userJsonResource.getURI()));
+        User user = objectMapper.readValue(userJson, User.class);
+        userService.removeUserByLogin(user.getLogin());
+        savedUser = userService.createOne(user);
+        token = loginAndGetToken(savedUser);
     }
 
     @Test
@@ -89,15 +93,18 @@ class OrderControllerIntegrationTest {
 
     @Test
     void givenRightCreds_shouldFindAllOrders() throws Exception {
-        savedGame = gameService.createOne(game);
-        orderService.buyGame(savedGame.getId(), savedUser.getId());
+        List<Game> savedGames = gameService.createAll(List.of(game, gameOneMore));
+        orderService.buyGame(savedGames.get(0).getId(), savedUser.getId());
+        orderService.buyGame(savedGames.get(1).getId(), savedUser.getId());
+        int ordersAmount = orderService.findAll().size();
 
         mockMvc.perform(get(API_ORDER_ENDPOINT)
                         .header(TOKEN_HEADER_TITLE, token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].user.login").value(savedUser.getLogin()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].game.name").value((savedGame.getName())));
+                .andExpect((jsonPath("$.*.game.name", Matchers.containsInAnyOrder(
+                        savedGames.get(0).getName(), savedGames.get(1).getName()))))
+                .andExpect((jsonPath("$.[%d].user.login", ordersAmount - 1).value(savedUser.getLogin())));
     }
 
     @Test
@@ -141,11 +148,7 @@ class OrderControllerIntegrationTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    private String loginAndGetToken() throws Exception {
-        if (userRepository.findByLogin(user.getLogin()).isEmpty()) {
-            userService.findByLogin(user.getLogin());
-        }
-        savedUser = userService.createOne(user); // should be created before login
+    private String loginAndGetToken(User user) throws Exception {
         return mockMvc.perform(post(API_LOGIN_ENDPOINT)
                         .content(userJson)
                         .contentType(MediaType.APPLICATION_JSON))

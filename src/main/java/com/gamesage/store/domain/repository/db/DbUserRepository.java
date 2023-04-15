@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,12 +29,26 @@ public class DbUserRepository implements UserFunctionRepository {
             "VALUES ( ?, ?, ?, ?) ";
     private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ? " +
             "WHERE id = ?";
+    private static final String REMOVE_USER = "DELETE FROM user " +
+            "WHERE login = ?";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> userRowMapper;
 
     public DbUserRepository(JdbcTemplate jdbcTemplate, UserRowMapper userRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.userRowMapper = userRowMapper;
+    }
+
+    @Override
+    public void deleteUserByLogin(String login) {
+        try {
+            jdbcTemplate.update(
+                    REMOVE_USER,
+                    login
+                            + " CASCADE");
+        } catch (EmptyResultDataAccessException e) {
+            System.out.println(Arrays.toString(e.getStackTrace()));
+        }
     }
 
     @Override

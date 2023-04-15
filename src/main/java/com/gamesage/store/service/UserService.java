@@ -5,6 +5,7 @@ import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.UserFunctionRepository;
 import com.gamesage.store.exception.EntityNotFoundException;
+import com.gamesage.store.exception.UserAlreadyExistsException;
 import com.gamesage.store.exception.WrongCredentialsException;
 import com.gamesage.store.paymentapi.PaymentProcessingApi;
 import com.gamesage.store.paymentapi.PaymentRequest;
@@ -65,10 +66,16 @@ public class UserService implements UserDetailsService, AuthenticationUserDetail
     public User createOne(User userToAdd) {
         Optional<User> alreadyExistedUser = repository.findByLogin(userToAdd.getLogin());
         if (alreadyExistedUser.isPresent()) {
-            throw new WrongCredentialsException();
+            throw new UserAlreadyExistsException();
         }
         userToAdd.setPassword(encoder.encode(userToAdd.getPassword()));
         return repository.createOne(userToAdd);
+    }
+
+    public void removeUserByLogin(String login) {
+        if (repository.findByLogin(login).isPresent()) {
+            repository.deleteUserByLogin(login);
+        }
     }
 
     public User updateBalance(User userToUpdate) {
