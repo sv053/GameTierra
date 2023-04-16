@@ -29,8 +29,11 @@ public class DbUserRepository implements UserFunctionRepository {
             "VALUES ( ?, ?, ?, ?) ";
     private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ? " +
             "WHERE id = ?";
-    private static final String REMOVE_USER = "DELETE FROM user " +
-            "WHERE login = ?";
+    private static final String REMOVE_USER = "DELETE " +
+            " FROM user ";//+
+    //" LEFT JOIN orders ON user.id = orders.user_id " +
+    //" WHERE id = ? CASCADE ";
+
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> userRowMapper;
 
@@ -40,12 +43,10 @@ public class DbUserRepository implements UserFunctionRepository {
     }
 
     @Override
-    public void deleteUserByLogin(String login) {
+    public void deleteAll() {
         try {
             jdbcTemplate.update(
-                    REMOVE_USER,
-                    login
-                            + " CASCADE");
+                    REMOVE_USER);
         } catch (EmptyResultDataAccessException e) {
             System.out.println(Arrays.toString(e.getStackTrace()));
         }

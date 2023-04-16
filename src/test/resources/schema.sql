@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS orders
     user_id        INTEGER,
     game_id        INTEGER,
     order_datetime DATETIME,
-    FOREIGN KEY (user_id) REFERENCES user (id),
-    FOREIGN KEY (game_id) REFERENCES game (id)
+    FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE,
+    FOREIGN KEY (game_id) REFERENCES game (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS token

@@ -17,6 +17,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Rollback(true)
+
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OrderControllerIntegrationTest {
@@ -50,6 +55,7 @@ class OrderControllerIntegrationTest {
     private String userJson;
     private String token;
     private User savedUser;
+    private User user;
     private Game savedGame;
 
     @Value("classpath:request/user/test.json")
@@ -68,10 +74,10 @@ class OrderControllerIntegrationTest {
     @BeforeAll
     void setup() throws Exception {
         userJson = Files.readString(Path.of(userJsonResource.getURI()));
-        User user = objectMapper.readValue(userJson, User.class);
-        userService.removeUserByLogin(user.getLogin());
+        user = objectMapper.readValue(userJson, User.class);
+        userService.deleteAll();
         savedUser = userService.createOne(user);
-        token = loginAndGetToken(savedUser);
+        token = loginAndGetToken();
     }
 
     @Test
@@ -148,7 +154,7 @@ class OrderControllerIntegrationTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    private String loginAndGetToken(User user) throws Exception {
+    private String loginAndGetToken() throws Exception {
         return mockMvc.perform(post(API_LOGIN_ENDPOINT)
                         .content(userJson)
                         .contentType(MediaType.APPLICATION_JSON))

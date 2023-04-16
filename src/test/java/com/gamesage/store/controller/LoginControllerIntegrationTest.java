@@ -14,6 +14,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @Transactional
+@Rollback(true)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LoginControllerIntegrationTest {
@@ -53,12 +57,12 @@ class LoginControllerIntegrationTest {
     void setup() throws IOException {
         userJson = Files.readString(Path.of(userJsonResource.getURI()));
         user = objectMapper.readValue(userJson, User.class);
+        userService.createOne(user);
+
     }
 
     @Test
     void givenCorrectCreds_shouldLoginAndReturn200() throws Exception {
-        userService.removeUserByLogin(user.getLogin());
-        userService.createOne(user);
         String tokenResponseValue = mockMvc.perform(post(API_ENDPOINT)
                         .content(userJson)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -77,8 +81,6 @@ class LoginControllerIntegrationTest {
 
     @Test
     void givenUserCredsDoNotExist_shouldNotLoginAndReturn401() throws Exception {
-        userService.removeUserByLogin(user.getLogin());
-
         mockMvc.perform(post(API_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))

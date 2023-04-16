@@ -72,9 +72,9 @@ public class UserService implements UserDetailsService, AuthenticationUserDetail
         return repository.createOne(userToAdd);
     }
 
-    public void removeUserByLogin(String login) {
-        if (repository.findByLogin(login).isPresent()) {
-            repository.deleteUserByLogin(login);
+    public void deleteAll() {
+        if (repository.findAll().size() > 0) {
+            repository.deleteAll();
         }
     }
 
