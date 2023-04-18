@@ -1,11 +1,15 @@
 package com.gamesage.store.service;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.UserFunctionRepository;
+import com.gamesage.store.exception.AlreadyTakenLoginException;
 import com.gamesage.store.exception.EntityNotFoundException;
-import com.gamesage.store.exception.UserAlreadyExistsException;
 import com.gamesage.store.exception.WrongCredentialsException;
 import com.gamesage.store.paymentapi.PaymentProcessingApi;
 import com.gamesage.store.paymentapi.PaymentRequest;
@@ -18,10 +22,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService, AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
@@ -66,7 +66,7 @@ public class UserService implements UserDetailsService, AuthenticationUserDetail
     public User createOne(User userToAdd) {
         Optional<User> alreadyExistedUser = repository.findByLogin(userToAdd.getLogin());
         if (alreadyExistedUser.isPresent()) {
-            throw new UserAlreadyExistsException();
+            throw new AlreadyTakenLoginException();
         }
         userToAdd.setPassword(encoder.encode(userToAdd.getPassword()));
         return repository.createOne(userToAdd);

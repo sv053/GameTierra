@@ -1,9 +1,19 @@
 package com.gamesage.store.controller;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.service.GameService;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +24,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
@@ -31,8 +33,8 @@ public class GameControllerIntegrationTest {
     private static final String API_GAME_ENDPOINT = "/games";
     private static final String GAME_ID_ENDPOINT = "/games/{gameId}";
 
-    private final Game game = new Game("THE_LAST_OF_US", BigDecimal.valueOf(7.28d));
-    private final Game anotherGame = new Game("THE_WITCHER", BigDecimal.valueOf(17.28d));
+    private final Game game = new Game("THE_LAST_OF_US", BigDecimal.valueOf(7.28));
+    private final Game anotherGame = new Game("THE_WITCHER", BigDecimal.valueOf(17.28));
     private final List<Game> games = Arrays.asList(game, anotherGame);
 
     @Autowired
@@ -68,8 +70,8 @@ public class GameControllerIntegrationTest {
         mockMvc.perform(get(API_GAME_ENDPOINT))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect((jsonPath("$.*.name", Matchers.containsInAnyOrder(game.getName(), anotherGame.getName()))))
-                .andExpect((jsonPath("$.*.id", Matchers.containsInAnyOrder(savedGames.get(0).getId(),
+                .andExpect((jsonPath("$.*.name", containsInAnyOrder(game.getName(), anotherGame.getName()))))
+                .andExpect((jsonPath("$.*.id", containsInAnyOrder(savedGames.get(0).getId(),
                         savedGames.get(1).getId()))));
     }
 
@@ -79,7 +81,11 @@ public class GameControllerIntegrationTest {
 
         ResultActions resultActions = mockMvc.perform(post(API_GAME_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(gamesJson));
+                .content(gamesJson))
+            .andExpect(status().isOk());
+//            .andExpect((jsonPath("$.*.name", containsInAnyOrder(game.getName(), anotherGame.getName()))))
+//            .andExpect((jsonPath("$.*.price", containsInAnyOrder(game.getPrice(),
+//                anotherGame.getPrice()))));
 
         for (int i = 0; i < games.size(); i++) {
             Game savedGame = games.get(i);

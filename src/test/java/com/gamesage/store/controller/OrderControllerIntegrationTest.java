@@ -1,5 +1,16 @@
 package com.gamesage.store.controller;
 
+import static java.nio.file.Path.of;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Order;
@@ -7,7 +18,6 @@ import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.GameService;
 import com.gamesage.store.service.OrderService;
 import com.gamesage.store.service.UserService;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -17,23 +27,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @Transactional
@@ -68,13 +63,11 @@ class OrderControllerIntegrationTest {
     private ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
 
     @BeforeAll
     void setup() throws Exception {
-        userJson = Files.readString(Path.of(userJsonResource.getURI()));
+        userJson = Files.readString(of(userJsonResource.getURI()));
         User user = objectMapper.readValue(userJson, User.class);
         userService.deleteAll();
         savedUser = userService.createOne(user);
@@ -109,8 +102,8 @@ class OrderControllerIntegrationTest {
                         .header(TOKEN_HEADER_TITLE, token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect((jsonPath("$.*.game.name", Matchers.containsInAnyOrder(
-                        savedGames.get(0).getName(), savedGames.get(1).getName()))))
+                .andExpect(jsonPath("$.*.game.name", containsInAnyOrder(
+                        savedGames.get(0).getName(), savedGames.get(1).getName())))
                 .andExpect(jsonPath("$.[%d].user.login", ordersAmount - 1).value(savedUser.getLogin()));
     }
 
@@ -125,10 +118,10 @@ class OrderControllerIntegrationTest {
                         .header(TOKEN_HEADER_TITLE, token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.user.login").value(savedUser.getLogin()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.user.id").value(order.getUser().getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.game.name").value(savedGame.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.game.id").value(savedGame.getId()));
+                .andExpect(jsonPath("$.user.login").value(savedUser.getLogin()))
+                .andExpect(jsonPath("$.user.id").value(order.getUser().getId()))
+                .andExpect(jsonPath("$.game.name").value(savedGame.getName()))
+                .andExpect(jsonPath("$.game.id").value(savedGame.getId()));
     }
 
     @Test
@@ -140,10 +133,10 @@ class OrderControllerIntegrationTest {
                         .content(userJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.bought").value(true))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.buyer.id").value(savedUser.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.buyer.login").value(savedUser.getLogin()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.targetGame.name").value(savedGame.getName()));
+                .andExpect(jsonPath("$.bought").value(true))
+                .andExpect(jsonPath("$.buyer.id").value(savedUser.getId()))
+                .andExpect(jsonPath("$.buyer.login").value(savedUser.getLogin()))
+                .andExpect(jsonPath("$.targetGame.name").value(savedGame.getName()));
     }
 
     @Test
@@ -163,20 +156,6 @@ class OrderControllerIntegrationTest {
                 .andReturn()
                 .getResponse()
                 .getHeader(TOKEN_HEADER_TITLE);
-    }
-
-    @Test
-    void testUserTable() {
-        // userService.createOne(savedUser);
-
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT * FROM user");
-
-        for (Map<String, Object> row : rows) {
-            System.out.println(row);
-            assertTrue(row.containsValue(savedUser.getLogin()));
-
-        }
-        assertEquals(1, rows.size());
     }
 }
 

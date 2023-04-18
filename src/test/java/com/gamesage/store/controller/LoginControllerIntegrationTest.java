@@ -1,5 +1,16 @@
 package com.gamesage.store.controller;
 
+import static java.nio.file.Path.of;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Optional;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.User;
@@ -14,18 +25,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @Transactional
@@ -49,19 +50,16 @@ class LoginControllerIntegrationTest {
     private TokenService tokenService;
     @Autowired
     private ObjectMapper objectMapper;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @BeforeAll
     void setup() throws IOException {
-        userJson = Files.readString(Path.of(userJsonResource.getURI()));
+        userJson = Files.readString(of(userJsonResource.getURI()));
         user = objectMapper.readValue(userJson, User.class);
     }
 
     @Test
     void givenCorrectCreds_shouldLoginAndReturn200() throws Exception {
         userService.deleteAll();
-
         userService.createOne(user);
         String tokenResponseValue = mockMvc.perform(post(API_ENDPOINT)
                         .content(userJson)
@@ -88,17 +86,5 @@ class LoginControllerIntegrationTest {
                 .andExpect(status().isUnauthorized())
                 .andReturn();
     }
-
-//    @Test
-//    void testUserTable() {
-//        List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT * FROM user");
-//
-//        for (Map<String, Object> row : rows) {
-//            System.out.println(row);
-//            assertTrue(row.containsValue(user.getLogin()));
-//
-//        }
-//        assertEquals(1, rows.size());
-//    }
 }
 

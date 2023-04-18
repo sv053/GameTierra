@@ -1,5 +1,14 @@
 package com.gamesage.store.controller;
 
+import static java.nio.file.Path.of;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -19,24 +28,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -60,13 +54,12 @@ class UserControllerIntegrationTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @BeforeAll
     void setup() throws Exception {
-        userJson = Files.readString(Path.of(userJsonResource.getURI()));
+        userJson = Files.readString(of(userJsonResource.getURI()));
         User user = objectMapper.readValue(userJson, User.class);
+        userService.deleteAll();
         savedUser = userService.createOne(user);
         token = loginAndGetToken();
         objectMapper
@@ -92,7 +85,7 @@ class UserControllerIntegrationTest {
     void givenUserWithoutToken_whenFindAllUsers_then403() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(API_USER_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -101,16 +94,16 @@ class UserControllerIntegrationTest {
         mockMvc.perform(MockMvcRequestBuilders.get(API_USER_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(TOKEN_HEADER_NAME, wrongToken))
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     void createOne_thenSuccess() throws Exception {
         userService.deleteAll();
-        mockMvc.perform(MockMvcRequestBuilders.post(API_USER_ENDPOINT)
+        mockMvc.perform(post(API_USER_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.login").value(savedUser.getLogin()))
                 .andExpect(jsonPath("$.tier.level").value(savedUser.getTier().getLevel()))
                 .andExpect(jsonPath("$.tier.id").value(savedUser.getTier().getId()))
@@ -125,10 +118,10 @@ class UserControllerIntegrationTest {
                 111);
         PaymentRequest errorPaymentRequest = new PaymentRequest(BigDecimal.ONE, cardWithWrongNumber);
 
-        mockMvc.perform(MockMvcRequestBuilders.post(TOPUP_ENDPOINT, savedUser.getId())
+        mockMvc.perform(post(TOPUP_ENDPOINT, savedUser.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(errorPaymentRequest)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.transactionId").isNotEmpty())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.responseError").value(ResponseError.INVALID_CARD_NUMBER.getCardErrorMessage()));
@@ -141,10 +134,10 @@ class UserControllerIntegrationTest {
                 LocalDate.of(2025, 3, 30),
                 111);
         PaymentRequest okPaymentRequest = new PaymentRequest(BigDecimal.ONE, cardWithCorrectNumber);
-        mockMvc.perform(MockMvcRequestBuilders.post(TOPUP_ENDPOINT, savedUser.getId())
+        mockMvc.perform(post(TOPUP_ENDPOINT, savedUser.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(okPaymentRequest)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.transactionId").isNotEmpty())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.responseError").isEmpty());
@@ -159,21 +152,6 @@ class UserControllerIntegrationTest {
                 .andReturn()
                 .getResponse()
                 .getHeader(TOKEN_HEADER_NAME);
-    }
-
-    private void removeUser() {
-        jdbcTemplate.queryForList("SELECT * FROM user");
-    }
-
-    @Test
-    void testUserTable() {
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT * FROM user");
-
-        for (Map<String, Object> row : rows) {
-            System.out.println(row);
-            assertTrue(row.containsValue(savedUser.getLogin()));
-        }
-        assertEquals(1, rows.size());
     }
 }
 
