@@ -17,8 +17,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +26,10 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -35,9 +37,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @Transactional
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Rollback(true)
-
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OrderControllerIntegrationTest {
@@ -48,6 +47,8 @@ class OrderControllerIntegrationTest {
     private static final String ORDER_BUY_ENDPOINT = "/cart/{gameId}/{userId}";
     private static final String WRONG_TOKEN_HEADER = "unknownTokenValue";
     private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
+    @Value("classpath:request/user/test.json")
+    private Resource userJsonResource;
 
     private final Game game = new Game("THE_LAST_OF_US", BigDecimal.valueOf(7.28d));
     private final Game gameOneMore = new Game("THE_LAST_OF_THEM", BigDecimal.valueOf(7.28d));
@@ -55,11 +56,8 @@ class OrderControllerIntegrationTest {
     private String userJson;
     private String token;
     private User savedUser;
-    private User user;
     private Game savedGame;
 
-    @Value("classpath:request/user/test.json")
-    private Resource userJsonResource;
     @Autowired
     private UserService userService;
     @Autowired
@@ -70,11 +68,14 @@ class OrderControllerIntegrationTest {
     private ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
 
     @BeforeAll
     void setup() throws Exception {
         userJson = Files.readString(Path.of(userJsonResource.getURI()));
-        user = objectMapper.readValue(userJson, User.class);
+        User user = objectMapper.readValue(userJson, User.class);
         userService.deleteAll();
         savedUser = userService.createOne(user);
         token = loginAndGetToken();
@@ -110,7 +111,7 @@ class OrderControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect((jsonPath("$.*.game.name", Matchers.containsInAnyOrder(
                         savedGames.get(0).getName(), savedGames.get(1).getName()))))
-                .andExpect((jsonPath("$.[%d].user.login", ordersAmount - 1).value(savedUser.getLogin())));
+                .andExpect(jsonPath("$.[%d].user.login", ordersAmount - 1).value(savedUser.getLogin()));
     }
 
     @Test
@@ -162,6 +163,20 @@ class OrderControllerIntegrationTest {
                 .andReturn()
                 .getResponse()
                 .getHeader(TOKEN_HEADER_TITLE);
+    }
+
+    @Test
+    void testUserTable() {
+        // userService.createOne(savedUser);
+
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT * FROM user");
+
+        for (Map<String, Object> row : rows) {
+            System.out.println(row);
+            assertTrue(row.containsValue(savedUser.getLogin()));
+
+        }
+        assertEquals(1, rows.size());
     }
 }
 

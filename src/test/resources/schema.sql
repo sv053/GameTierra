@@ -1,3 +1,5 @@
+//DELETE FROM user;
+
 CREATE TABLE IF NOT EXISTS game
 (
     id    INTEGER PRIMARY KEY AUTO_INCREMENT,
@@ -19,7 +21,7 @@ CREATE TABLE IF NOT EXISTS user
     balance  REAL,
     tier_id  INTEGER,
     password VARCHAR(150),
-    FOREIGN KEY (tier_id) REFERENCES tier (id)
+    FOREIGN KEY (tier_id) REFERENCES tier (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS orders
@@ -36,6 +38,6 @@ CREATE TABLE IF NOT EXISTS token
 (
     token_value VARCHAR(150),
     user_login  VARCHAR(150) PRIMARY KEY,
-    FOREIGN KEY (user_login) REFERENCES user (login)
+    FOREIGN KEY (user_login) REFERENCES user (login) ON DELETE CASCADE
 );
 

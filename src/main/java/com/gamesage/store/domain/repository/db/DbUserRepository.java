@@ -31,7 +31,7 @@ public class DbUserRepository implements UserFunctionRepository {
             "WHERE id = ?";
     private static final String REMOVE_USER = "DELETE " +
             " FROM user ";//+
-    //" LEFT JOIN orders ON user.id = orders.user_id " +
+    // " LEFT JOIN orders ON user.id = orders.user_id " ;//+
     //" WHERE id = ? CASCADE ";
 
     private final JdbcTemplate jdbcTemplate;
