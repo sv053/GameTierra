@@ -111,7 +111,6 @@ class UserControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                //   .andExpect(jsonPath("$.balance").value(savedUser.getBalance()))
                 .andExpect(jsonPath("$.login").value(savedUser.getLogin()))
                 .andExpect(jsonPath("$.tier.level").value(savedUser.getTier().getLevel()))
                 .andExpect(jsonPath("$.tier.id").value(savedUser.getTier().getId()))
@@ -168,14 +167,11 @@ class UserControllerIntegrationTest {
 
     @Test
     void testUserTable() {
-        //  userService.createOne(savedUser);
-
         List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT * FROM user");
 
         for (Map<String, Object> row : rows) {
             System.out.println(row);
             assertTrue(row.containsValue(savedUser.getLogin()));
-
         }
         assertEquals(1, rows.size());
     }
