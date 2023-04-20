@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -89,17 +88,13 @@ public class GameControllerIntegrationTest {
     void shouldCreateGamesWithUserRightCreds() throws Exception {
         String gamesJson = objectMapper.writeValueAsString(gamesToCreate);
 
-        String responseContent =
                 mockMvc.perform(post(API_GAME_ENDPOINT)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(gamesJson))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.*.name", containsInAnyOrder(firstGameToCreate.getName(), secondGameToCreate.getName())))
-                        .andReturn()
-                        .getResponse()
-                        .getContentAsString();
-        assertTrue(responseContent.contains(firstGameToCreate.getPrice().toString()));
-        assertTrue(responseContent.contains(secondGameToCreate.getPrice().toString()));
+                        .andExpect(jsonPath("$[0].price").value(firstGameToCreate.getPrice()))
+                        .andExpect(jsonPath("$[1].price").value(secondGameToCreate.getPrice()));
     }
 
     @AfterAll
