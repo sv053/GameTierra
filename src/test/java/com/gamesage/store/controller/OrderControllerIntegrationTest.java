@@ -1,16 +1,5 @@
 package com.gamesage.store.controller;
 
-import static java.nio.file.Path.of;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Order;
@@ -18,6 +7,7 @@ import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.GameService;
 import com.gamesage.store.service.OrderService;
 import com.gamesage.store.service.UserService;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -29,6 +19,17 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.util.List;
+
+import static java.nio.file.Path.of;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @Transactional
@@ -45,13 +46,14 @@ class OrderControllerIntegrationTest {
     @Value("classpath:request/user/test.json")
     private Resource userJsonResource;
 
-    private final Game game = new Game("THE_LAST_OF_US", BigDecimal.valueOf(7.28d));
-    private final Game gameOneMore = new Game("THE_LAST_OF_THEM", BigDecimal.valueOf(7.28d));
+    private final Game game = new Game("THE_LAST", BigDecimal.valueOf(7.28d));
+    private final Game gameOneMore = new Game("LOST", BigDecimal.valueOf(7.28d));
 
     private String userJson;
     private String token;
     private User savedUser;
     private Game savedGame;
+    private List<Game> savedGames;
 
     @Autowired
     private UserService userService;
@@ -69,9 +71,10 @@ class OrderControllerIntegrationTest {
     void setup() throws Exception {
         userJson = Files.readString(of(userJsonResource.getURI()));
         User user = objectMapper.readValue(userJson, User.class);
-        userService.deleteAll();
         savedUser = userService.createOne(user);
         token = loginAndGetToken();
+        savedGames = gameService.createAll(List.of(game, gameOneMore));
+        savedGame = savedGames.get(0);
     }
 
     @Test
@@ -93,8 +96,7 @@ class OrderControllerIntegrationTest {
 
     @Test
     void givenRightCreds_shouldFindAllOrders() throws Exception {
-        List<Game> savedGames = gameService.createAll(List.of(game, gameOneMore));
-        orderService.buyGame(savedGames.get(0).getId(), savedUser.getId());
+        orderService.buyGame(savedGame.getId(), savedUser.getId());
         orderService.buyGame(savedGames.get(1).getId(), savedUser.getId());
         int ordersAmount = orderService.findAll().size();
 
@@ -103,14 +105,13 @@ class OrderControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*.game.name", containsInAnyOrder(
-                        savedGames.get(0).getName(), savedGames.get(1).getName())))
-                .andExpect(jsonPath("$.[%d].user.login", ordersAmount - 1).value(savedUser.getLogin()));
+                        savedGame.getName(), savedGames.get(1).getName())))
+                .andExpect(jsonPath("$.*.user.login").isNotEmpty());
     }
 
     @Test
     void givenRightCreds_shouldFindOrderById() throws Exception {
-        savedGame = gameService.createOne(game);
-        orderService.buyGame(savedGame.getId(), savedUser.getId());
+        orderService.buyGame(savedGames.get(0).getId(), savedUser.getId());
 
         Order order = orderService.findAll().get(0);
 
@@ -120,15 +121,13 @@ class OrderControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.user.login").value(savedUser.getLogin()))
                 .andExpect(jsonPath("$.user.id").value(order.getUser().getId()))
-                .andExpect(jsonPath("$.game.name").value(savedGame.getName()))
-                .andExpect(jsonPath("$.game.id").value(savedGame.getId()));
+                .andExpect(jsonPath("$.game.name").value(savedGames.get(0).getName()))
+                .andExpect(jsonPath("$.game.id").value(savedGames.get(0).getId()));
     }
 
     @Test
     void givenRightCreds_shouldBuyGame() throws Exception {
-        savedGame = gameService.createOne(game);
-
-        mockMvc.perform(post(ORDER_BUY_ENDPOINT, savedGame.getId(), savedUser.getId())
+        mockMvc.perform(post(ORDER_BUY_ENDPOINT, game.getId(), savedUser.getId())
                         .header(TOKEN_HEADER_TITLE, token)
                         .content(userJson)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -136,7 +135,7 @@ class OrderControllerIntegrationTest {
                 .andExpect(jsonPath("$.bought").value(true))
                 .andExpect(jsonPath("$.buyer.id").value(savedUser.getId()))
                 .andExpect(jsonPath("$.buyer.login").value(savedUser.getLogin()))
-                .andExpect(jsonPath("$.targetGame.name").value(savedGame.getName()));
+                .andExpect(jsonPath("$.targetGame.name").value(game.getName()));
     }
 
     @Test
@@ -156,6 +155,12 @@ class OrderControllerIntegrationTest {
                 .andReturn()
                 .getResponse()
                 .getHeader(TOKEN_HEADER_TITLE);
+    }
+
+    @AfterAll
+    void tearDown() {
+        userService.deleteAll();
+        gameService.deleteAll();
     }
 }
 

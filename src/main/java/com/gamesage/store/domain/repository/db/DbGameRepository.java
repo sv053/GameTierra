@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,12 +30,25 @@ public class DbGameRepository implements FindAllDependentRepository<Game, Intege
             " LEFT JOIN orders" +
             " ON game.id = orders.game_id  WHERE orders.user_id  = ? ";
     private static final String INSERT_GAME_QUERY = "INSERT INTO game (name, price) VALUES (?, ?) ";
+    private static final String REMOVE_GAME = "DELETE " +
+            " FROM game ";
+
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<Game> gameRowMapper;
 
     public DbGameRepository(JdbcTemplate jdbcTemplate, RowMapper<Game> gameRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.gameRowMapper = gameRowMapper;
+    }
+
+    @Override
+    public void deleteAll() {
+        try {
+            jdbcTemplate.update(
+                    REMOVE_GAME);
+        } catch (EmptyResultDataAccessException e) {
+            System.out.println(Arrays.toString(e.getStackTrace()));
+        }
     }
 
     @Override

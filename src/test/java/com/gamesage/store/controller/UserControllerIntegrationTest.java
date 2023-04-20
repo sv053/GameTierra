@@ -1,14 +1,5 @@
 package com.gamesage.store.controller;
 
-import static java.nio.file.Path.of;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.time.LocalDate;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -19,6 +10,7 @@ import com.gamesage.store.domain.model.User;
 import com.gamesage.store.paymentapi.PaymentRequest;
 import com.gamesage.store.service.UserService;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -32,6 +24,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.time.LocalDate;
+
+import static java.nio.file.Path.of;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -43,10 +44,13 @@ class UserControllerIntegrationTest {
     private static final String TOPUP_ENDPOINT = "/users/{userId}/topup";
     @Value("classpath:request/user/test.json")
     private Resource userJsonResource;
+    @Value("classpath:request/user/nonExistentUser.json")
+    private Resource nonExistentUserJsonResource;
 
     private User savedUser;
     private String userJson;
     private String token;
+    private String nonExistentUserJson;
 
     @Autowired
     private UserService userService;
@@ -57,6 +61,7 @@ class UserControllerIntegrationTest {
 
     @BeforeAll
     void setup() throws Exception {
+        nonExistentUserJson = Files.readString(of(nonExistentUserJsonResource.getURI()));
         userJson = Files.readString(of(userJsonResource.getURI()));
         User user = objectMapper.readValue(userJson, User.class);
         userService.deleteAll();
@@ -99,15 +104,15 @@ class UserControllerIntegrationTest {
 
     @Test
     void createOne_thenSuccess() throws Exception {
-        userService.deleteAll();
+        User user = objectMapper.readValue(nonExistentUserJson, User.class);
         mockMvc.perform(post(API_USER_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(userJson))
+                        .content(nonExistentUserJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.login").value(savedUser.getLogin()))
-                .andExpect(jsonPath("$.tier.level").value(savedUser.getTier().getLevel()))
-                .andExpect(jsonPath("$.tier.id").value(savedUser.getTier().getId()))
-                .andExpect(jsonPath("$.tier.cashbackPercentage").value(savedUser.getTier().getCashbackPercentage()));
+                .andExpect(jsonPath("$.login").value(user.getLogin()))
+                .andExpect(jsonPath("$.tier.level").value(user.getTier().getLevel()))
+                .andExpect(jsonPath("$.tier.id").value(user.getTier().getId()))
+                .andExpect(jsonPath("$.tier.cashbackPercentage").value(user.getTier().getCashbackPercentage()));
     }
 
     @Test
@@ -152,6 +157,11 @@ class UserControllerIntegrationTest {
                 .andReturn()
                 .getResponse()
                 .getHeader(TOKEN_HEADER_NAME);
+    }
+
+    @AfterAll
+    void tearDown() {
+        userService.deleteAll();
     }
 }
 

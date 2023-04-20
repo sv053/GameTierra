@@ -30,9 +30,7 @@ public class DbUserRepository implements UserFunctionRepository {
     private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ? " +
             "WHERE id = ?";
     private static final String REMOVE_USER = "DELETE " +
-            " FROM user ";//+
-    // " LEFT JOIN orders ON user.id = orders.user_id " ;//+
-    //" WHERE id = ? CASCADE ";
+            " FROM user ";
 
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> userRowMapper;

@@ -1,21 +1,11 @@
 package com.gamesage.store.controller;
 
-import static java.nio.file.Path.of;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Optional;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.TokenService;
 import com.gamesage.store.service.UserService;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -27,6 +17,15 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Optional;
+
+import static java.nio.file.Path.of;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @Transactional
@@ -85,6 +84,11 @@ class LoginControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().isUnauthorized())
                 .andReturn();
+    }
+
+    @AfterAll
+    void tearDown() {
+        userService.deleteAll();
     }
 }
 

@@ -37,5 +37,10 @@ public class GameService {
         return repository.createOne(gameToAdd);
     }
 
+    public void deleteAll() {
+        if (repository.findAll().size() > 0) {
+            repository.deleteAll();
+        }
+    }
 }
 

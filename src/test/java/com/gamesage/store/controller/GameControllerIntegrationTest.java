@@ -1,19 +1,10 @@
 package com.gamesage.store.controller;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.service.GameService;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +15,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
@@ -33,9 +33,16 @@ public class GameControllerIntegrationTest {
     private static final String API_GAME_ENDPOINT = "/games";
     private static final String GAME_ID_ENDPOINT = "/games/{gameId}";
 
-    private final Game game = new Game("THE_LAST_OF_US", BigDecimal.valueOf(7.28));
-    private final Game anotherGame = new Game("THE_WITCHER", BigDecimal.valueOf(17.28));
-    private final List<Game> games = Arrays.asList(game, anotherGame);
+    private final Game firstGameToCreate = new Game("THE_LAST", BigDecimal.valueOf(73.28));
+    private final Game secondGameToCreate = new Game("THE_LAST_OF_US", BigDecimal.valueOf(26.16));
+    private final Game secondGame = new Game("THE_WITCHERS", BigDecimal.valueOf(112.28));
+    private final Game firstGame = new Game("THE_WITCHER", BigDecimal.valueOf(118.21));
+    private final List<Game> games = Arrays.asList(secondGame, firstGame);
+    private final List<Game> gamesToCreate = Arrays.asList(firstGameToCreate, secondGameToCreate);
+
+
+    private List<Game> savedGames;
+    private Game savedGame;
 
     @Autowired
     private MockMvc mockMvc;
@@ -44,9 +51,14 @@ public class GameControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @BeforeAll
+    void setup() {
+        savedGames = gameService.createAll(games);
+        savedGame = savedGames.get(0);
+    }
+
     @Test
     void shouldFindGameById() throws Exception {
-        Game savedGame = gameService.createOne(game);
         mockMvc.perform(get(GAME_ID_ENDPOINT, savedGame.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -65,34 +77,38 @@ public class GameControllerIntegrationTest {
 
     @Test
     void shouldFindAllGames() throws Exception {
-        List<Game> savedGames = gameService.createAll(games);
-
         mockMvc.perform(get(API_GAME_ENDPOINT))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect((jsonPath("$.*.name", containsInAnyOrder(game.getName(), anotherGame.getName()))))
+                .andExpect((jsonPath("$.*.name", containsInAnyOrder(savedGames.get(0).getName(), savedGames.get(1).getName()))))
                 .andExpect((jsonPath("$.*.id", containsInAnyOrder(savedGames.get(0).getId(),
                         savedGames.get(1).getId()))));
     }
 
     @Test
     void shouldCreateGamesWithUserRightCreds() throws Exception {
-        String gamesJson = objectMapper.writeValueAsString(games);
+        String gamesJson = objectMapper.writeValueAsString(gamesToCreate);
 
-        ResultActions resultActions = mockMvc.perform(post(API_GAME_ENDPOINT)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(gamesJson))
-            .andExpect(status().isOk());
-//            .andExpect((jsonPath("$.*.name", containsInAnyOrder(game.getName(), anotherGame.getName()))))
-//            .andExpect((jsonPath("$.*.price", containsInAnyOrder(game.getPrice(),
-//                anotherGame.getPrice()))));
+        ResultActions resultActions =
+                mockMvc.perform(post(API_GAME_ENDPOINT)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(gamesJson))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.*.name", containsInAnyOrder(firstGameToCreate.getName(), secondGameToCreate.getName())))
+                        .andExpect(jsonPath("$.*.price", containsInAnyOrder(firstGameToCreate.getPrice(),
+                                secondGameToCreate.getPrice())));
 
-        for (int i = 0; i < games.size(); i++) {
-            Game savedGame = games.get(i);
-            String jsonPathPrefix = String.format("$[%d].", i);
-            resultActions.andExpect(jsonPath(jsonPathPrefix + "name").value(savedGame.getName()))
-                    .andExpect(jsonPath(jsonPathPrefix + "price").value(savedGame.getPrice()));
-        }
+//        for (int i = 0; i < games.size(); i++) {
+//            Game savedGame = gamesToCreate.get(i);
+//            String jsonPathPrefix = String.format("$[%d].", i);
+//            resultActions.andExpect(jsonPath(jsonPathPrefix + "name").value(savedGame.getName()))
+//                    .andExpect(jsonPath(jsonPathPrefix + "price").value(savedGame.getPrice()));
+//        }
+    }
+
+    @AfterAll
+    void tearDown() {
+        gameService.deleteAll();
     }
 }
 
