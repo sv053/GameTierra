@@ -127,7 +127,7 @@ class OrderControllerIntegrationTest {
 
     @Test
     void givenRightCreds_shouldBuyGame() throws Exception {
-        mockMvc.perform(post(ORDER_BUY_ENDPOINT, game.getId(), savedUser.getId())
+        mockMvc.perform(post(ORDER_BUY_ENDPOINT, savedGame.getId(), savedUser.getId())
                         .header(TOKEN_HEADER_TITLE, token)
                         .content(userJson)
                         .contentType(MediaType.APPLICATION_JSON))

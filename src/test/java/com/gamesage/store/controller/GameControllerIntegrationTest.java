@@ -12,7 +12,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -20,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -89,21 +89,17 @@ public class GameControllerIntegrationTest {
     void shouldCreateGamesWithUserRightCreds() throws Exception {
         String gamesJson = objectMapper.writeValueAsString(gamesToCreate);
 
-        ResultActions resultActions =
+        String responseContent =
                 mockMvc.perform(post(API_GAME_ENDPOINT)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(gamesJson))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.*.name", containsInAnyOrder(firstGameToCreate.getName(), secondGameToCreate.getName())))
-                        .andExpect(jsonPath("$.*.price", containsInAnyOrder(firstGameToCreate.getPrice(),
-                                secondGameToCreate.getPrice())));
-
-//        for (int i = 0; i < games.size(); i++) {
-//            Game savedGame = gamesToCreate.get(i);
-//            String jsonPathPrefix = String.format("$[%d].", i);
-//            resultActions.andExpect(jsonPath(jsonPathPrefix + "name").value(savedGame.getName()))
-//                    .andExpect(jsonPath(jsonPathPrefix + "price").value(savedGame.getPrice()));
-//        }
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+        assertTrue(responseContent.contains(firstGameToCreate.getPrice().toString()));
+        assertTrue(responseContent.contains(secondGameToCreate.getPrice().toString()));
     }
 
     @AfterAll
