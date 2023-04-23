@@ -16,7 +16,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,12 +42,7 @@ public class DbGameRepository implements FindAllDependentRepository<Game, Intege
 
     @Override
     public void deleteAll() {
-        try {
-            jdbcTemplate.update(
-                    REMOVE_GAME);
-        } catch (EmptyResultDataAccessException e) {
-            System.out.println(Arrays.toString(e.getStackTrace()));
-        }
+            jdbcTemplate.update(REMOVE_GAME);
     }
 
     @Override

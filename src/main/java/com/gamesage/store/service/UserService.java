@@ -1,9 +1,5 @@
 package com.gamesage.store.service;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.User;
@@ -22,6 +18,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService, AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
@@ -73,9 +73,7 @@ public class UserService implements UserDetailsService, AuthenticationUserDetail
     }
 
     public void deleteAll() {
-        if (repository.findAll().size() > 0) {
             repository.deleteAll();
-        }
     }
 
     public User updateBalance(User userToUpdate) {

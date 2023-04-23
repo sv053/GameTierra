@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,12 +41,7 @@ public class DbUserRepository implements UserFunctionRepository {
 
     @Override
     public void deleteAll() {
-        try {
-            jdbcTemplate.update(
-                    REMOVE_USER);
-        } catch (EmptyResultDataAccessException e) {
-            System.out.println(Arrays.toString(e.getStackTrace()));
-        }
+            jdbcTemplate.update(REMOVE_USER);
     }
 
     @Override

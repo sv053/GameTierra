@@ -8,21 +8,13 @@ import com.gamesage.store.domain.model.ResponseError;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.paymentapi.PaymentRequest;
-import com.gamesage.store.service.UserService;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -33,43 +25,25 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UserControllerIntegrationTest {
+class UserControllerIntegrationTest extends ControllerIntegrationTest {
 
-    public static final String TOKEN_HEADER_NAME = "X-Auth-Token";
     private static final String API_USER_ENDPOINT = "/users";
     private static final String TOPUP_ENDPOINT = "/users/{userId}/topup";
-    @Value("classpath:request/user/test.json")
-    private Resource userJsonResource;
+
     @Value("classpath:request/user/nonExistentUser.json")
     private Resource nonExistentUserJsonResource;
 
-    private User savedUser;
-    private String userJson;
     private String token;
-    private String nonExistentUserJson;
-
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @BeforeAll
     void setup() throws Exception {
-        nonExistentUserJson = Files.readString(of(nonExistentUserJsonResource.getURI()));
-        userJson = Files.readString(of(userJsonResource.getURI()));
-        User user = objectMapper.readValue(userJson, User.class);
-        userService.deleteAll();
-        savedUser = userService.createOne(user);
-        token = loginAndGetToken();
-        objectMapper
+        objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        String userJson = Files.readString(of(userJsonResource.getURI()));
+        User userToSave = objectMapper.readValue(userJson, User.class);
+        user = userService.createOne(userToSave);
+        token = loginAndGetToken(userJson);
     }
 
     @Test
@@ -82,8 +56,8 @@ class UserControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(TOKEN_HEADER_NAME, token))
                 .andExpect(status().isOk())
-                .andExpect((jsonPath("$.*.login", Matchers.containsInAnyOrder(savedUser.getLogin(), secondSavedUser.getLogin()))))
-                .andExpect((jsonPath("$.*.id", Matchers.containsInAnyOrder(savedUser.getId(), secondSavedUser.getId()))));
+                .andExpect((jsonPath("$.*.login", Matchers.containsInAnyOrder(user.getLogin(), secondSavedUser.getLogin()))))
+                .andExpect((jsonPath("$.*.id", Matchers.containsInAnyOrder(user.getId(), secondSavedUser.getId()))));
     }
 
     @Test
@@ -104,26 +78,28 @@ class UserControllerIntegrationTest {
 
     @Test
     void createOne_thenSuccess() throws Exception {
-        User user = objectMapper.readValue(nonExistentUserJson, User.class);
+        String nonExistentUserJson = Files.readString(of(nonExistentUserJsonResource.getURI()));
+        User userUnsaved = objectMapper.readValue(nonExistentUserJson, User.class);
+
         mockMvc.perform(post(API_USER_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(nonExistentUserJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.login").value(user.getLogin()))
-                .andExpect(jsonPath("$.tier.level").value(user.getTier().getLevel()))
-                .andExpect(jsonPath("$.tier.id").value(user.getTier().getId()))
-                .andExpect(jsonPath("$.tier.cashbackPercentage").value(user.getTier().getCashbackPercentage()));
+                .andExpect(jsonPath("$.login").value(userUnsaved.getLogin()))
+                .andExpect(jsonPath("$.tier.level").value(userUnsaved.getTier().getLevel()))
+                .andExpect(jsonPath("$.tier.id").value(userUnsaved.getTier().getId()))
+                .andExpect(jsonPath("$.tier.cashbackPercentage").value(userUnsaved.getTier().getCashbackPercentage()));
     }
 
     @Test
-    void givenUser_whenTryTopUp_thenTopupFails() throws Exception {
+    void givenUser_whenTryTopUp_thenFails() throws Exception {
         Card cardWithWrongNumber = new Card(156L,
                 "Jack Black",
                 LocalDate.of(2025, 3, 30),
                 111);
         PaymentRequest errorPaymentRequest = new PaymentRequest(BigDecimal.ONE, cardWithWrongNumber);
 
-        mockMvc.perform(post(TOPUP_ENDPOINT, savedUser.getId())
+        mockMvc.perform(post(TOPUP_ENDPOINT, user.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(errorPaymentRequest)))
                 .andExpect(status().isOk())
@@ -139,29 +115,13 @@ class UserControllerIntegrationTest {
                 LocalDate.of(2025, 3, 30),
                 111);
         PaymentRequest okPaymentRequest = new PaymentRequest(BigDecimal.ONE, cardWithCorrectNumber);
-        mockMvc.perform(post(TOPUP_ENDPOINT, savedUser.getId())
+        mockMvc.perform(post(TOPUP_ENDPOINT, user.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(okPaymentRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.transactionId").isNotEmpty())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.responseError").isEmpty());
-    }
-
-    private String loginAndGetToken() throws Exception {
-        String loginEndpoint = "/login";
-        return mockMvc.perform(post(loginEndpoint)
-                        .content(userJson)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getHeader(TOKEN_HEADER_NAME);
-    }
-
-    @AfterAll
-    void tearDown() {
-        userService.deleteAll();
     }
 }
 

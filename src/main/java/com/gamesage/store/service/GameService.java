@@ -38,9 +38,7 @@ public class GameService {
     }
 
     public void deleteAll() {
-        if (repository.findAll().size() > 0) {
             repository.deleteAll();
-        }
     }
 }
 
