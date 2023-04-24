@@ -2,6 +2,7 @@ package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.data.SampleData;
 import com.gamesage.store.domain.model.Game;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -18,16 +19,13 @@ public class GameControllerIntegrationTest extends ControllerIntegrationTest {
     private static final String API_GAME_ENDPOINT = "/games";
     private static final String GAME_ID_ENDPOINT = "/games/{gameId}";
 
-    private List<Game> savedGames;
+    private List<Game> games;
     private Game game;
 
     @BeforeAll
     void setup() {
-        savedGames = gameService.createAll(List.of(
-                SampleData.GAMES.get(0),
-                SampleData.GAMES.get(1),
-                SampleData.GAMES.get(2)));
-        game = savedGames.get(0);
+        games = gameService.createAll(SampleData.GAMES.subList(0, 3));
+        game = games.get(0);
     }
 
     @Test
@@ -53,14 +51,14 @@ public class GameControllerIntegrationTest extends ControllerIntegrationTest {
         mockMvc.perform(get(API_GAME_ENDPOINT))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect((jsonPath("$.*.name", containsInAnyOrder(
+                .andExpect(jsonPath("$.*.name", containsInAnyOrder(
                         game.getName(),
-                        savedGames.get(1).getName(),
-                        savedGames.get(2).getName()))))
-                .andExpect((jsonPath("$.*.id", containsInAnyOrder(
+                        games.get(1).getName(),
+                        games.get(2).getName())))
+                .andExpect(jsonPath("$.*.id", containsInAnyOrder(
                         game.getId(),
-                        savedGames.get(1).getId(),
-                        savedGames.get(2).getId()))));
+                        games.get(1).getId(),
+                        games.get(2).getId())));
     }
 
     @Test
@@ -77,6 +75,11 @@ public class GameControllerIntegrationTest extends ControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*.name", containsInAnyOrder(gameOne.getName(), gameTwo.getName())))
                 .andExpect(jsonPath("$.*.price", containsInAnyOrder(firstGamePrice, secondGamePrice)));
+    }
+
+    @AfterAll
+    void tearDown() {
+        gameService.deleteAll();
     }
 }
 

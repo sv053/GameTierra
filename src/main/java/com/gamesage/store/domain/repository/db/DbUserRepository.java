@@ -28,7 +28,7 @@ public class DbUserRepository implements UserFunctionRepository {
             "VALUES ( ?, ?, ?, ?) ";
     private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ? " +
             "WHERE id = ?";
-    private static final String REMOVE_USER = "DELETE " +
+    private static final String REMOVE_USERS = "DELETE " +
             " FROM user ";
 
     private final JdbcTemplate jdbcTemplate;
@@ -41,7 +41,7 @@ public class DbUserRepository implements UserFunctionRepository {
 
     @Override
     public void deleteAll() {
-            jdbcTemplate.update(REMOVE_USER);
+        jdbcTemplate.update(REMOVE_USERS);
     }
 
     @Override

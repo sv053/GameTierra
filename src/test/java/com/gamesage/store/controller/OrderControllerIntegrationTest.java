@@ -5,15 +5,18 @@ import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Order;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.OrderService;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
-import static java.nio.file.Path.of;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -28,21 +31,26 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
     private static final String WRONG_TOKEN_HEADER = "unknownTokenValue";
     private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
 
-    private Game game;
-    private List<Game> savedGames;
+    @Value("classpath:request/user/existentUser.json")
+    protected Resource userJsonResource;
+    protected String userJson;
+    protected User user;
     private String token;
+
+    private Game game;
+    private List<Game> games;
 
     @Autowired
     private OrderService orderService;
 
     @BeforeAll
     void setup() throws Exception {
-        userJson = Files.readString(of(userJsonResource.getURI()));
+        userJson = Files.readString(Path.of(userJsonResource.getURI()));
         User userToSave = objectMapper.readValue(userJson, User.class);
         user = userService.createOne(userToSave);
         token = loginAndGetToken(userJson);
-        savedGames = gameService.createAll(List.of(SampleData.GAMES.get(0), SampleData.GAMES.get(1)));
-        game = savedGames.get(0);
+        games = gameService.createAll(SampleData.GAMES.subList(0, 3));
+        game = games.get(0);
     }
 
     @Test
@@ -65,14 +73,14 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
     @Test
     void givenRightCreds_shouldFindAllOrders() throws Exception {
         orderService.buyGame(game.getId(), user.getId());
-        orderService.buyGame(savedGames.get(1).getId(), user.getId());
+        orderService.buyGame(games.get(1).getId(), user.getId());
 
         mockMvc.perform(get(API_ORDER_ENDPOINT)
                         .header(TOKEN_HEADER_TITLE, token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*.game.name", containsInAnyOrder(
-                        game.getName(), savedGames.get(1).getName())))
+                        game.getName(), games.get(1).getName())))
                 .andExpect(jsonPath("$.*.user.login").isNotEmpty());
     }
 
@@ -112,6 +120,12 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
                         .content(userJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @AfterAll
+    void tearDown() {
+        userService.deleteAll();
+        gameService.deleteAll();
     }
 }
 

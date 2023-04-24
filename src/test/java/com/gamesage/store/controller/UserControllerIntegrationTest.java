@@ -9,6 +9,7 @@ import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.paymentapi.PaymentRequest;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,9 +19,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 
-import static java.nio.file.Path.of;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,7 +33,9 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
 
     @Value("classpath:request/user/nonExistentUser.json")
     private Resource nonExistentUserJsonResource;
-
+    @Value("classpath:request/user/existentUser.json")
+    private Resource userJsonResource;
+    private User user;
     private String token;
 
     @BeforeAll
@@ -40,7 +43,7 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
         objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        String userJson = Files.readString(of(userJsonResource.getURI()));
+        String userJson = Files.readString(Path.of(userJsonResource.getURI()));
         User userToSave = objectMapper.readValue(userJson, User.class);
         user = userService.createOne(userToSave);
         token = loginAndGetToken(userJson);
@@ -56,8 +59,8 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(TOKEN_HEADER_NAME, token))
                 .andExpect(status().isOk())
-                .andExpect((jsonPath("$.*.login", Matchers.containsInAnyOrder(user.getLogin(), secondSavedUser.getLogin()))))
-                .andExpect((jsonPath("$.*.id", Matchers.containsInAnyOrder(user.getId(), secondSavedUser.getId()))));
+                .andExpect(jsonPath("$.*.login", Matchers.containsInAnyOrder(user.getLogin(), secondSavedUser.getLogin())))
+                .andExpect(jsonPath("$.*.id", Matchers.containsInAnyOrder(user.getId(), secondSavedUser.getId())));
     }
 
     @Test
@@ -78,7 +81,7 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
 
     @Test
     void createOne_thenSuccess() throws Exception {
-        String nonExistentUserJson = Files.readString(of(nonExistentUserJsonResource.getURI()));
+        String nonExistentUserJson = Files.readString(Path.of(nonExistentUserJsonResource.getURI()));
         User userUnsaved = objectMapper.readValue(nonExistentUserJson, User.class);
 
         mockMvc.perform(post(API_USER_ENDPOINT)
@@ -122,6 +125,11 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
                 .andExpect(jsonPath("$.transactionId").isNotEmpty())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.responseError").isEmpty());
+    }
+
+    @AfterAll
+    void tearDown() {
+        userService.deleteAll();
     }
 }
 

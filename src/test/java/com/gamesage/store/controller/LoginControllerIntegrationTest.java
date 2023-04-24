@@ -2,29 +2,37 @@ package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.User;
+import com.gamesage.store.exception.EntityNotFoundException;
 import com.gamesage.store.service.TokenService;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Optional;
+import java.nio.file.Path;
 
-import static java.nio.file.Path.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class LoginControllerIntegrationTest extends ControllerIntegrationTest {
 
+    @Value("classpath:request/user/existentUser.json")
+    private Resource userJsonResource;
+    private String userJson;
+    private User user;
+
     @Autowired
     private TokenService tokenService;
 
     @BeforeAll
     void setup() throws IOException {
-        userJson = Files.readString(of(userJsonResource.getURI()));
+        userJson = Files.readString(Path.of(userJsonResource.getURI()));
         user = objectMapper.readValue(userJson, User.class);
     }
 
@@ -33,10 +41,11 @@ class LoginControllerIntegrationTest extends ControllerIntegrationTest {
         userService.createOne(user);
         String tokenResponseValue = loginAndGetToken(userJson);
 
-        Optional<String> tokenValue = tokenService.findTokenByLogin(user.getLogin())
-                .map(AuthToken::getValue);
+        String tokenValue = tokenService.findTokenByLogin(user.getLogin())
+                .map(AuthToken::getValue)
+                .orElseThrow(() -> new EntityNotFoundException("token for " + user.getLogin()));
 
-        assertEquals(tokenValue, Optional.of(tokenResponseValue));
+        assertEquals(tokenValue, tokenResponseValue);
     }
 
     @Test
@@ -45,6 +54,11 @@ class LoginControllerIntegrationTest extends ControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @AfterAll
+    void tearDown() {
+        userService.deleteAll();
     }
 }
 
