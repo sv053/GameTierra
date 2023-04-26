@@ -16,11 +16,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 
-import static java.nio.file.Path.of;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -31,8 +32,9 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
     private static final String TOPUP_ENDPOINT = "/users/{userId}/topup";
 
     @Value("classpath:request/user/nonExistentUser.json")
-    private Resource nonExistentUserJsonResource;
-
+    protected Resource notUserJsonResource;
+    private String userJson;
+    private User user;
     private String token;
 
     @BeforeAll
@@ -40,10 +42,14 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
         objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        String userJson = Files.readString(of(userJsonResource.getURI()));
+        getResource(Path.of(userJsonResource.getURI()));
+        token = loginAndGetToken(userJson);
+    }
+
+    void getResource(Path path) throws IOException {
+        userJson = Files.readString(path);
         User userToSave = objectMapper.readValue(userJson, User.class);
         user = userService.createOne(userToSave);
-        token = loginAndGetToken(userJson);
     }
 
     @Test
@@ -56,8 +62,8 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(TOKEN_HEADER_NAME, token))
                 .andExpect(status().isOk())
-                .andExpect((jsonPath("$.*.login", Matchers.containsInAnyOrder(user.getLogin(), secondSavedUser.getLogin()))))
-                .andExpect((jsonPath("$.*.id", Matchers.containsInAnyOrder(user.getId(), secondSavedUser.getId()))));
+                .andExpect(jsonPath("$.*.login", Matchers.containsInAnyOrder(user.getLogin(), secondSavedUser.getLogin())))
+                .andExpect(jsonPath("$.*.id", Matchers.containsInAnyOrder(user.getId(), secondSavedUser.getId())));
     }
 
     @Test
@@ -78,7 +84,7 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
 
     @Test
     void createOne_thenSuccess() throws Exception {
-        String nonExistentUserJson = Files.readString(of(nonExistentUserJsonResource.getURI()));
+        String nonExistentUserJson = Files.readString(Path.of(notUserJsonResource.getURI()));
         User userUnsaved = objectMapper.readValue(nonExistentUserJson, User.class);
 
         mockMvc.perform(post(API_USER_ENDPOINT)

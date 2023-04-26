@@ -1,7 +1,6 @@
 package com.gamesage.store.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.GameService;
 import com.gamesage.store.service.UserService;
 import org.junit.jupiter.api.AfterAll;
@@ -16,21 +15,23 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.Path;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ControllerIntegrationTest {
+abstract public class ControllerIntegrationTest {
 
     protected static final String TOKEN_HEADER_NAME = "X-Auth-Token";
     protected static final String LOGIN_ENDPOINT = "/login";
 
     @Value("classpath:request/user/existentUser.json")
     protected Resource userJsonResource;
-    protected String userJson;
-    protected User user;
+
 
     @Autowired
     protected MockMvc mockMvc;
@@ -40,6 +41,8 @@ public class ControllerIntegrationTest {
     protected UserService userService;
     @Autowired
     protected GameService gameService;
+
+    abstract void getResource(Path path) throws IOException;
 
     public String loginAndGetToken(String jsonObject) throws Exception {
         return mockMvc.perform(MockMvcRequestBuilders.post(LOGIN_ENDPOINT)

@@ -73,7 +73,7 @@ public class UserService implements UserDetailsService, AuthenticationUserDetail
     }
 
     public void deleteAll() {
-            repository.deleteAll();
+        repository.deleteAll();
     }
 
     public User updateBalance(User userToUpdate) {

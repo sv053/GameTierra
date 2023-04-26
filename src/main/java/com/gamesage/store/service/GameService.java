@@ -38,7 +38,7 @@ public class GameService {
     }
 
     public void deleteAll() {
-            repository.deleteAll();
+        repository.deleteAll();
     }
 }
 

@@ -10,10 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
-import static java.nio.file.Path.of;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -28,6 +29,8 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
     private static final String WRONG_TOKEN_HEADER = "unknownTokenValue";
     private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
 
+    private String userJson;
+    private User user;
     private Game game;
     private List<Game> savedGames;
     private String token;
@@ -37,12 +40,16 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
 
     @BeforeAll
     void setup() throws Exception {
-        userJson = Files.readString(of(userJsonResource.getURI()));
+        getResource(Path.of(userJsonResource.getURI()));
+        token = loginAndGetToken(userJson);
+        savedGames = gameService.createAll(SampleData.GAMES.subList(0, 2));
+        game = savedGames.get(0);
+    }
+
+    void getResource(Path path) throws IOException {
+        userJson = Files.readString(path);
         User userToSave = objectMapper.readValue(userJson, User.class);
         user = userService.createOne(userToSave);
-        token = loginAndGetToken(userJson);
-        savedGames = gameService.createAll(List.of(SampleData.GAMES.get(0), SampleData.GAMES.get(1)));
-        game = savedGames.get(0);
     }
 
     @Test

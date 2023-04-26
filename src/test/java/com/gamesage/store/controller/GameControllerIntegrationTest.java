@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -23,10 +24,11 @@ public class GameControllerIntegrationTest extends ControllerIntegrationTest {
 
     @BeforeAll
     void setup() {
-        savedGames = gameService.createAll(List.of(
-                SampleData.GAMES.get(0),
-                SampleData.GAMES.get(1),
-                SampleData.GAMES.get(2)));
+        getResource(null);
+    }
+
+    void getResource(Path path) {
+        savedGames = gameService.createAll(SampleData.GAMES.subList(0, 4));
         game = savedGames.get(0);
     }
 
@@ -53,14 +55,16 @@ public class GameControllerIntegrationTest extends ControllerIntegrationTest {
         mockMvc.perform(get(API_GAME_ENDPOINT))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect((jsonPath("$.*.name", containsInAnyOrder(
+                .andExpect(jsonPath("$.*.name", containsInAnyOrder(
                         game.getName(),
                         savedGames.get(1).getName(),
-                        savedGames.get(2).getName()))))
-                .andExpect((jsonPath("$.*.id", containsInAnyOrder(
+                        savedGames.get(2).getName(),
+                        savedGames.get(3).getName())))
+                .andExpect(jsonPath("$.*.id", containsInAnyOrder(
                         game.getId(),
                         savedGames.get(1).getId(),
-                        savedGames.get(2).getId()))));
+                        savedGames.get(2).getId(),
+                        savedGames.get(3).getId())));
     }
 
     @Test
