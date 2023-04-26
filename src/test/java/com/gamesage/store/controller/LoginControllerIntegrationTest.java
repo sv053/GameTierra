@@ -27,25 +27,21 @@ class LoginControllerIntegrationTest extends ControllerIntegrationTest {
 
     @BeforeAll
     void setup() throws IOException {
-        getResource(Path.of(userJsonResource.getURI()));
-    }
-
-    void getResource(Path path) throws IOException {
-        userJson = Files.readString(path);
+        userJson = Files.readString(Path.of(userJsonResource.getURI()));
         user = objectMapper.readValue(userJson, User.class);
     }
 
     @Test
     void givenCorrectCreds_shouldLoginAndReturn200() throws Exception {
         userService.createOne(user);
-        String tokenResponseValue = loginAndGetToken(userJson);
+        String expectedToken = loginAndGetToken(userJson);
 
-        String tokenValue = tokenService
+        String actualToken = tokenService
                 .findTokenByLogin(user.getLogin())
                 .map(AuthToken::getValue)
                 .orElseThrow(() -> new EntityNotFoundException("token for " + user.getLogin()));
 
-        assertEquals(tokenValue, tokenResponseValue);
+        assertEquals(expectedToken, actualToken);
     }
 
     @Test

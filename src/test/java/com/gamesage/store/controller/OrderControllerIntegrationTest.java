@@ -5,12 +5,12 @@ import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Order;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.OrderService;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -40,16 +40,12 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
 
     @BeforeAll
     void setup() throws Exception {
-        getResource(Path.of(userJsonResource.getURI()));
+        userJson = Files.readString(Path.of(userJsonResource.getURI()));
+        User userToSave = objectMapper.readValue(userJson, User.class);
+        user = userService.createOne(userToSave);
         token = loginAndGetToken(userJson);
         savedGames = gameService.createAll(SampleData.GAMES.subList(0, 2));
         game = savedGames.get(0);
-    }
-
-    void getResource(Path path) throws IOException {
-        userJson = Files.readString(path);
-        User userToSave = objectMapper.readValue(userJson, User.class);
-        user = userService.createOne(userToSave);
     }
 
     @Test
@@ -119,6 +115,12 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
                         .content(userJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @AfterAll
+    void tearDown() {
+        userService.deleteAll();
+        gameService.deleteAll();
     }
 }
 

@@ -2,11 +2,11 @@ package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.data.SampleData;
 import com.gamesage.store.domain.model.Game;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
-import java.nio.file.Path;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -24,10 +24,6 @@ public class GameControllerIntegrationTest extends ControllerIntegrationTest {
 
     @BeforeAll
     void setup() {
-        getResource(null);
-    }
-
-    void getResource(Path path) {
         savedGames = gameService.createAll(SampleData.GAMES.subList(0, 4));
         game = savedGames.get(0);
     }
@@ -81,6 +77,11 @@ public class GameControllerIntegrationTest extends ControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*.name", containsInAnyOrder(gameOne.getName(), gameTwo.getName())))
                 .andExpect(jsonPath("$.*.price", containsInAnyOrder(firstGamePrice, secondGamePrice)));
+    }
+
+    @AfterAll
+    void tearDown() {
+        gameService.deleteAll();
     }
 }
 

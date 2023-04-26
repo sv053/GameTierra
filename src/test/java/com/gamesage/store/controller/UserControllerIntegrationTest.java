@@ -9,6 +9,7 @@ import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.paymentapi.PaymentRequest;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +17,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,8 +32,7 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
     private static final String TOPUP_ENDPOINT = "/users/{userId}/topup";
 
     @Value("classpath:request/user/nonExistentUser.json")
-    protected Resource notUserJsonResource;
-    private String userJson;
+    public Resource notUserJsonResource;
     private User user;
     private String token;
 
@@ -42,14 +41,10 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
         objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        getResource(Path.of(userJsonResource.getURI()));
+        String userJson = Files.readString(Path.of(userJsonResource.getURI()));
+        User userToCreate = objectMapper.readValue(userJson, User.class);
+        user = userService.createOne(userToCreate);
         token = loginAndGetToken(userJson);
-    }
-
-    void getResource(Path path) throws IOException {
-        userJson = Files.readString(path);
-        User userToSave = objectMapper.readValue(userJson, User.class);
-        user = userService.createOne(userToSave);
     }
 
     @Test
@@ -128,6 +123,11 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
                 .andExpect(jsonPath("$.transactionId").isNotEmpty())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.responseError").isEmpty());
+    }
+
+    @AfterAll
+    void tearDown() {
+        userService.deleteAll();
     }
 }
 

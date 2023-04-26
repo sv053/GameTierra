@@ -3,7 +3,6 @@ package com.gamesage.store.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamesage.store.service.GameService;
 import com.gamesage.store.service.UserService;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,9 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-import java.nio.file.Path;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,7 +28,6 @@ abstract public class ControllerIntegrationTest {
     @Value("classpath:request/user/existentUser.json")
     protected Resource userJsonResource;
 
-
     @Autowired
     protected MockMvc mockMvc;
     @Autowired
@@ -42,8 +37,6 @@ abstract public class ControllerIntegrationTest {
     @Autowired
     protected GameService gameService;
 
-    abstract void getResource(Path path) throws IOException;
-
     public String loginAndGetToken(String jsonObject) throws Exception {
         return mockMvc.perform(MockMvcRequestBuilders.post(LOGIN_ENDPOINT)
                         .content(jsonObject)
@@ -52,12 +45,6 @@ abstract public class ControllerIntegrationTest {
                 .andReturn()
                 .getResponse()
                 .getHeader(TOKEN_HEADER_NAME);
-    }
-
-    @AfterAll
-    void tearDown() {
-        userService.deleteAll();
-        gameService.deleteAll();
     }
 }
 
