@@ -2,7 +2,6 @@ package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.data.SampleData;
 import com.gamesage.store.domain.model.Game;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -77,11 +76,6 @@ public class GameControllerIntegrationTest extends ControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*.name", containsInAnyOrder(gameOne.getName(), gameTwo.getName())))
                 .andExpect(jsonPath("$.*.price", containsInAnyOrder(firstGamePrice, secondGamePrice)));
-    }
-
-    @AfterAll
-    void tearDown() {
-        gameService.deleteAll();
     }
 }
 

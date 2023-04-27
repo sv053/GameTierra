@@ -3,6 +3,7 @@ package com.gamesage.store.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamesage.store.service.GameService;
 import com.gamesage.store.service.UserService;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +46,12 @@ abstract public class ControllerIntegrationTest {
                 .andReturn()
                 .getResponse()
                 .getHeader(TOKEN_HEADER_NAME);
+    }
+
+    @AfterAll
+    void tearDown() {
+        userService.deleteAll();
+        gameService.deleteAll();
     }
 }
 

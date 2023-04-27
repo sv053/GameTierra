@@ -9,7 +9,6 @@ import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.paymentapi.PaymentRequest;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
@@ -123,11 +122,6 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
                 .andExpect(jsonPath("$.transactionId").isNotEmpty())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.responseError").isEmpty());
-    }
-
-    @AfterAll
-    void tearDown() {
-        userService.deleteAll();
     }
 }
 
