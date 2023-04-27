@@ -94,11 +94,11 @@ class UserServiceIntegrationTest {
 
     @Test
     void topUpBalance_Success_RightUserId() {
-        BigDecimal balance = BigDecimal.TEN;
+        BigDecimal balance = BigDecimal.valueOf(10.d);
         User user = userService.createOne(new User(null, "lsla", "canaria", new Tier(
                 3, "SILVER", 10.d), balance));
+        BigDecimal amount = BigDecimal.valueOf(10.d);
 
-        BigDecimal amount = BigDecimal.TEN;
         Card card = new Card(1111_2222_3333_4444L,
                 "TA IA",
                 LocalDate.of(LocalDate.now().getYear() + 1, 1, 1),
@@ -107,7 +107,8 @@ class UserServiceIntegrationTest {
 
         userService.topUpBalance(paymentRequest, user.getId());
         User updatedUser = userService.findById(user.getId());
-        assertEquals(balance.add(amount), updatedUser.getBalance().setScale(0));
+
+        assertEquals(balance.add(amount), updatedUser.getBalance());
     }
 }
 

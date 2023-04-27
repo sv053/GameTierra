@@ -116,7 +116,7 @@ public class User {
         return "\nUser{"
                 + "id=" + id
                 + ", login=" + login
-                + ", tier=" + tier.getLevel()
+                + ", tier=" + tier
                 + ", cashback=" + tier.getCashbackPercentage() * 100 + "%}"
                 + ", balance=$" + balance
                 + ", \ngames=\n" + getGames()

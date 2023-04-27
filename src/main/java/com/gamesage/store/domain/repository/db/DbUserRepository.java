@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
@@ -29,14 +28,20 @@ public class DbUserRepository implements UserFunctionRepository {
             "VALUES ( ?, ?, ?, ?) ";
     private static final String UPDATE_USER_BALANCE = "UPDATE user SET balance = ? " +
             "WHERE id = ?";
+    private static final String REMOVE_USERS = "DELETE " +
+            " FROM user ";
+
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> userRowMapper;
-    private final BCryptPasswordEncoder encoder;
 
-    public DbUserRepository(JdbcTemplate jdbcTemplate, UserRowMapper userRowMapper, BCryptPasswordEncoder encoder) {
+    public DbUserRepository(JdbcTemplate jdbcTemplate, UserRowMapper userRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.userRowMapper = userRowMapper;
-        this.encoder = encoder;
+    }
+
+    @Override
+    public void deleteAll() {
+        jdbcTemplate.update(REMOVE_USERS);
     }
 
     @Override
@@ -56,7 +61,6 @@ public class DbUserRepository implements UserFunctionRepository {
     @Override
     public Optional<User> findByLogin(String login) {
         try {
-
             return Optional.ofNullable(jdbcTemplate.queryForObject(
                     SELECT_USER_QUERY +
                             "WHERE user.login = ?",

@@ -29,12 +29,20 @@ public class DbGameRepository implements FindAllDependentRepository<Game, Intege
             " LEFT JOIN orders" +
             " ON game.id = orders.game_id  WHERE orders.user_id  = ? ";
     private static final String INSERT_GAME_QUERY = "INSERT INTO game (name, price) VALUES (?, ?) ";
+    private static final String REMOVE_GAMES = "DELETE " +
+            " FROM game ";
+
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<Game> gameRowMapper;
 
     public DbGameRepository(JdbcTemplate jdbcTemplate, RowMapper<Game> gameRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.gameRowMapper = gameRowMapper;
+    }
+
+    @Override
+    public void deleteAll() {
+        jdbcTemplate.update(REMOVE_GAMES);
     }
 
     @Override

@@ -8,5 +8,7 @@ public interface UserFunctionRepository extends Repository<User, Integer> {
 
     User updateUserBalance(User user);
     Optional<User> findByLogin(String login);
+
+    void deleteAll();
 }
 

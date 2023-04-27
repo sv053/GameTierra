@@ -1,0 +1,11 @@
+{
+  "login": "sadpony",
+  "password": "poorpoorpony",
+  "tier": {
+    "cashbackPercentage": 0.0,
+    "id": 1,
+    "level": "FREE"
+  },
+  "balance": 10000.00,
+  "games": []
+}

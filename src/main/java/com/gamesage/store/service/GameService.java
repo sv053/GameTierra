@@ -37,5 +37,8 @@ public class GameService {
         return repository.createOne(gameToAdd);
     }
 
+    public void deleteAll() {
+        repository.deleteAll();
+    }
 }
 

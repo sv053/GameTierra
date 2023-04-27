@@ -24,9 +24,9 @@ public class DbOrderRepository implements Repository<Order, Integer> {
             "VALUES (?, ?, ?) ";
     private static final String SELECT_ALL_ORDERS_QUERY = "SELECT orders.id AS id, user_id, game_id, order_datetime, " +
             "user.login, user.password, user.tier_id, user.balance, game.name, game.price" +
-            " FROM user" +
-            " LEFT JOIN orders" +
-            " ON  user.id = orders.user_id" +
+            " FROM orders" +
+            " LEFT JOIN user" +
+            " ON  user.id = user_id" +
             " LEFT JOIN game " +
             " ON game.id = game_id ";
     private static final String SELECT_ORDER_QUERY = SELECT_ALL_ORDERS_QUERY + " WHERE orders.id = ?";
