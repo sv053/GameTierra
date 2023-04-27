@@ -5,7 +5,6 @@ import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Order;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.OrderService;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,12 +114,6 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
                         .content(userJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
-    }
-
-    @AfterAll
-    void tearDown() {
-        userService.deleteAll();
-        gameService.deleteAll();
     }
 }
 
