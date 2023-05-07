@@ -29,6 +29,8 @@ public class DbOrderRepository implements Repository<Order, Integer> {
             " ON  user.id = user_id" +
             " LEFT JOIN game " +
             " ON game.id = game_id ";
+    private static final String SELECT_ALL_ORDERS_SYNC_EXISTENT_USERS_QUERY = SELECT_ALL_ORDERS_QUERY +
+            "WHERE user.id IS NOT NULL ";
     private static final String SELECT_ORDER_QUERY = SELECT_ALL_ORDERS_QUERY + " WHERE orders.id = ?";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<Order> rowMapper;
@@ -71,7 +73,7 @@ public class DbOrderRepository implements Repository<Order, Integer> {
 
     @Override
     public List<Order> findAll() {
-        return jdbcTemplate.query(SELECT_ALL_ORDERS_QUERY, rowMapper);
+        return jdbcTemplate.query(SELECT_ALL_ORDERS_SYNC_EXISTENT_USERS_QUERY, rowMapper);
     }
 
     @Component

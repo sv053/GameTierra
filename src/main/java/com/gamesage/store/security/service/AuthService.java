@@ -23,12 +23,12 @@ public class AuthService {
 
     public AuthToken authenticateUser(User user) {
         User foundUser = userService.findByCredentials(user.getLogin(), user.getPassword());
-        return provideWithToken(foundUser.getLogin());
+        return provideWithToken(foundUser.getId());
     }
 
-    private AuthToken provideWithToken(String login) {
-        return tokenService.findTokenByLogin(login)
-                .orElseGet(() -> tokenService.createToken(new AuthToken(generateToken(), login)));
+    private AuthToken provideWithToken(Integer id) {
+        return tokenService.findTokenById(id)
+                .orElseGet(() -> tokenService.createToken(new AuthToken(generateToken(), id)));
     }
 
     private String generateToken() {

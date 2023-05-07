@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS 'orders'
     'game_id'        INTEGER,
     'order_datetime' DATETIME_INTERVAL_CODE,
     PRIMARY KEY ('id' AUTOINCREMENT),
-    CONSTRAINT 'user_fk' FOREIGN KEY ('user_id') REFERENCES 'user' ('id') ON DELETE CASCADE,
-    CONSTRAINT 'game_fk' FOREIGN KEY ('game_id') REFERENCES 'game' ('id') ON DELETE CASCADE
+    CONSTRAINT 'user_fk' FOREIGN KEY ('user_id') REFERENCES 'user' ('id'),
+    CONSTRAINT 'game_fk' FOREIGN KEY ('game_id') REFERENCES 'game' ('id')
 );
 
 CREATE TABLE IF NOT EXISTS 'token'
