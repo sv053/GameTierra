@@ -16,8 +16,8 @@ public class TokenService {
         this.tokenRepository = tokenRepository;
     }
 
-    public Optional<AuthToken> findTokenByLogin(String userLogin) {
-        return tokenRepository.findById(userLogin);
+    public Optional<AuthToken> findTokenById(Integer userId) {
+        return tokenRepository.findById(userId);
     }
 
     public AuthToken findToken(String token) {

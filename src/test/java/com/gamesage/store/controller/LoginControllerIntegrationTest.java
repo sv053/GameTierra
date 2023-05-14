@@ -33,11 +33,11 @@ class LoginControllerIntegrationTest extends ControllerIntegrationTest {
 
     @Test
     void givenCorrectCreds_shouldLoginAndReturn200() throws Exception {
-        userService.createOne(user);
+        User savedUser = userService.createOne(user);
         String actualToken = loginAndGetToken(userJson);
 
         String expectedToken = tokenService
-                .findTokenByLogin(user.getLogin())
+                .findTokenById(savedUser.getId())
                 .map(AuthToken::getValue)
                 .orElseThrow(() -> new EntityNotFoundException("token for " + user.getLogin()));
 

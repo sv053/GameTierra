@@ -27,8 +27,8 @@ class TokenServiceIntegrationTest {
     void findByTokenValue_Success() {
         User userWithoutToken = new User(null, "user1", "lerida", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
-        userService.createOne(userWithoutToken);
-        AuthToken tokenToCreate = new AuthToken("ftyytgiuhiuhiuh", userWithoutToken.getLogin());
+        User savedUser = userService.createOne(userWithoutToken);
+        AuthToken tokenToCreate = new AuthToken("ftyytgiuhiuhiuh", savedUser.getId());
         AuthToken tokenToFind = tokenService.createToken(tokenToCreate);
         AuthToken foundToken = tokenService.findToken(tokenToCreate.getValue());
 
@@ -39,10 +39,10 @@ class TokenServiceIntegrationTest {
     void findByLogin_Success() {
         User userWithoutToken = new User(null, "user111", "lerida", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
-        userService.createOne(userWithoutToken);
-        AuthToken token = new AuthToken("ftyytgiuhiuhiuh", userWithoutToken.getLogin());
+        User savedUser = userService.createOne(userWithoutToken);
+        AuthToken token = new AuthToken("ftyytgiuhiuhiuh", savedUser.getId());
         AuthToken tokenToFind = tokenService.createToken(token);
-        Optional<AuthToken> foundToken = tokenService.findTokenByLogin(token.getUserLogin());
+        Optional<AuthToken> foundToken = tokenService.findTokenById(savedUser.getId());
 
         assertTrue(foundToken.isPresent());
         assertEquals(Optional.of(tokenToFind), foundToken);
@@ -57,10 +57,10 @@ class TokenServiceIntegrationTest {
     void saveTokenValue_Success() {
         User user = new User(null, "agamer", "lerida", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
-        userService.createOne(user);
-        AuthToken token = new AuthToken("ftyzrdtcfjyiuh", user.getLogin());
+        User savedUser = userService.createOne(user);
+        AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId());
         tokenService.createToken(token);
-        Optional<AuthToken> foundToken = tokenService.findTokenByLogin(token.getUserLogin());
+        Optional<AuthToken> foundToken = tokenService.findTokenById(savedUser.getId());
 
         assertEquals(Optional.of(token), foundToken);
     }
