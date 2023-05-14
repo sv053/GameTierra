@@ -31,14 +31,14 @@ public class AuthToken {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), value);
+        return Objects.hash(super.hashCode(), value, userId);
     }
 
     @Override
     public String toString() {
         return "AuthToken{" +
                 ", token='" + value + '\'' +
-                ", userLogin=" + userId +
+                ", userId=" + userId +
                 '}';
     }
 }
