@@ -22,7 +22,7 @@ public class DbOrderRepository implements Repository<Order, Integer> {
 
     private static final String INSERT_ORDER = "INSERT INTO orders (user_id, game_id, order_datetime) " +
             "VALUES (?, ?, ?) ";
-    private static final String SELECT_ORDERS_QUERY =
+    private static final String SELECT_ACTIVE_ORDERS_QUERY =
             "SELECT orders.id AS id, user_id, game_id, order_datetime, " +
                     " user.login, user.password, user.tier_id, user.balance, " +
                     " game.id, game.name, game.price" +
@@ -77,7 +77,7 @@ public class DbOrderRepository implements Repository<Order, Integer> {
 
     @Override
     public List<Order> findAll() {
-        return jdbcTemplate.query(SELECT_ORDERS_QUERY, rowMapper);
+        return jdbcTemplate.query(SELECT_ACTIVE_ORDERS_QUERY, rowMapper);
     }
 
     @Component
