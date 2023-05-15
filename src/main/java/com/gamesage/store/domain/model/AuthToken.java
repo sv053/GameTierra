@@ -1,5 +1,6 @@
 package com.gamesage.store.domain.model;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class AuthToken {
@@ -7,9 +8,20 @@ public class AuthToken {
     private final Integer userId;
     private final String value;
 
-    public AuthToken(String tokenValue, Integer userId) {
+    private LocalDateTime expirationDate;
+
+    public AuthToken(String tokenValue, Integer userId, LocalDateTime date) {
         this.value = tokenValue;
         this.userId = userId;
+        this.expirationDate = date;
+    }
+
+    public LocalDateTime getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(LocalDateTime expirationDate) {
+        this.expirationDate = expirationDate;
     }
 
     public Integer getUserId() {
@@ -31,7 +43,7 @@ public class AuthToken {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), value, userId);
+        return Objects.hash(super.hashCode(), value, userId, expirationDate);
     }
 
     @Override
@@ -39,6 +51,7 @@ public class AuthToken {
         return "AuthToken{" +
                 ", token='" + value + '\'' +
                 ", userId=" + userId +
+                ", expirationDate=" + expirationDate +
                 '}';
     }
 }

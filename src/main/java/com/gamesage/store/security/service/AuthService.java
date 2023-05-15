@@ -7,6 +7,8 @@ import com.gamesage.store.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Service
@@ -26,9 +28,14 @@ public class AuthService {
         return provideWithToken(foundUser.getId());
     }
 
+    public void revokeAccess(User user, String token) {
+        tokenService.invalidateToken(token);
+    }
+
     private AuthToken provideWithToken(Integer id) {
         return tokenService.findTokenById(id)
-                .orElseGet(() -> tokenService.createToken(new AuthToken(generateToken(), id)));
+                .orElseGet(() -> tokenService.createToken(
+                        new AuthToken(generateToken(), id, LocalDateTime.now().plus(7, ChronoUnit.DAYS))));
     }
 
     private String generateToken() {

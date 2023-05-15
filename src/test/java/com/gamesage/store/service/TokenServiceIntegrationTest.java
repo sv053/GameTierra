@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,7 +29,7 @@ class TokenServiceIntegrationTest {
         User userWithoutToken = new User(null, "user1", "lerida", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(userWithoutToken);
-        AuthToken tokenToCreate = new AuthToken("ftyytgiuhiuhiuh", savedUser.getId());
+        AuthToken tokenToCreate = new AuthToken("ftyytgiuhiuhiuh", savedUser.getId(), LocalDateTime.now());
         AuthToken tokenToFind = tokenService.createToken(tokenToCreate);
         AuthToken foundToken = tokenService.findToken(tokenToCreate.getValue());
 
@@ -40,7 +41,7 @@ class TokenServiceIntegrationTest {
         User userWithoutToken = new User(null, "user111", "lerida", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(userWithoutToken);
-        AuthToken token = new AuthToken("ftyytgiuhiuhiuh", savedUser.getId());
+        AuthToken token = new AuthToken("ftyytgiuhiuhiuh", savedUser.getId(), LocalDateTime.now());
         AuthToken tokenToFind = tokenService.createToken(token);
         Optional<AuthToken> foundToken = tokenService.findTokenById(savedUser.getId());
 
@@ -58,7 +59,7 @@ class TokenServiceIntegrationTest {
         User user = new User(null, "agamer", "lerida", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(user);
-        AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId());
+        AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
         tokenService.createToken(token);
         Optional<AuthToken> foundToken = tokenService.findTokenById(savedUser.getId());
 

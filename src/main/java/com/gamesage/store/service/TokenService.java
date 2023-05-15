@@ -27,5 +27,14 @@ public class TokenService {
     public AuthToken createToken(AuthToken authToken) {
         return tokenRepository.createOne(authToken);
     }
+
+    public void removeExpiredTokens() {
+        tokenRepository.removeExpired();
+    }
+
+    public void invalidateToken(String token) {
+//        AuthToken authToken = findToken(token);
+        tokenRepository.removeByValue(token);
+    }
 }
 

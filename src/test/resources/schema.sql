@@ -34,8 +34,9 @@ CREATE TABLE IF NOT EXISTS orders
 
 CREATE TABLE IF NOT EXISTS token
 (
-    token_value VARCHAR(150),
-    user_id     INTEGER PRIMARY KEY,
+    token_value     VARCHAR(150),
+    user_id         INTEGER PRIMARY KEY,
+    expiration_date DATETIME,
     FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
 );
 
