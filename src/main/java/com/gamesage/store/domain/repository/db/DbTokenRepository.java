@@ -16,15 +16,15 @@ import java.util.Optional;
 @Repository
 public class DbTokenRepository implements TokenRepository {
 
-    private static final String SELECT_ALL_TOKENS_QUERY = "SELECT token_value, user_login " +
+    private static final String SELECT_ALL_TOKENS_QUERY = "SELECT token_value, user_id " +
             " FROM token ";
-    private static final String SELECT_TOKEN_BY_USER_LOGIN = "SELECT token_value, user_login " +
+    private static final String SELECT_TOKEN_BY_USER_ID = "SELECT token_value, user_id " +
             " FROM token " +
-            " WHERE user_login = ? ";
-    private static final String SELECT_TOKEN_QUERY = "SELECT token_value, user_login " +
+            " WHERE user_id = ? ";
+    private static final String SELECT_TOKEN_QUERY = "SELECT token_value, user_id " +
             " FROM token " +
             " WHERE token_value = ? ";
-    private static final String INSERT_USER_TOKEN = "INSERT INTO token (token_value, user_login) " +
+    private static final String INSERT_USER_TOKEN = "INSERT INTO token (token_value, user_id) " +
             " VALUES (?, ?) ";
     private final JdbcTemplate jdbcTemplate;
     private final TokenRowMapper tokenRowMapper;
@@ -40,12 +40,12 @@ public class DbTokenRepository implements TokenRepository {
     }
 
     @Override
-    public Optional<AuthToken> findById(String login) {
+    public Optional<AuthToken> findById(Integer id) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
-                    SELECT_TOKEN_BY_USER_LOGIN,
+                    SELECT_TOKEN_BY_USER_ID,
                     tokenRowMapper,
-                    login
+                    id
             ));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -69,7 +69,7 @@ public class DbTokenRepository implements TokenRepository {
     public AuthToken createOne(AuthToken authToken) {
         jdbcTemplate.update(INSERT_USER_TOKEN,
                 authToken.getValue(),
-                authToken.getUserLogin());
+                authToken.getUserId());
         return authToken;
     }
 
@@ -80,7 +80,7 @@ public class DbTokenRepository implements TokenRepository {
         public AuthToken mapRow(ResultSet rs, int rowNum) throws SQLException {
             return new AuthToken(
                     rs.getString("token_value"),
-                    rs.getString("user_login"));
+                    rs.getInt("user_id"));
         }
     }
 }

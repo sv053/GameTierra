@@ -27,7 +27,7 @@ class AuthServiceIntegrationTest {
     void authenticateUser_Success() {
         User user = new User(0, "user11111", "lerida", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
-        userService.createOne(user);
+        User savedUser = userService.createOne(user);
         assertNotNull(userService.findByLogin(user.getLogin()));
 
         AuthToken foundToken = authService.authenticateUser(new User(
@@ -36,7 +36,7 @@ class AuthServiceIntegrationTest {
         ));
         assertNotNull(foundToken);
         assertNotNull(foundToken.getValue());
-        assertEquals(user.getLogin(), foundToken.getUserLogin());
+        assertEquals(savedUser.getId(), foundToken.getUserId());
     }
 
     @Test

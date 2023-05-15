@@ -22,17 +22,23 @@ public class DbOrderRepository implements Repository<Order, Integer> {
 
     private static final String INSERT_ORDER = "INSERT INTO orders (user_id, game_id, order_datetime) " +
             "VALUES (?, ?, ?) ";
-    private static final String SELECT_ALL_ORDERS_QUERY = "SELECT orders.id AS id, user_id, game_id, order_datetime, " +
-            "user.login, user.password, user.tier_id, user.balance, game.name, game.price" +
-            " FROM orders" +
-            " LEFT JOIN user" +
-            " ON  user.id = user_id" +
-            " LEFT JOIN game " +
-            " ON game.id = game_id ";
-    private static final String SELECT_ORDER_QUERY = SELECT_ALL_ORDERS_QUERY + " WHERE orders.id = ?";
+    private static final String SELECT_ACTIVE_ORDERS_QUERY =
+            "SELECT orders.id AS id, user_id, game_id, order_datetime, " +
+                    " user.login, user.password, user.tier_id, user.balance, " +
+                    " game.id, game.name, game.price" +
+                    " FROM orders " +
+                    " INNER JOIN user ON  user.id = user_id " +
+                    " INNER JOIN game ON game.id = game_id ";
+    private static final String SELECT_ORDER_QUERY =
+            "SELECT orders.id AS id, user_id, game_id, order_datetime, " +
+                    " user.login, user.password, user.tier_id, user.balance, " +
+                    " game.id, game.name, game.price " +
+                    " FROM orders " +
+                    " LEFT JOIN user ON  user.id = user_id " +
+                    " LEFT JOIN game ON game.id = game_id " +
+                    " WHERE orders.id = ?";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<Order> rowMapper;
-
 
     public DbOrderRepository(JdbcTemplate jdbcTemplate, RowMapper<Order> rowMapper) {
         this.jdbcTemplate = jdbcTemplate;
@@ -71,7 +77,7 @@ public class DbOrderRepository implements Repository<Order, Integer> {
 
     @Override
     public List<Order> findAll() {
-        return jdbcTemplate.query(SELECT_ALL_ORDERS_QUERY, rowMapper);
+        return jdbcTemplate.query(SELECT_ACTIVE_ORDERS_QUERY, rowMapper);
     }
 
     @Component
