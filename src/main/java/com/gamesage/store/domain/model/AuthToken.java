@@ -8,20 +8,20 @@ public class AuthToken {
     private final Integer userId;
     private final String value;
 
-    private LocalDateTime expirationDate;
+    private LocalDateTime expirationDateTime;
 
-    public AuthToken(String tokenValue, Integer userId, LocalDateTime expiringDateTime) {
+    public AuthToken(String tokenValue, Integer userId, LocalDateTime expirationDateTime) {
         this.value = tokenValue;
         this.userId = userId;
-        this.expirationDate = expiringDateTime;
+        this.expirationDateTime = expirationDateTime;
     }
 
     public LocalDateTime getExpirationDate() {
-        return expirationDate;
+        return expirationDateTime;
     }
 
-    public void setExpirationDate(LocalDateTime expirationDate) {
-        this.expirationDate = expirationDate;
+    public void setExpirationDate(LocalDateTime expirationDateTime) {
+        this.expirationDateTime = expirationDateTime;
     }
 
     public Integer getUserId() {
@@ -43,7 +43,7 @@ public class AuthToken {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), value, userId, expirationDate);
+        return Objects.hash(super.hashCode(), value, userId, expirationDateTime);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class AuthToken {
         return "AuthToken{" +
                 ", token='" + value + '\'' +
                 ", userId=" + userId +
-                ", expirationDate=" + expirationDate +
+                ", expirationDate=" + expirationDateTime +
                 '}';
     }
 }
