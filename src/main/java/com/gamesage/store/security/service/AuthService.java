@@ -5,6 +5,7 @@ import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.TokenService;
 import com.gamesage.store.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,6 +18,9 @@ public class AuthService {
     private final UserService userService;
     private final TokenService tokenService;
 
+    @Value("${com.gamesage.store.tokenExpiryInterval}")
+    private int tokenExpiryInterval;
+
     @Autowired
     public AuthService(UserService userService, TokenService tokenService) {
         this.userService = userService;
@@ -28,14 +32,15 @@ public class AuthService {
         return provideWithToken(foundUser.getId());
     }
 
-    public void revokeAccess(User user, String token) {
+    public void revokeAccess(String token) {
         tokenService.invalidateToken(token);
     }
 
     private AuthToken provideWithToken(Integer id) {
         return tokenService.findTokenById(id)
                 .orElseGet(() -> tokenService.createToken(
-                        new AuthToken(generateToken(), id, LocalDateTime.now().plus(7, ChronoUnit.DAYS))));
+                        new AuthToken(generateToken(), id,
+                                LocalDateTime.now().plus(tokenExpiryInterval, ChronoUnit.DAYS))));
     }
 
     private String generateToken() {

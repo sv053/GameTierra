@@ -10,10 +10,10 @@ public class AuthToken {
 
     private LocalDateTime expirationDate;
 
-    public AuthToken(String tokenValue, Integer userId, LocalDateTime date) {
+    public AuthToken(String tokenValue, Integer userId, LocalDateTime expiringDateTime) {
         this.value = tokenValue;
         this.userId = userId;
-        this.expirationDate = date;
+        this.expirationDate = expiringDateTime;
     }
 
     public LocalDateTime getExpirationDate() {

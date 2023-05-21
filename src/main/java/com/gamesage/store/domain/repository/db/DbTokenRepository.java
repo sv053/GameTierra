@@ -5,7 +5,6 @@ import com.gamesage.store.domain.repository.TokenRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
@@ -28,10 +27,13 @@ public class DbTokenRepository implements TokenRepository {
             " FROM token " +
             " WHERE token_value = ? ";
     private static final String INSERT_USER_TOKEN = "INSERT INTO token (token_value, user_id, expiration_date) " +
-            " VALUES (?, ?) ";
+            " VALUES (?, ?, ?) ";
     private static final String REMOVE_EXPIRED_TOKENS = "DELETE " +
             " FROM token " +
-            " WHERE expirationDate < ? ";
+            " WHERE expiration_date < ? ";
+    private static final String REMOVE_EXPIRED_TOKEN = "DELETE " +
+            " FROM token " +
+            " WHERE token_value = ? ";
     private final JdbcTemplate jdbcTemplate;
     private final TokenRowMapper tokenRowMapper;
 
@@ -75,11 +77,11 @@ public class DbTokenRepository implements TokenRepository {
     public AuthToken createOne(AuthToken authToken) {
         jdbcTemplate.update(INSERT_USER_TOKEN,
                 authToken.getValue(),
-                authToken.getUserId());
+                authToken.getUserId(),
+                Timestamp.valueOf(authToken.getExpirationDate()));
         return authToken;
     }
 
-    @Scheduled(cron = "0 0 0 * * ?")
     @Override
     public void removeExpired() {
         jdbcTemplate.update(REMOVE_EXPIRED_TOKENS, LocalDateTime.now());
@@ -87,7 +89,7 @@ public class DbTokenRepository implements TokenRepository {
 
     @Override
     public void removeByValue(String token) {
-        jdbcTemplate.update(REMOVE_EXPIRED_TOKENS, token);
+        jdbcTemplate.update(REMOVE_EXPIRED_TOKEN, token);
     }
 
     @Component

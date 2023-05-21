@@ -3,6 +3,7 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.repository.TokenRepository;
 import com.gamesage.store.exception.WrongCredentialsException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -28,12 +29,12 @@ public class TokenService {
         return tokenRepository.createOne(authToken);
     }
 
+    @Scheduled(cron = "@midnight")
     public void removeExpiredTokens() {
         tokenRepository.removeExpired();
     }
 
     public void invalidateToken(String token) {
-//        AuthToken authToken = findToken(token);
         tokenRepository.removeByValue(token);
     }
 }
