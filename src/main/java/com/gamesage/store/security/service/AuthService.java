@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
@@ -28,19 +32,35 @@ public class AuthService {
     }
 
     public AuthToken authenticateUser(User user) {
-        User foundUser = userService.findByCredentials(user.getLogin(), user.getPassword());
-        return provideWithToken(foundUser.getId());
+        LocalDateTime localDateTime = LocalDateTime.now().plus(tokenExpiryInterval, ChronoUnit.DAYS);
+        return provideWithToken(findUserId(user), localDateTime);
     }
 
-    public void revokeAccess(String token) {
-        tokenService.invalidateToken(token);
+    public void revokeAccess(String tokenToRemove) throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+        tokenService.invalidateToken(tokenToRemove);
     }
 
-    private AuthToken provideWithToken(Integer id) {
+    private Integer findUserId(User user) {
+        return userService.findByCredentials(user.getLogin(), user.getPassword()).getId();
+    }
+
+    private AuthToken provideWithToken(Integer id, LocalDateTime localDateTime) {
         return tokenService.findTokenById(id)
-                .orElseGet(() -> tokenService.createToken(
-                        new AuthToken(generateToken(), id,
-                                LocalDateTime.now().plus(tokenExpiryInterval, ChronoUnit.DAYS))));
+                .orElseGet(() -> {
+                    try {
+                        return tokenService.createToken(
+                                new AuthToken(generateToken(), id, localDateTime));
+                    } catch (InvalidAlgorithmParameterException e) {
+                        e.printStackTrace();
+                    } catch (IllegalBlockSizeException e) {
+                        e.printStackTrace();
+                    } catch (BadPaddingException e) {
+                        e.printStackTrace();
+                    } catch (InvalidKeyException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                });
     }
 
     private String generateToken() {
