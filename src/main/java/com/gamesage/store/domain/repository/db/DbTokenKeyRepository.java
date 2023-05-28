@@ -25,10 +25,5 @@ public class DbTokenKeyRepository {
         jdbcTemplate.update(INSERT_TOKEN_KEY, key);
         return key;
     }
-
-//    public void removeExpired() {
-//        jdbcTemplate.update(REMOVE_EXPIRED_TOKENS, LocalDateTime.now());
-//    }
-
 }
 
