@@ -26,9 +26,9 @@ public class LogoutController {
 
     @PostMapping
     public ResponseEntity<String> logout(HttpServletRequest request) throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
-        String tokenFronHeader = request.getHeader(HeaderName.TOKEN_HEADER);
-        if (!tokenFronHeader.isEmpty()) {
-            authService.revokeAccess(tokenFronHeader);
+        String tokenFromHeader = request.getHeader(HeaderName.TOKEN_HEADER);
+        if (!tokenFromHeader.isEmpty()) {
+            authService.revokeAccess(tokenFromHeader);
             return ResponseEntity.ok()
                     .header(HeaderName.TOKEN_HEADER, "")
                     .body("You have successfully logged out");
