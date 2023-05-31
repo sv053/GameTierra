@@ -40,10 +40,11 @@ CREATE TABLE IF NOT EXISTS 'orders'
 
 CREATE TABLE IF NOT EXISTS 'token'
 (
+    'id'              INTEGER,
     'token_value'     TEXT,
     'user_id'         INTEGER,
     'expiration_date' DATETIME_INTERVAL_CODE,
-    PRIMARY KEY ('user_id'),
+    PRIMARY KEY ('id' AUTOINCREMENT),
     CONSTRAINT 'user_fk' FOREIGN KEY ('user_id') REFERENCES 'user' ('id') ON DELETE CASCADE
 );
 

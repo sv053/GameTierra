@@ -29,9 +29,9 @@ class TokenServiceIntegrationTest {
         User userWithoutToken = new User(null, "user1", "lerida", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(userWithoutToken);
-        AuthToken tokenToCreate = new AuthToken("ftyytgiuhiuhiuh", savedUser.getId(), LocalDateTime.now());
+        AuthToken tokenToCreate = new AuthToken("1___ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
         AuthToken tokenToFind = tokenService.createToken(tokenToCreate);
-        AuthToken foundToken = tokenService.findToken(tokenToCreate.getValue());
+        AuthToken foundToken = tokenService.findToken(tokenToFind.getValue());
 
         assertEquals(tokenToFind, foundToken);
     }
@@ -41,7 +41,7 @@ class TokenServiceIntegrationTest {
         User userWithoutToken = new User(null, "user111", "lerida", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(userWithoutToken);
-        AuthToken token = new AuthToken("ftyytgiuhiuhiuh", savedUser.getId(), LocalDateTime.now());
+        AuthToken token = new AuthToken(1, "1___ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
         AuthToken tokenToFind = tokenService.createToken(token);
         Optional<AuthToken> foundToken = tokenService.findTokenById(savedUser.getId());
 
@@ -51,7 +51,8 @@ class TokenServiceIntegrationTest {
 
     @Test
     void findByLogin_Failure_Exception() {
-        assertThrows(WrongCredentialsException.class, () -> tokenService.findToken("cfgjgvuikhyvbfbu"));
+//        assertThrows(WrongCredentialsException.class, () -> tokenService.findToken("123" + (char) 0x1C + "cfgjgvuikhyvbfbu"));
+        assertThrows(WrongCredentialsException.class, () -> tokenService.findToken("123___cfgjgvuikhyvbfbu"));
     }
 
     @Test
@@ -59,11 +60,43 @@ class TokenServiceIntegrationTest {
         User user = new User(null, "agamer", "lerida", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(user);
-        AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
-        tokenService.createToken(token);
+        AuthToken token = new AuthToken("1___ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
+        AuthToken savedToken = tokenService.createToken(token);
         Optional<AuthToken> foundToken = tokenService.findTokenById(savedUser.getId());
 
-        assertEquals(Optional.of(token), foundToken);
+        assertEquals(Optional.of(savedToken), foundToken);
     }
+
+    @Test
+    void removeExpiredTokens_Success() {
+        User user = new User(null, "agamer", "lerida", new Tier(
+                3, "SILVER", 10.d), BigDecimal.TEN);
+        User savedUser = userService.createOne(user);
+        AuthToken token = new AuthToken("1___ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
+        AuthToken savedToken = tokenService.createToken(token);
+        Optional<AuthToken> foundToken = tokenService.findTokenById(savedUser.getId());
+
+        assertEquals(Optional.of(savedToken), foundToken);
+
+        tokenService.removeExpiredTokens();
+
+        assertNull(tokenService.findTokenById(0));
+    }
+//
+//    @Test
+//    void invalidateToken_Success() {
+//        User user = new User(null, "agamer", "lerida", new Tier(
+//                3, "SILVER", 10.d), BigDecimal.TEN);
+//        User savedUser = userService.createOne(user);
+//        AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
+//        AuthToken savedToken = tokenService.createToken(token);
+//        Optional<AuthToken> foundToken = tokenService.findTokenById(savedUser.getId());
+//
+//        assertEquals(Optional.of(savedToken), foundToken);
+//        tokenService.invalidateToken(savedToken.getValue())
+//        tokenService.findToken(savedToken.getValue());
+//        AuthToken removedToken = tokenService.findToken(savedToken.getValue());
+//        assertNull(removedToken);
+//    }
 }
 

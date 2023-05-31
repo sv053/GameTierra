@@ -69,7 +69,9 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
 
     @Test
     void givenUnauthorizedUser_whenFindAllUsers_then401() throws Exception {
-        String wrongToken = "fijwofosk";
+//        String wrongToken = "123" + (char) 0x1C + "cfgjgvuikhyvbfbu";
+        String wrongToken = "123___cfgjgvuikhyvbfbu";
+
         mockMvc.perform(MockMvcRequestBuilders.get(API_USER_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(TOKEN_HEADER_NAME, wrongToken))

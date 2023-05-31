@@ -27,20 +27,22 @@ public class AuthService {
         this.tokenService = tokenService;
     }
 
+    private Integer findUserId(User user) {
+        return userService.findByCredentials(user.getLogin(), user.getPassword()).getId();
+    }
+
     public AuthToken authenticateUser(User user) {
-        User foundUser = userService.findByCredentials(user.getLogin(), user.getPassword());
-        return provideWithToken(foundUser.getId());
+        LocalDateTime localDateTime = LocalDateTime.now().plus(tokenExpiryInterval, ChronoUnit.DAYS);
+        return provideWithToken(findUserId(user), localDateTime);
     }
 
     public void revokeAccess(String token) {
         tokenService.invalidateToken(token);
     }
 
-    private AuthToken provideWithToken(Integer id) {
-        return tokenService.findTokenById(id)
-                .orElseGet(() -> tokenService.createToken(
-                        new AuthToken(generateToken(), id,
-                                LocalDateTime.now().plus(tokenExpiryInterval, ChronoUnit.DAYS))));
+    private AuthToken provideWithToken(Integer id, LocalDateTime localDateTime) {
+        return tokenService.createToken(
+                new AuthToken(generateToken(), id, localDateTime));
     }
 
     private String generateToken() {

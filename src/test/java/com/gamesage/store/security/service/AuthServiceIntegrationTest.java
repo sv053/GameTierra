@@ -46,5 +46,26 @@ class AuthServiceIntegrationTest {
 
         assertThrows(WrongCredentialsException.class, () -> authService.authenticateUser(user));
     }
+
+//    @Test
+//    void revokeAccess_Success() {
+//        User user = new User(0, "user11111", "lerida", new Tier(
+//                3, "SILVER", 10.d), BigDecimal.TEN);
+//        User savedUser = userService.createOne(user);
+//        assertNotNull(userService.findByLogin(user.getLogin()));
+//
+//        AuthToken foundToken = authService.authenticateUser(new User(
+//                0, "user11111", "lerida", new Tier(
+//                3, "SILVER", 10.d), BigDecimal.TEN
+//        ));
+//        authService.revokeAccess(foundToken.getValue());
+//
+//        assertNull();
+//        AuthToken foundTokenAfterRemoving = authService.authenticateUser(new User(
+//                0, "user11111", "lerida", new Tier(
+//                3, "SILVER", 10.d), BigDecimal.TEN
+//        ));
+//        assertEquals(foundTokenAfterRemoving.getExpirationDateTime(), LocalDateTime.now().plus(7, ChronoUnit.DAYS));
+//    }
 }
 

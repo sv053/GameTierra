@@ -5,12 +5,17 @@ import java.util.Objects;
 
 public class AuthToken {
 
+    private final Integer id;
     private final Integer userId;
     private final String value;
-
     private LocalDateTime expirationDateTime;
 
     public AuthToken(String tokenValue, Integer userId, LocalDateTime expirationDateTime) {
+        this(null, tokenValue, userId, expirationDateTime);
+    }
+
+    public AuthToken(Integer id, String tokenValue, Integer userId, LocalDateTime expirationDateTime) {
+        this.id = id;
         this.value = tokenValue;
         this.userId = userId;
         this.expirationDateTime = expirationDateTime;
@@ -21,6 +26,18 @@ public class AuthToken {
     }
 
     public void setExpirationDate(LocalDateTime expirationDateTime) {
+        this.expirationDateTime = expirationDateTime;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public LocalDateTime getExpirationDateTime() {
+        return expirationDateTime;
+    }
+
+    public void setExpirationDateTime(LocalDateTime expirationDateTime) {
         this.expirationDateTime = expirationDateTime;
     }
 
@@ -49,6 +66,7 @@ public class AuthToken {
     @Override
     public String toString() {
         return "AuthToken{" +
+                ", id='" + id + '\'' +
                 ", token='" + value + '\'' +
                 ", userId=" + userId +
                 ", expirationDate=" + expirationDateTime +

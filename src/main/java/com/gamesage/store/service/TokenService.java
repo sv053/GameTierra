@@ -4,6 +4,7 @@ import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.repository.TokenRepository;
 import com.gamesage.store.exception.WrongCredentialsException;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,9 +13,11 @@ import java.util.Optional;
 public class TokenService {
 
     private final TokenRepository tokenRepository;
+    private final BCryptPasswordEncoder encoder;
 
-    public TokenService(TokenRepository tokenRepository) {
+    public TokenService(TokenRepository tokenRepository, BCryptPasswordEncoder encoder) {
         this.tokenRepository = tokenRepository;
+        this.encoder = encoder;
     }
 
     public Optional<AuthToken> findTokenById(Integer userId) {
@@ -29,7 +32,7 @@ public class TokenService {
         return tokenRepository.createOne(authToken);
     }
 
-    @Scheduled(cron = "@midnight")
+    @Scheduled(cron = "${com.gamesage.store.cleanup}")
     public void removeExpiredTokens() {
         tokenRepository.removeExpired();
     }

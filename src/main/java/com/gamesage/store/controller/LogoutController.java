@@ -2,6 +2,7 @@ package com.gamesage.store.controller;
 
 import com.gamesage.store.security.auth.HeaderName;
 import com.gamesage.store.security.service.AuthService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,10 +22,17 @@ public class LogoutController {
 
     @PostMapping
     public ResponseEntity<String> logout(HttpServletRequest request) {
-        authService.revokeAccess(request.getHeader(HeaderName.TOKEN_HEADER));
-        return ResponseEntity.ok()
-                .header(HeaderName.TOKEN_HEADER, "")
-                .body("You have successfully logged out");
+        String tokenFromHeader = request.getHeader(HeaderName.TOKEN_HEADER);
+        if (!tokenFromHeader.isEmpty()) {
+            authService.revokeAccess(tokenFromHeader);
+            return ResponseEntity.ok()
+                    .header(HeaderName.TOKEN_HEADER, "")
+                    .body("You have successfully logged out");
+        } else {
+            return ResponseEntity.status(HttpStatus.LENGTH_REQUIRED)
+                    .header(HeaderName.TOKEN_HEADER, "")
+                    .body("You are logged out already");
+        }
     }
 }
 
