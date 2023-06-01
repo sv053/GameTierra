@@ -48,5 +48,11 @@ CREATE TABLE IF NOT EXISTS 'token'
     CONSTRAINT 'user_fk' FOREIGN KEY ('user_id') REFERENCES 'user' ('id') ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS 'token_key'
+(
+    'key_value' TEXT,
+    PRIMARY KEY ('key_value'),
+);
+
 COMMIT;
 
