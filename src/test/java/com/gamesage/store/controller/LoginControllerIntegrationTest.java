@@ -37,7 +37,7 @@ class LoginControllerIntegrationTest extends ControllerIntegrationTest {
         String actualToken = loginAndGetToken(userJson);
 
         String expectedToken = tokenService
-                .findTokenById(savedUser.getId())
+                .findTokenByUserId(savedUser.getId())
                 .map(AuthToken::getValue)
                 .orElseThrow(() -> new EntityNotFoundException("token for " + user.getLogin()));
 

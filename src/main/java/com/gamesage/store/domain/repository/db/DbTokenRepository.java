@@ -18,15 +18,15 @@ import java.util.Optional;
 @Repository
 public class DbTokenRepository implements TokenRepository {
 
-    private static final String SELECT_ALL_TOKENS_QUERY = "SELECT token_value, user_id, expiration_date " +
+    private static final String SELECT_ALL_TOKENS_QUERY = "SELECT id, token_value, user_id, expiration_date " +
             " FROM token ";
-    private static final String SELECT_TOKEN_BY_USER_ID = "SELECT token_value, user_id, expiration_date " +
+    private static final String SELECT_TOKEN_BY_USER_ID = "SELECT id, token_value, user_id, expiration_date " +
             " FROM token " +
             " WHERE user_id = ? ";
     private static final String SELECT_TOKEN_BY_ID = "SELECT id, token_value, user_id, expiration_date " +
             " FROM token " +
             " WHERE id = ? ";
-    private static final String SELECT_TOKEN_QUERY = "SELECT token_value, user_id, expiration_date " +
+    private static final String SELECT_TOKEN_QUERY = "SELECT id, token_value, user_id, expiration_date " +
             " FROM token " +
             " WHERE token_value = ? ";
     private static final String INSERT_USER_TOKEN = "INSERT INTO token (token_value, user_id, expiration_date) " +
@@ -50,6 +50,19 @@ public class DbTokenRepository implements TokenRepository {
     @Override
     public List<AuthToken> findAll() {
         return jdbcTemplate.query(SELECT_ALL_TOKENS_QUERY, tokenRowMapper);
+    }
+
+    @Override
+    public Optional<AuthToken> findByUserId(Integer id) {
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(
+                    SELECT_TOKEN_BY_USER_ID,
+                    tokenRowMapper,
+                    id
+            ));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override

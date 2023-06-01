@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -72,7 +73,7 @@ class TokenServiceIntegrationTest {
         User user = new User(null, "agamer", "lerida", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(user);
-        AuthToken token = new AuthToken("1___ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
+        AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now().minus(100, ChronoUnit.DAYS));
         AuthToken savedToken = tokenService.createToken(token);
         Optional<AuthToken> foundToken = tokenService.findTokenById(savedUser.getId());
 
@@ -80,7 +81,7 @@ class TokenServiceIntegrationTest {
 
         tokenService.removeExpiredTokens();
 
-        assertNull(tokenService.findTokenById(0));
+        assertEquals(Optional.empty(), tokenService.findTokenById(0));
     }
 //
 //    @Test

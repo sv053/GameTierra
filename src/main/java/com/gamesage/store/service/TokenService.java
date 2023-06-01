@@ -20,8 +20,12 @@ public class TokenService {
         this.encoder = encoder;
     }
 
-    public Optional<AuthToken> findTokenById(Integer userId) {
-        return tokenRepository.findById(userId);
+    public Optional<AuthToken> findTokenById(Integer id) {
+        return tokenRepository.findById(id);
+    }
+
+    public Optional<AuthToken> findTokenByUserId(Integer userId) {
+        return tokenRepository.findByUserId(userId);
     }
 
     public AuthToken findToken(String token) {
