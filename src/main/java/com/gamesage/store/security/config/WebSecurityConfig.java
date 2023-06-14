@@ -47,7 +47,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/login").anonymous()
                 .antMatchers(HttpMethod.GET, "/users", "/cart", "/users/**", "/cart/**").authenticated()
-                .antMatchers(HttpMethod.POST, "/logout").authenticated()
+                .antMatchers(HttpMethod.POST, "/logout").permitAll()
                 .and()
                 .addFilter(preAuthenticationFilter())
                 .addFilterBefore(exceptionHandler, LogoutFilter.class);

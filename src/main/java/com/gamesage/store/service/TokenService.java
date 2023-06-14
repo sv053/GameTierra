@@ -33,7 +33,12 @@ public class TokenService {
     }
 
     public AuthToken createToken(AuthToken authToken) {
-        return tokenRepository.createOne(authToken);
+        AuthToken encryptedToken = new AuthToken(
+                encoder.encode(authToken.getValue()),
+                authToken.getUserId(),
+                authToken.getExpirationDateTime());
+
+        return tokenRepository.createOne(encryptedToken);
     }
 
     @Scheduled(cron = "${com.gamesage.store.cleanup}")

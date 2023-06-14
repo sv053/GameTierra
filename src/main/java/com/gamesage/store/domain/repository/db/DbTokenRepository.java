@@ -53,12 +53,12 @@ public class DbTokenRepository implements TokenRepository {
     }
 
     @Override
-    public Optional<AuthToken> findByUserId(Integer id) {
+    public Optional<AuthToken> findByUserId(Integer userId) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
                     SELECT_TOKEN_BY_USER_ID,
                     tokenRowMapper,
-                    id
+                    userId
             ));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -80,15 +80,10 @@ public class DbTokenRepository implements TokenRepository {
 
     @Override
     public Optional<AuthToken> findByValue(String token) {
-        String tokenId = "0";
 //        tokenId = token.split("\u001C")[0] ;
-        tokenId = token.split("___")[0];
+        Integer userId = Integer.parseInt(token.split("^")[0]);
         try {
-            return Optional.ofNullable(jdbcTemplate.queryForObject(
-                    SELECT_TOKEN_BY_ID,
-                    tokenRowMapper,
-                    tokenId
-            ));
+            return findByUserId(userId);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
@@ -108,18 +103,13 @@ public class DbTokenRepository implements TokenRepository {
         }, keyHolder);
 
         Integer id = keyHolder.getKeyAs(Integer.class);
-        String tokenWithItsId = new StringBuilder()
-                .append(id)
-//                .append((char) 0x1C)
-                .append("___")
-                .append(authToken.getValue())
-                .toString();
         jdbcTemplate.update(UPDATE_TOKEN
-                , tokenWithItsId
+                , authToken.getValue()
                 , id);
         return new AuthToken(
                 id,
-                tokenWithItsId,
+//                authToken.getUserId() + (char) 0x1C + authToken.getValue(),
+                authToken.getUserId() + "^" + authToken.getValue(),
                 authToken.getUserId(),
                 authToken.getExpirationDateTime());
     }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,7 +34,19 @@ public class AuthService {
 
     public AuthToken authenticateUser(User user) {
         LocalDateTime localDateTime = LocalDateTime.now().plus(tokenExpiryInterval, ChronoUnit.DAYS);
-        return provideWithToken(findUserId(user), localDateTime);
+        Integer savedUserId = findUserId(user);
+        Optional<AuthToken> existedToken = tokenService.findTokenByUserId(savedUserId);
+        AuthToken encryptedToken;
+        if (existedToken.isPresent()) {
+            AuthToken token = existedToken.get();
+            encryptedToken = new AuthToken(
+                    token.getUserId() + "^" + token.getValue(),
+                    token.getUserId(),
+                    token.getExpirationDateTime());
+        } else {
+            encryptedToken = provideWithToken(savedUserId, localDateTime);
+        }
+        return encryptedToken;
     }
 
     public void revokeAccess(String token) {
