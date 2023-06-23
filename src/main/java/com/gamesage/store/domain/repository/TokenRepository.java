@@ -12,6 +12,7 @@ public interface TokenRepository extends Repository<AuthToken, Integer> {
 
     Optional<AuthToken> findById(Integer id);
     void removeExpired();
-    void removeByValue(String token);
+
+    void removeByUserId(Integer id);
 }
 

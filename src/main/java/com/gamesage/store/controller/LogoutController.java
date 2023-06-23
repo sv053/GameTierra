@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/logout")
+@RequestMapping("/userlogout")
 public class LogoutController {
 
     private final AuthService authService;
@@ -29,7 +29,7 @@ public class LogoutController {
         String tokenFromHeader = request.getHeader(HeaderName.TOKEN_HEADER);
         Integer userId = Integer.parseInt(tokenFromHeader.split("^")[0]);
         if (!tokenFromHeader.isEmpty() && tokenService.findTokenByUserId(userId).isPresent()) {
-            authService.revokeAccess(tokenFromHeader);
+            authService.revokeAccess(userId);
             SecurityContextHolder.clearContext();
 
             return ResponseEntity.ok()
@@ -38,7 +38,7 @@ public class LogoutController {
         } else {
             return ResponseEntity.status(HttpStatus.LENGTH_REQUIRED)
                     .header(HeaderName.TOKEN_HEADER, "")
-                    .body("You are logged out already");
+                    .body("You logged out already");
         }
     }
 }

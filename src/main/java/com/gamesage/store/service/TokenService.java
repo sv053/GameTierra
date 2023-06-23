@@ -4,7 +4,6 @@ import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.repository.TokenRepository;
 import com.gamesage.store.exception.WrongCredentialsException;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -13,11 +12,9 @@ import java.util.Optional;
 public class TokenService {
 
     private final TokenRepository tokenRepository;
-    private final BCryptPasswordEncoder encoder;
 
-    public TokenService(TokenRepository tokenRepository, BCryptPasswordEncoder encoder) {
+    public TokenService(TokenRepository tokenRepository) {
         this.tokenRepository = tokenRepository;
-        this.encoder = encoder;
     }
 
     public Optional<AuthToken> findTokenById(Integer id) {
@@ -33,12 +30,7 @@ public class TokenService {
     }
 
     public AuthToken createToken(AuthToken authToken) {
-        AuthToken encryptedToken = new AuthToken(
-                encoder.encode(authToken.getValue()),
-                authToken.getUserId(),
-                authToken.getExpirationDateTime());
-
-        return tokenRepository.createOne(encryptedToken);
+        return tokenRepository.createOne(authToken);
     }
 
     @Scheduled(cron = "${com.gamesage.store.cleanup}")
@@ -46,8 +38,8 @@ public class TokenService {
         tokenRepository.removeExpired();
     }
 
-    public void invalidateToken(String token) {
-        tokenRepository.removeByValue(token);
+    public void invalidateToken(Integer id) {
+        tokenRepository.removeByUserId(id);
     }
 }
 

@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
@@ -36,15 +37,18 @@ public class DbTokenRepository implements TokenRepository {
     private static final String REMOVE_EXPIRED_TOKENS = "DELETE " +
             " FROM token " +
             " WHERE expiration_date < ? ";
-    private static final String REMOVE_TOKEN = "DELETE " +
+    private static final String REMOVE_TOKEN_BY_USERID = "DELETE " +
             " FROM token " +
-            " WHERE token_value = ? ";
+            " WHERE user_id = ? ";
     private final JdbcTemplate jdbcTemplate;
     private final TokenRowMapper tokenRowMapper;
+    private final BCryptPasswordEncoder encoder;
 
-    public DbTokenRepository(JdbcTemplate jdbcTemplate, TokenRowMapper tokenRowMapper) {
+
+    public DbTokenRepository(JdbcTemplate jdbcTemplate, TokenRowMapper tokenRowMapper, BCryptPasswordEncoder encoder) {
         this.jdbcTemplate = jdbcTemplate;
         this.tokenRowMapper = tokenRowMapper;
+        this.encoder = encoder;
     }
 
     @Override
@@ -81,7 +85,7 @@ public class DbTokenRepository implements TokenRepository {
     @Override
     public Optional<AuthToken> findByValue(String token) {
 //        tokenId = token.split("\u001C")[0] ;
-        Integer userId = Integer.parseInt(token.split("^")[0]);
+        Integer userId = Integer.parseInt(token.split("\\^")[0]);
         try {
             return findByUserId(userId);
         } catch (EmptyResultDataAccessException e) {
@@ -96,7 +100,7 @@ public class DbTokenRepository implements TokenRepository {
             PreparedStatement ps = con
                     .prepareStatement(INSERT_USER_TOKEN,
                             Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, authToken.getValue());
+            ps.setString(1, encoder.encode(authToken.getValue()));
             ps.setInt(2, authToken.getUserId());
             ps.setTimestamp(3, Timestamp.valueOf(authToken.getExpirationDateTime()));
             return ps;
@@ -104,7 +108,7 @@ public class DbTokenRepository implements TokenRepository {
 
         Integer id = keyHolder.getKeyAs(Integer.class);
         jdbcTemplate.update(UPDATE_TOKEN
-                , authToken.getValue()
+                , encoder.encode(authToken.getValue())
                 , id);
         return new AuthToken(
                 id,
@@ -120,8 +124,8 @@ public class DbTokenRepository implements TokenRepository {
     }
 
     @Override
-    public void removeByValue(String token) {
-        jdbcTemplate.update(REMOVE_TOKEN, token);
+    public void removeByUserId(Integer id) {
+        jdbcTemplate.update(REMOVE_TOKEN_BY_USERID, id);
     }
 
     @Component

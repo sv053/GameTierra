@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -32,34 +31,31 @@ public class AuthService {
         return userService.findByCredentials(user.getLogin(), user.getPassword()).getId();
     }
 
+
     public AuthToken authenticateUser(User user) {
         LocalDateTime localDateTime = LocalDateTime.now().plus(tokenExpiryInterval, ChronoUnit.DAYS);
         Integer savedUserId = findUserId(user);
-        Optional<AuthToken> existedToken = tokenService.findTokenByUserId(savedUserId);
-        AuthToken encryptedToken;
-        if (existedToken.isPresent()) {
-            AuthToken token = existedToken.get();
-            encryptedToken = new AuthToken(
-                    token.getUserId() + "^" + token.getValue(),
-                    token.getUserId(),
-                    token.getExpirationDateTime());
-        } else {
-            encryptedToken = provideWithToken(savedUserId, localDateTime);
-        }
-        return encryptedToken;
+        return tokenService.findTokenByUserId(savedUserId).orElse(provideWithToken(savedUserId, localDateTime));
     }
 
-    public void revokeAccess(String token) {
-        tokenService.invalidateToken(token);
+    public AuthToken prepareTokenWithId(User user) {
+        AuthToken authToken = authenticateUser(user);
+        String tokenWithId = authToken.getUserId() + "^" + authToken.getValue();
+        return new AuthToken(tokenWithId, authToken.getUserId(), authToken.getExpirationDateTime());
     }
 
-    private AuthToken provideWithToken(Integer id, LocalDateTime localDateTime) {
+    private AuthToken provideWithToken(Integer userId, LocalDateTime localDateTime) {
         return tokenService.createToken(
-                new AuthToken(generateToken(), id, localDateTime));
+                new AuthToken(generateToken(), userId, localDateTime));
     }
 
     private String generateToken() {
         return String.format("%s-%s", System.currentTimeMillis(), UUID.randomUUID());
     }
+
+    public void revokeAccess(Integer id) {
+        tokenService.invalidateToken(id);
+    }
+
 }
 
