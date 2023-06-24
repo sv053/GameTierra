@@ -30,10 +30,10 @@ class AuthServiceIntegrationTest {
         User savedUser = userService.createOne(user);
         assertNotNull(userService.findByLogin(user.getLogin()));
 
-        AuthToken foundToken = authService.authenticateUser(new User(
+        AuthToken foundToken = (authService.authenticateUser(new User(
                 0, "user11111", "lerida", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN
-        ));
+        ))).get();
         assertNotNull(foundToken);
         assertNotNull(foundToken.getValue());
         assertEquals(savedUser.getId(), foundToken.getUserId());
