@@ -1,10 +1,8 @@
 package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.service.TokenService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import java.nio.file.Files;
@@ -16,13 +14,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class LogoutControllerIntegrationTest extends ControllerIntegrationTest {
 
     private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
+    protected static final String LOGOUT_ENDPOINT = "/userlogout";
 
     private String userJson;
     private User user;
     private String token;
-
-    @Autowired
-    private TokenService tokenService;
 
     @BeforeAll
     void setup() throws Exception {
@@ -34,15 +30,10 @@ class LogoutControllerIntegrationTest extends ControllerIntegrationTest {
 
     @Test
     void givenLoggedInUser_shouldLogout() throws Exception {
-        mockMvc.perform(post("/logout")
+        mockMvc.perform(post(LOGOUT_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(TOKEN_HEADER_TITLE, token)
                         .content(objectMapper.writeValueAsString(user)))
-                .andExpect(status().isMovedTemporarily());
-
-//        assertThrows(EntityNotFoundException.class, () -> tokenService
-//                .findTokenById(savedUser.getId())
-//                .map(AuthToken::getValue)
-//                .orElseThrow(() -> new EntityNotFoundException("token for " + user.getLogin())));
+                .andExpect(status().isOk());
     }
 }
