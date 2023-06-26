@@ -7,12 +7,12 @@ import java.util.Optional;
 public interface TokenRepository extends Repository<AuthToken, Integer> {
 
     Optional<AuthToken> findByValue(String token);
-
     Optional<AuthToken> findByUserId(Integer id);
-
     Optional<AuthToken> findById(Integer id);
-    void removeExpired();
 
+    AuthToken updateByUserId(AuthToken token);
+
+    void removeExpired();
     void removeByUserId(Integer id);
 }
 

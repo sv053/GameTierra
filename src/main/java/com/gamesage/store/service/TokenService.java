@@ -33,6 +33,10 @@ public class TokenService {
         return tokenRepository.createOne(authToken);
     }
 
+    public AuthToken updateToken(AuthToken authToken) {
+        return tokenRepository.updateByUserId(authToken);
+    }
+
     @Scheduled(cron = "${com.gamesage.store.cleanup}")
     public void removeExpiredTokens() {
         tokenRepository.removeExpired();

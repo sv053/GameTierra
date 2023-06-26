@@ -27,13 +27,12 @@ public class DbTokenRepository implements TokenRepository {
     private static final String SELECT_TOKEN_BY_ID = "SELECT id, token_value, user_id, expiration_date " +
             " FROM token " +
             " WHERE id = ? ";
-    private static final String SELECT_TOKEN_QUERY = "SELECT id, token_value, user_id, expiration_date " +
-            " FROM token " +
-            " WHERE token_value = ? ";
     private static final String INSERT_USER_TOKEN = "INSERT INTO token (token_value, user_id, expiration_date) " +
             " VALUES (?, ?, ?) ";
     private static final String UPDATE_TOKEN = "UPDATE token SET token_value = ? " +
             "WHERE id = ?";
+    private static final String UPDATE_TOKEN_BY_USER_ID = "UPDATE token SET token_value = ? " +
+            "WHERE user_id = ?";
     private static final String REMOVE_EXPIRED_TOKENS = "DELETE " +
             " FROM token " +
             " WHERE expiration_date < ? ";
@@ -85,7 +84,7 @@ public class DbTokenRepository implements TokenRepository {
     @Override
     public Optional<AuthToken> findByValue(String token) {
 //        tokenId = token.split("\u001C")[0] ;
-        Integer userId = Integer.parseInt(token.split("\\^")[0]);
+        Integer userId = Integer.parseInt(token.split("\\$\\$")[0]);
         try {
             return findByUserId(userId);
         } catch (EmptyResultDataAccessException e) {
@@ -110,9 +109,22 @@ public class DbTokenRepository implements TokenRepository {
         jdbcTemplate.update(UPDATE_TOKEN
                 , encoder.encode(authToken.getValue())
                 , id);
+
         return new AuthToken(
                 id,
 //                authToken.getUserId() + (char) 0x1C + authToken.getValue(),
+                authToken.getUserId() + "$$" + authToken.getValue(),
+                authToken.getUserId(),
+                authToken.getExpirationDateTime());
+    }
+
+    @Override
+    public AuthToken updateByUserId(AuthToken authToken) {
+        jdbcTemplate.update(UPDATE_TOKEN_BY_USER_ID
+                , encoder.encode(authToken.getValue())
+                , authToken.getUserId());
+        return new AuthToken(
+                authToken.getId(),
                 authToken.getUserId() + "$$" + authToken.getValue(),
                 authToken.getUserId(),
                 authToken.getExpirationDateTime());

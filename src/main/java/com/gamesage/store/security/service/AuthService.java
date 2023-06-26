@@ -39,16 +39,11 @@ public class AuthService {
         Optional<AuthToken> existedToken = tokenService.findTokenByUserId(savedUserId);
         AuthToken tokenForHeader;
         if (existedToken.isPresent()) {
-            return Optional.empty();
+            tokenForHeader = tokenService.updateToken(new AuthToken(generateToken(), savedUserId, localDateTime));
         } else {
-            tokenForHeader = provideWithToken(savedUserId, localDateTime);
+            tokenForHeader = tokenService.createToken(new AuthToken(generateToken(), savedUserId, localDateTime));
         }
         return Optional.of(tokenForHeader);
-    }
-
-    private AuthToken provideWithToken(Integer userId, LocalDateTime localDateTime) {
-        return tokenService.createToken(
-                new AuthToken(generateToken(), userId, localDateTime));
     }
 
     private String generateToken() {
