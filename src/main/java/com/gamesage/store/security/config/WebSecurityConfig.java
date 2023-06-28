@@ -1,5 +1,6 @@
 package com.gamesage.store.security.config;
 
+import com.gamesage.store.controller.CustomLogoutHandler;
 import com.gamesage.store.security.auth.filter.FilterChainExceptionHandler;
 import com.gamesage.store.security.auth.filter.PreAuthenticationFilter;
 import com.gamesage.store.service.UserService;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 
 @Configuration
@@ -40,6 +42,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return filter;
     }
 
+    @Bean
+    public LogoutHandler customLogoutHandler() {
+        return new CustomLogoutHandler();
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -49,7 +56,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/users", "/cart", "/users/**", "/cart/**").authenticated()
                 .and()
                 .addFilter(preAuthenticationFilter())
-                .addFilterBefore(exceptionHandler, LogoutFilter.class);
+                .addFilterBefore(exceptionHandler, LogoutFilter.class)
+                .logout()
+                .addLogoutHandler(customLogoutHandler());
     }
 }
 

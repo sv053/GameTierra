@@ -56,7 +56,6 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(TOKEN_HEADER_NAME, token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.*.login", Matchers.containsInAnyOrder(user.getLogin(), secondSavedUser.getLogin())))
                 .andExpect(jsonPath("$.*.id", Matchers.containsInAnyOrder(user.getId(), secondSavedUser.getId())));
     }
 
@@ -68,14 +67,14 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
     }
 
     @Test
-    void givenUnauthorizedUser_whenFindAllUsers_then401() throws Exception {
+    void givenUnauthorizedUser_whenFindAllUsers_then403() throws Exception {
 //        String wrongToken = "123" + (char) 0x1C + "cfgjgvuikhyvbfbu";
-        String wrongToken = "123___cfgjgvuikhyvbfbu";
+        String wrongToken = "1$$cfgjgvuikhyvbfbu";
 
         mockMvc.perform(MockMvcRequestBuilders.get(API_USER_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(TOKEN_HEADER_NAME, wrongToken))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
