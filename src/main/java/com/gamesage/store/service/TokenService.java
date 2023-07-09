@@ -3,7 +3,9 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.repository.TokenRepository;
 import com.gamesage.store.exception.WrongCredentialsException;
+import com.gamesage.store.util.Parser;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,9 +14,11 @@ import java.util.Optional;
 public class TokenService {
 
     private final TokenRepository tokenRepository;
+    private final BCryptPasswordEncoder encoder;
 
-    public TokenService(TokenRepository tokenRepository) {
+    public TokenService(TokenRepository tokenRepository, BCryptPasswordEncoder encoder) {
         this.tokenRepository = tokenRepository;
+        this.encoder = encoder;
     }
 
     public Optional<AuthToken> findTokenById(Integer id) {
@@ -30,7 +34,11 @@ public class TokenService {
     }
 
     public AuthToken createToken(AuthToken authToken) {
-        return tokenRepository.createOne(authToken);
+        AuthToken tokenToSave = new AuthToken(encoder.encode(authToken.getValue()), authToken.getUserId(), authToken.getExpirationDateTime());
+        AuthToken savedToken = tokenRepository.createOne(tokenToSave);
+        int userId = savedToken.getUserId();
+        String tokenValue = userId + Parser.DELIMITER + authToken.getValue();
+        return new AuthToken(savedToken.getId(), tokenValue, userId, savedToken.getExpirationDateTime());
     }
 
     public AuthToken updateToken(AuthToken authToken) {
@@ -42,8 +50,8 @@ public class TokenService {
         tokenRepository.removeExpired();
     }
 
-    public void invalidateToken(Integer id) {
-        tokenRepository.removeByUserId(id);
+    public boolean invalidateToken(AuthToken authToken) {
+        return tokenRepository.removeByUserId(authToken.getUserId(), authToken.getValue());
     }
 }
 

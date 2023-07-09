@@ -50,8 +50,8 @@ public class AuthService {
         return String.format("%s-%s", System.currentTimeMillis(), UUID.randomUUID());
     }
 
-    public void revokeAccess(Integer id) {
-        tokenService.invalidateToken(id);
+    public void revokeAccess(AuthToken authToken) {
+        tokenService.invalidateToken(authToken);
     }
 }
 

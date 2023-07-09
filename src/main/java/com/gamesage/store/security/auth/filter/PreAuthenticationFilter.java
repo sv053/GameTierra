@@ -26,9 +26,7 @@ public class PreAuthenticationFilter extends AbstractPreAuthenticatedProcessingF
         if (null == token || token.isEmpty()) {
             return null;
         }
-        String delimiter = "$$";
-        String regexDelimiter = "\\$\\$";
-        String expectedId = Parser.findSubstring(token, delimiter, regexDelimiter, 0);
+        String expectedId = Parser.findSubstring(token, 0);
         if (!StringUtils.hasLength(expectedId)) {
             throw new WrongCredentialsException();
         }
@@ -36,7 +34,7 @@ public class PreAuthenticationFilter extends AbstractPreAuthenticatedProcessingF
         Optional<AuthToken> authToken = tokenService.findTokenByUserId(idFromToken);
         if (authToken.isPresent()) {
             String encodedToken = authToken.get().getValue();
-            int substringIndex = token.indexOf(delimiter) + delimiter.length();
+            int substringIndex = token.indexOf(Parser.DELIMITER) + Parser.DELIMITER.length();
             String rawToken = token.substring(substringIndex);
             if (encoder.matches(rawToken, encodedToken)) {
                 return encodedToken;

@@ -11,6 +11,7 @@ import com.gamesage.store.paymentapi.PaymentProcessingApi;
 import com.gamesage.store.paymentapi.PaymentRequest;
 import com.gamesage.store.paymentapi.PaymentResponse;
 import com.gamesage.store.security.model.AppUser;
+import com.gamesage.store.util.Parser;
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -103,7 +104,7 @@ public class UserService implements UserDetailsService, AuthenticationUserDetail
     @Override
     public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
 //        Integer userId = Integer.parseInt(token.getCredentials().toString().split("\u001C")[0]);
-        Integer userId = Integer.parseInt(token.getCredentials().toString().split("\\^")[0]);
+        Integer userId = Integer.parseInt(token.getCredentials().toString().split(Parser.DELIMITER)[0]);
 
         Optional<AuthToken> tokenEntity = tokenService.findTokenByUserId(userId);
         User user = findById(tokenEntity.orElseThrow(WrongCredentialsException::new).getUserId());

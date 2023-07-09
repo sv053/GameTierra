@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class LogoutControllerIntegrationTest extends ControllerIntegrationTest {
 
     private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
-    protected static final String LOGOUT_ENDPOINT = "/userlogout";
+    protected static final String LOGOUT_ENDPOINT = "/logout";
 
     private String userJson;
     private User user;

@@ -10,6 +10,10 @@ public class AuthToken {
     private final String value;
     private LocalDateTime expirationDateTime;
 
+    public AuthToken(String tokenValue, Integer userId) {
+        this(null, tokenValue, userId, null);
+    }
+
     public AuthToken(String tokenValue, Integer userId, LocalDateTime expirationDateTime) {
         this(null, tokenValue, userId, expirationDateTime);
     }

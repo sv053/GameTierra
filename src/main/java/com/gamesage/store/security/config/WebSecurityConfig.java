@@ -7,11 +7,13 @@ import com.gamesage.store.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
@@ -58,7 +60,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilter(preAuthenticationFilter())
                 .addFilterBefore(exceptionHandler, LogoutFilter.class)
                 .logout()
-                .addLogoutHandler(customLogoutHandler());
+                .addLogoutHandler(customLogoutHandler())
+                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK));
+
     }
 }
 

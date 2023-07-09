@@ -25,6 +25,8 @@ abstract public class ControllerIntegrationTest {
 
     protected static final String TOKEN_HEADER_NAME = "X-Auth-Token";
     protected static final String LOGIN_ENDPOINT = "/login";
+    protected static final String DELIMITER = "&";
+
 
     @Value("classpath:request/user/existentUser.json")
     protected Resource userJsonResource;

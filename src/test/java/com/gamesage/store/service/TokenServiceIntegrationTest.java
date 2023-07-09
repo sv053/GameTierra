@@ -21,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 class TokenServiceIntegrationTest {
 
+    protected static final String DELIMITER = "&";
+
     @Autowired
     private TokenService tokenService;
     @Autowired
@@ -37,7 +39,7 @@ class TokenServiceIntegrationTest {
         AuthToken tokenToFind = tokenService.createToken(tokenToCreate);
         AuthToken foundToken = tokenService.findToken(tokenToFind.getValue());
 
-        assertEquals(tokenToFind, foundToken);
+        assertTrue(encoder.matches(tokenToCreate.getValue(), foundToken.getValue()));
     }
 
     @Test
@@ -46,7 +48,7 @@ class TokenServiceIntegrationTest {
                 3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(userWithoutToken);
         AuthToken token = new AuthToken(1, "ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
-        AuthToken tokenToFind = tokenService.createToken(token);
+        tokenService.createToken(token);
         Optional<AuthToken> foundToken = tokenService.findTokenById(savedUser.getId());
         String foundTokenValue = "";
         if (foundToken.isPresent()) {
@@ -54,13 +56,12 @@ class TokenServiceIntegrationTest {
         }
 
         assertTrue(foundToken.isPresent());
-        assertTrue(encoder.matches(tokenToFind.getValue(), foundTokenValue));
+        assertTrue(encoder.matches(token.getValue(), foundTokenValue));
     }
 
     @Test
     void findByLogin_Failure_Exception() {
-//        assertThrows(WrongCredentialsException.class, () -> tokenService.findToken("123" + (char) 0x1C + "cfgjgvuikhyvbfbu"));
-        assertThrows(WrongCredentialsException.class, () -> tokenService.findToken("123$$cfgjgvuikhyvbfbu"));
+        assertThrows(WrongCredentialsException.class, () -> tokenService.findToken("123" + DELIMITER + "cfgjgvuikhyvbfbu"));
     }
 
     @Test
@@ -69,10 +70,10 @@ class TokenServiceIntegrationTest {
                 3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(user);
         AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
-        AuthToken savedToken = tokenService.createToken(token);
-        Optional<AuthToken> foundToken = tokenService.findTokenById(savedUser.getId());
+        tokenService.createToken(token);
+        AuthToken foundToken = (tokenService.findTokenById(savedUser.getId()).get());
 
-        assertEquals(Optional.of(savedToken), foundToken);
+        assertTrue(encoder.matches(token.getValue(), foundToken.getValue()));
     }
 
     @Test
@@ -82,9 +83,9 @@ class TokenServiceIntegrationTest {
         User savedUser = userService.createOne(user);
         AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now().minus(100, ChronoUnit.DAYS));
         AuthToken savedToken = tokenService.createToken(token);
-        Optional<AuthToken> foundToken = tokenService.findTokenById(savedUser.getId());
+        AuthToken foundToken = (tokenService.findTokenById(savedUser.getId())).get();
 
-        assertEquals(Optional.of(savedToken), foundToken);
+        assertTrue(encoder.matches(token.getValue(), foundToken.getValue()));
 
         tokenService.removeExpiredTokens();
 
@@ -98,13 +99,13 @@ class TokenServiceIntegrationTest {
         User savedUser = userService.createOne(user);
         AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
         AuthToken savedToken = tokenService.createToken(token);
-        Optional<AuthToken> foundToken = tokenService.findTokenById(savedUser.getId());
+        AuthToken foundToken = (tokenService.findTokenById(savedUser.getId())).get();
 
-        assertTrue(foundToken.isPresent());
-        tokenService.invalidateToken(savedToken.getUserId());
-        tokenService.findToken(savedToken.getValue());
-        AuthToken removedToken = tokenService.findToken(savedToken.getValue());
-        assertNull(removedToken);
+        assertTrue(encoder.matches(token.getValue(), foundToken.getValue()));
+
+        var result = tokenService.invalidateToken(savedToken);
+        var t = tokenService.findToken(savedToken.getValue());
+        assertThrows(WrongCredentialsException.class, () -> tokenService.findToken(savedToken.getValue()));
     }
 }
 

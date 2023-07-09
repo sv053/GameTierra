@@ -2,12 +2,12 @@ package com.gamesage.store.domain.repository.db;
 
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.repository.TokenRepository;
+import com.gamesage.store.util.Parser;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
@@ -38,16 +38,14 @@ public class DbTokenRepository implements TokenRepository {
             " WHERE expiration_date < ? ";
     private static final String REMOVE_TOKEN_BY_USERID = "DELETE " +
             " FROM token " +
-            " WHERE user_id = ? ";
+            " WHERE user_id = ? " +
+            " AND token_value = ? ";
     private final JdbcTemplate jdbcTemplate;
     private final TokenRowMapper tokenRowMapper;
-    private final BCryptPasswordEncoder encoder;
 
-
-    public DbTokenRepository(JdbcTemplate jdbcTemplate, TokenRowMapper tokenRowMapper, BCryptPasswordEncoder encoder) {
+    public DbTokenRepository(JdbcTemplate jdbcTemplate, TokenRowMapper tokenRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.tokenRowMapper = tokenRowMapper;
-        this.encoder = encoder;
     }
 
     @Override
@@ -84,7 +82,8 @@ public class DbTokenRepository implements TokenRepository {
     @Override
     public Optional<AuthToken> findByValue(String token) {
 //        tokenId = token.split("\u001C")[0] ;
-        Integer userId = Integer.parseInt(token.split("\\$\\$")[0]);
+        String delimiterRegex = String.format("\\%s", Parser.DELIMITER);
+        Integer userId = Integer.parseInt(token.split(delimiterRegex)[0]);
         try {
             return findByUserId(userId);
         } catch (EmptyResultDataAccessException e) {
@@ -99,7 +98,7 @@ public class DbTokenRepository implements TokenRepository {
             PreparedStatement ps = con
                     .prepareStatement(INSERT_USER_TOKEN,
                             Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, encoder.encode(authToken.getValue()));
+            ps.setString(1, authToken.getValue());
             ps.setInt(2, authToken.getUserId());
             ps.setTimestamp(3, Timestamp.valueOf(authToken.getExpirationDateTime()));
             return ps;
@@ -107,13 +106,13 @@ public class DbTokenRepository implements TokenRepository {
 
         Integer id = keyHolder.getKeyAs(Integer.class);
         jdbcTemplate.update(UPDATE_TOKEN
-                , encoder.encode(authToken.getValue())
+                , authToken.getValue()
                 , id);
 
         return new AuthToken(
                 id,
 //                authToken.getUserId() + (char) 0x1C + authToken.getValue(),
-                authToken.getUserId() + "$$" + authToken.getValue(),
+                "",
                 authToken.getUserId(),
                 authToken.getExpirationDateTime());
     }
@@ -121,11 +120,11 @@ public class DbTokenRepository implements TokenRepository {
     @Override
     public AuthToken updateByUserId(AuthToken authToken) {
         jdbcTemplate.update(UPDATE_TOKEN_BY_USER_ID
-                , encoder.encode(authToken.getValue())
+                , authToken.getValue()
                 , authToken.getUserId());
         return new AuthToken(
                 authToken.getId(),
-                authToken.getUserId() + "$$" + authToken.getValue(),
+                authToken.getUserId() + Parser.DELIMITER + authToken.getValue(),
                 authToken.getUserId(),
                 authToken.getExpirationDateTime());
     }
@@ -136,8 +135,8 @@ public class DbTokenRepository implements TokenRepository {
     }
 
     @Override
-    public void removeByUserId(Integer id) {
-        jdbcTemplate.update(REMOVE_TOKEN_BY_USERID, id);
+    public boolean removeByUserId(Integer id, String token) {
+        return jdbcTemplate.update(REMOVE_TOKEN_BY_USERID, id, token) > 0;
     }
 
     @Component
