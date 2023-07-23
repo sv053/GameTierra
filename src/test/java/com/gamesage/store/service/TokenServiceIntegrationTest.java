@@ -21,8 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 class TokenServiceIntegrationTest {
 
-    protected static final String DELIMITER = "&";
-
     @Autowired
     private TokenService tokenService;
     @Autowired
@@ -37,7 +35,7 @@ class TokenServiceIntegrationTest {
         User savedUser = userService.createOne(userWithoutToken);
         AuthToken tokenToCreate = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
         AuthToken tokenToFind = tokenService.createToken(tokenToCreate);
-        AuthToken foundToken = tokenService.findToken(tokenToFind.getValue());
+        AuthToken foundToken = tokenService.findTokenByUserId(tokenToFind.getUserId()).get();
 
         assertTrue(encoder.matches(tokenToCreate.getValue(), foundToken.getValue()));
     }
@@ -61,7 +59,7 @@ class TokenServiceIntegrationTest {
 
     @Test
     void findByLogin_Failure_Exception() {
-        assertThrows(WrongCredentialsException.class, () -> tokenService.findToken("123" + DELIMITER + "cfgjgvuikhyvbfbu"));
+        assertThrows(WrongCredentialsException.class, () -> tokenService.findTokenByUserId(88888888));
     }
 
     @Test
@@ -103,9 +101,9 @@ class TokenServiceIntegrationTest {
 
         assertTrue(encoder.matches(token.getValue(), foundToken.getValue()));
 
-        var result = tokenService.invalidateToken(savedToken);
-        var t = tokenService.findToken(savedToken.getValue());
-        assertThrows(WrongCredentialsException.class, () -> tokenService.findToken(savedToken.getValue()));
+        tokenService.invalidateToken(savedToken);
+        var removedToken = tokenService.findTokenByUserId(savedToken.getUserId());
+        assertTrue(removedToken.isEmpty());
     }
 }
 

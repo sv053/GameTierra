@@ -4,7 +4,7 @@ import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.security.auth.HeaderName;
 import com.gamesage.store.security.service.AuthService;
 import com.gamesage.store.service.TokenService;
-import com.gamesage.store.util.Parser;
+import com.gamesage.store.util.TokenParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
@@ -24,26 +24,17 @@ public class CustomLogoutHandler implements LogoutHandler {
         public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
                 String tokenFromHeader = request.getHeader(HeaderName.TOKEN_HEADER);
 
-                int userId = -1;
-                String idFromToken = Parser.findSubstring(tokenFromHeader, 0);
-                if (Objects.nonNull(idFromToken)) {
-                        userId = Integer.parseInt(idFromToken);
-                }
-                if (!tokenFromHeader.isEmpty() && tokenService.findTokenByUserId(userId).isPresent()) {
-                        String token = request.getHeader(HeaderName.TOKEN_HEADER);
-                        AuthToken authToken = new AuthToken(
-                                Parser.findSubstring(token, 0),
-                                Integer.parseInt(Parser.findSubstring(token, 1)));
-                        authService.revokeAccess(authToken);
-                        //  SecurityContextHolder.clearContext();
-//
-//                        return ResponseEntity.ok()
-//                                .header(HeaderName.TOKEN_HEADER, "")
-//                                .body("You have successfully logged out");
-//                } else {
-//                        return ResponseEntity.status(HttpStatus.LENGTH_REQUIRED)
-//                                .header(HeaderName.TOKEN_HEADER, "")
-//                                .body("You logged out already");
+                if (Objects.nonNull(tokenFromHeader)) {
+                        int userId = -1;
+                        String idFromToken = TokenParser.findStringPart(tokenFromHeader, TokenParser.USER_ID_PART_NUMBER);
+                        if (Objects.nonNull(idFromToken)) {
+                                userId = Integer.parseInt(idFromToken);
+                        }
+                        if (!tokenFromHeader.isEmpty() && tokenService.findTokenByUserId(userId).isPresent()) {
+                                String token = TokenParser.findStringPart(tokenFromHeader, TokenParser.TOKEN_VALUE_PART_NUMBER);
+                                AuthToken authToken = new AuthToken(token, userId);
+                                authService.revokeAccess(authToken);
+                        }
                 }
         }
 }

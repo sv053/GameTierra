@@ -26,7 +26,7 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
     private static final String API_ORDER_ENDPOINT = "/cart";
     private static final String ORDER_ID_ENDPOINT = "/cart/{id}";
     private static final String ORDER_BUY_ENDPOINT = "/cart/{gameId}/{userId}";
-    private static final String WRONG_TOKEN_HEADER = "111111___unknownTokenValue";
+    private static final String WRONG_TOKEN_HEADER = "111111&unknownTokenValue";
     private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
 
     private String userJson;
@@ -49,12 +49,12 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
     }
 
     @Test
-    void givenWrongCreds_shouldNotFindOrderByIdAndReturn401() throws Exception {
+    void givenWrongCreds_shouldNotFindOrderByIdAndReturn403() throws Exception {
         int wrongId = -15;
         mockMvc.perform(get(ORDER_ID_ENDPOINT, wrongId)
                         .header(TOKEN_HEADER_TITLE, WRONG_TOKEN_HEADER)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -124,7 +124,7 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
                         .header(TOKEN_HEADER_TITLE, WRONG_TOKEN_HEADER)
                         .content(userJson)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 }
 

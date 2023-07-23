@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/login")
 public class LoginController {
@@ -24,13 +22,9 @@ public class LoginController {
 
     @PostMapping
     public ResponseEntity<User> login(@RequestBody User user) {
-        String tokenValue = "";
-        Optional<AuthToken> authToken = authService.authenticateUser(user);
-        if (authToken.isPresent()) {
-            tokenValue = authToken.get().getValue();
-        }
+        AuthToken authToken = authService.authenticateUser(user);
         return ResponseEntity.ok()
-                .header(HeaderName.TOKEN_HEADER, tokenValue)
+                .header(HeaderName.TOKEN_HEADER, authToken.getValue())
                 .body(user);
     }
 }

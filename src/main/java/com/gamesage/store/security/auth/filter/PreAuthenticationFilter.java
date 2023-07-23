@@ -4,7 +4,7 @@ import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.exception.WrongCredentialsException;
 import com.gamesage.store.security.auth.HeaderName;
 import com.gamesage.store.service.TokenService;
-import com.gamesage.store.util.Parser;
+import com.gamesage.store.util.TokenParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
@@ -26,15 +26,16 @@ public class PreAuthenticationFilter extends AbstractPreAuthenticatedProcessingF
         if (null == token || token.isEmpty()) {
             return null;
         }
-        String expectedId = Parser.findSubstring(token, 0);
-        if (!StringUtils.hasLength(expectedId)) {
+        Integer expectedUserId = Integer.parseInt(TokenParser.findStringPart(
+                token,
+                TokenParser.USER_ID_PART_NUMBER));
+        if (!StringUtils.hasLength(expectedUserId.toString())) {
             throw new WrongCredentialsException();
         }
-        int idFromToken = Integer.parseInt(expectedId);
-        Optional<AuthToken> authToken = tokenService.findTokenByUserId(idFromToken);
+        Optional<AuthToken> authToken = tokenService.findTokenByUserId(expectedUserId);
         if (authToken.isPresent()) {
             String encodedToken = authToken.get().getValue();
-            int substringIndex = token.indexOf(Parser.DELIMITER) + Parser.DELIMITER.length();
+            int substringIndex = token.indexOf(TokenParser.DELIMITER) + TokenParser.DELIMITER.length();
             String rawToken = token.substring(substringIndex);
             if (encoder.matches(rawToken, encodedToken)) {
                 return encodedToken;

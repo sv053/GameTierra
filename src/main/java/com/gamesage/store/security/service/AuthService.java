@@ -2,6 +2,7 @@ package com.gamesage.store.security.service;
 
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.User;
+import com.gamesage.store.exception.WrongCredentialsException;
 import com.gamesage.store.service.TokenService;
 import com.gamesage.store.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,14 +29,9 @@ public class AuthService {
         this.tokenService = tokenService;
     }
 
-    private Integer findUserId(User user) {
-        return userService.findByCredentials(user.getLogin(), user.getPassword()).getId();
-    }
-
-
-    public Optional<AuthToken> authenticateUser(User user) {
+    public AuthToken authenticateUser(User user) {
         LocalDateTime localDateTime = LocalDateTime.now().plus(tokenExpiryInterval, ChronoUnit.DAYS);
-        Integer savedUserId = findUserId(user);
+        Integer savedUserId = userService.findByCredentials(user.getLogin(), user.getPassword()).getId();
         Optional<AuthToken> existedToken = tokenService.findTokenByUserId(savedUserId);
         AuthToken tokenForHeader;
         if (existedToken.isPresent()) {
@@ -43,7 +39,7 @@ public class AuthService {
         } else {
             tokenForHeader = tokenService.createToken(new AuthToken(generateToken(), savedUserId, localDateTime));
         }
-        return Optional.of(tokenForHeader);
+        return tokenForHeader;
     }
 
     private String generateToken() {
@@ -51,7 +47,8 @@ public class AuthService {
     }
 
     public void revokeAccess(AuthToken authToken) {
-        tokenService.invalidateToken(authToken);
+        boolean isRevoked = tokenService.invalidateToken(authToken);
+        if (!isRevoked) throw new WrongCredentialsException();
     }
 }
 

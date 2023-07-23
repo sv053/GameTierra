@@ -4,7 +4,7 @@ import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.exception.EntityNotFoundException;
 import com.gamesage.store.service.TokenService;
-import com.gamesage.store.util.Parser;
+import com.gamesage.store.util.TokenParser;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ class LoginControllerIntegrationTest extends ControllerIntegrationTest {
     void givenCorrectCreds_shouldLoginAndReturn200() throws Exception {
         User savedUser = userService.createOne(user);
         String actualToken = loginAndGetToken(userJson);
-        String tokenWithoutUserId = Parser.findSubstring(actualToken, 1);
+        String tokenWithoutUserId = TokenParser.findStringPart(actualToken, TokenParser.TOKEN_VALUE_PART_NUMBER);
 
         String expectedToken = tokenService
                 .findTokenByUserId(savedUser.getId())
