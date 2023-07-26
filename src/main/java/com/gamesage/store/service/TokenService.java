@@ -28,10 +28,6 @@ public class TokenService {
         return tokenRepository.findByUserId(userId);
     }
 
-//    public AuthToken findToken(String token) {
-//        return tokenRepository.findByValue(token).orElseThrow(WrongCredentialsException::new);
-//    }
-
     public AuthToken createToken(AuthToken authToken) {
         AuthToken tokenToSave = new AuthToken(encoder.encode(authToken.getValue()), authToken.getUserId(), authToken.getExpirationDateTime());
         AuthToken savedToken = tokenRepository.createOne(tokenToSave);
