@@ -29,11 +29,11 @@ public class TokenService {
     }
 
     public AuthToken createToken(AuthToken authToken) {
-        AuthToken tokenToSave = new AuthToken(encoder.encode(authToken.getValue()), authToken.getUserId(), authToken.getExpirationDateTime());
+        AuthToken tokenToSave = authToken.withTokenValue(authToken, encoder.encode(authToken.getValue()));
         AuthToken savedToken = tokenRepository.createOne(tokenToSave);
         int userId = savedToken.getUserId();
         String tokenValue = TokenParser.prepareTokenForHeader(authToken.getValue(), userId);
-        return new AuthToken(savedToken.getId(), tokenValue, userId, savedToken.getExpirationDateTime());
+        return authToken.withIdAndValue(authToken, tokenValue, savedToken.getId());
     }
 
     public AuthToken updateToken(AuthToken authToken) {

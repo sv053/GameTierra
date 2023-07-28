@@ -11,6 +11,10 @@ public class TokenParser {
         return stringToFindPart.split(DELIMITER_REGEX)[partNumber];
     }
 
+    public static Integer convertStringToInteger(String stringToConvert, int partNumber) {
+        return Integer.parseInt(findStringPart(stringToConvert, partNumber));
+    }
+
     public static String prepareTokenForHeader(String encodedToken, int userId) {
         return String.format("%s%s%s", userId, DELIMITER, encodedToken);
     }

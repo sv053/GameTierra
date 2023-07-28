@@ -25,14 +25,6 @@ public class AuthToken {
         this.expirationDateTime = expirationDateTime;
     }
 
-    public LocalDateTime getExpirationDate() {
-        return expirationDateTime;
-    }
-
-    public void setExpirationDate(LocalDateTime expirationDateTime) {
-        this.expirationDateTime = expirationDateTime;
-    }
-
     public Integer getId() {
         return id;
     }
@@ -51,6 +43,14 @@ public class AuthToken {
 
     public String getValue() {
         return value;
+    }
+
+    public AuthToken withTokenValue(AuthToken authToken, String tokenValue) {
+        return new AuthToken(authToken.getId(), tokenValue, authToken.getUserId(), authToken.getExpirationDateTime());
+    }
+
+    public AuthToken withIdAndValue(AuthToken authToken, String tokenValue, Integer id) {
+        return new AuthToken(id, tokenValue, authToken.getUserId(), authToken.getExpirationDateTime());
     }
 
     @Override
@@ -73,7 +73,7 @@ public class AuthToken {
                 ", id='" + id + '\'' +
                 ", token='" + value + '\'' +
                 ", userId=" + userId +
-                ", expirationDate=" + expirationDateTime +
+                ", expirationDateTime=" + expirationDateTime +
                 '}';
     }
 }

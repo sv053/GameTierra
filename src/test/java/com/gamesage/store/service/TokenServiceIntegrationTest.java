@@ -7,13 +7,17 @@ import com.gamesage.store.exception.WrongCredentialsException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,6 +31,9 @@ class TokenServiceIntegrationTest {
     private UserService userService;
     @Autowired
     private BCryptPasswordEncoder encoder;
+    private final CountDownLatch latch = new CountDownLatch(1);
+    @Autowired
+    private TaskScheduler taskScheduler;
 
     @Test
     void findByTokenValue_Success() {
@@ -86,6 +93,27 @@ class TokenServiceIntegrationTest {
         assertTrue(encoder.matches(token.getValue(), foundToken.getValue()));
 
         tokenService.removeExpiredTokens();
+
+        assertEquals(Optional.empty(), tokenService.findTokenById(0));
+    }
+
+    @Test
+    public void expiredTokenRemoveScheduler() throws InterruptedException {
+        User user = new User(null, "agamer", "lerida", new Tier(
+                3, "SILVER", 10.d), BigDecimal.TEN);
+        User savedUser = userService.createOne(user);
+        AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now().minus(100, ChronoUnit.DAYS));
+        AuthToken savedToken = tokenService.createToken(token);
+        AuthToken foundToken = (tokenService.findTokenById(savedUser.getId())).get();
+
+        assertTrue(encoder.matches(token.getValue(), foundToken.getValue()));
+
+        taskScheduler.schedule(() -> {
+            tokenService.removeExpiredTokens();
+            latch.countDown();
+        }, new Date(System.currentTimeMillis() + 5000));
+
+        assertTrue(latch.await(10, TimeUnit.SECONDS));
 
         assertEquals(Optional.empty(), tokenService.findTokenById(0));
     }

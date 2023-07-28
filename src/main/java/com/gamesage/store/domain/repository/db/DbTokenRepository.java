@@ -98,7 +98,6 @@ public class DbTokenRepository implements TokenRepository {
 
         return new AuthToken(
                 id,
-//                authToken.getUserId() + (char) 0x1C + authToken.getValue(),
                 authToken.getValue(),
                 authToken.getUserId(),
                 authToken.getExpirationDateTime());
