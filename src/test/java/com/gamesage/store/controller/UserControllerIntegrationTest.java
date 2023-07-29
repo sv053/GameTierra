@@ -77,6 +77,14 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
     }
 
     @Test
+    void givenEmptyToken_whenFindAllUsers_then403() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(API_USER_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(TOKEN_HEADER_NAME, ""))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void createOne_thenSuccess() throws Exception {
         String nonExistentUserJson = Files.readString(Path.of(notUserJsonResource.getURI()));
         User userUnsaved = objectMapper.readValue(nonExistentUserJson, User.class);
