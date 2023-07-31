@@ -1,14 +1,12 @@
 package com.gamesage.store.security.auth.filter;
 
 import com.gamesage.store.domain.model.AuthToken;
-import com.gamesage.store.exception.WrongCredentialsException;
 import com.gamesage.store.security.auth.HeaderName;
 import com.gamesage.store.service.TokenService;
 import com.gamesage.store.util.TokenParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
-import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
@@ -26,11 +24,11 @@ public class PreAuthenticationFilter extends AbstractPreAuthenticatedProcessingF
         if (null == token || token.isEmpty()) {
             return null;
         }
-        Integer expectedUserId = Integer.parseInt(TokenParser.findStringPart(
+        int expectedUserId = Integer.parseInt(TokenParser.findStringPart(
                 token,
                 TokenParser.USER_ID_PART_NUMBER));
-        if (!StringUtils.hasLength(expectedUserId.toString())) {
-            throw new WrongCredentialsException();
+        if (0 >= expectedUserId) {
+            return null;
         }
         Optional<AuthToken> authToken = tokenService.findTokenByUserId(expectedUserId);
         if (authToken.isPresent()) {

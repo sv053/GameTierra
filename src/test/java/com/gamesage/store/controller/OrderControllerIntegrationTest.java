@@ -126,5 +126,14 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    void givenEmptyToken_shouldNotBuyGame() throws Exception {
+        mockMvc.perform(post(ORDER_BUY_ENDPOINT, game.getId(), user.getId())
+                        .header(TOKEN_HEADER_TITLE, "")
+                        .content(userJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
 }
 
