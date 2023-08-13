@@ -1,40 +1,49 @@
 package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.AuthToken;
+import com.gamesage.store.exception.WrongCredentialsException;
 import com.gamesage.store.security.auth.HeaderName;
 import com.gamesage.store.security.service.AuthService;
 import com.gamesage.store.service.TokenService;
 import com.gamesage.store.util.TokenParser;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
+import java.util.Optional;
 
 public class CustomLogoutHandler implements LogoutHandler {
 
-        @Autowired
-        private AuthService authService;
-        @Autowired
-        private TokenService tokenService;
+	private final AuthService authService;
+	private final TokenService tokenService;
 
-        @Override
-        public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-                String tokenFromHeader = request.getHeader(HeaderName.TOKEN_HEADER);
+	public CustomLogoutHandler(AuthService authService, TokenService tokenService) {
+		this.authService = authService;
+		this.tokenService = tokenService;
+	}
 
-                if (Objects.nonNull(tokenFromHeader)) {
-                        int userId = -1;
-                        String idFromToken = TokenParser.findStringPart(tokenFromHeader, TokenParser.USER_ID_PART_NUMBER);
-                        if (Objects.nonNull(idFromToken)) {
-                                userId = Integer.parseInt(idFromToken);
-                        }
-                        if (!tokenFromHeader.isEmpty() && tokenService.findTokenByUserId(userId).isPresent()) {
-                                String token = TokenParser.findStringPart(tokenFromHeader, TokenParser.TOKEN_VALUE_PART_NUMBER);
-                                AuthToken authToken = new AuthToken(token, userId);
-                                authService.revokeAccess(authToken);
-                        }
-                }
-        }
+	@Override
+	public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+		String tokenFromHeader = request.getHeader(HeaderName.TOKEN_HEADER);
+
+		if (Objects.nonNull(tokenFromHeader) && StringUtils.hasText(tokenFromHeader)) {
+			Integer userId = TokenParser.convertUserIdToInteger(tokenFromHeader);
+			if (Objects.isNull(userId) || userId <= 0) {
+				throw new WrongCredentialsException();
+			}
+			Optional<AuthToken> savedToken = tokenService.findTokenByUserId(userId);
+			if (savedToken.isPresent()) {
+				String token = TokenParser.findTokenValue(tokenFromHeader);
+				AuthToken authToken = new AuthToken(token, userId);
+				authService.revokeAccess(authToken);
+			} else {
+				throw new WrongCredentialsException();
+			}
+		} else {
+			throw new WrongCredentialsException();
+		}
+	}
 }

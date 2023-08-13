@@ -1,22 +1,33 @@
 package com.gamesage.store.util;
 
-public class TokenParser {
+public final class TokenParser {
 
     public static final int USER_ID_PART_NUMBER = 0;
     public static final int TOKEN_VALUE_PART_NUMBER = 1;
     public static final String DELIMITER = "&";
     private static final String DELIMITER_REGEX = String.format("\\%s", DELIMITER);
 
-    public static String findStringPart(String stringToFindPart, int partNumber) {
-        return stringToFindPart.split(DELIMITER_REGEX)[partNumber];
+    private TokenParser() {
     }
 
-    public static Integer convertStringToInteger(String stringToConvert, int partNumber) {
-        return Integer.parseInt(findStringPart(stringToConvert, partNumber));
+    private static String findTokenPart(String headerWithToken, int partNumber) {
+        return headerWithToken.split(DELIMITER_REGEX)[partNumber];
     }
 
-    public static String prepareTokenForHeader(String encodedToken, int userId) {
-        return String.format("%s%s%s", userId, DELIMITER, encodedToken);
+    private static String findUserId(String headerWithToken) {
+        return findTokenPart(headerWithToken, USER_ID_PART_NUMBER);
+    }
+
+    public static String findTokenValue(String headerWithToken) {
+        return findTokenPart(headerWithToken, TOKEN_VALUE_PART_NUMBER);
+    }
+
+    public static Integer convertUserIdToInteger(String userId) {
+        return Integer.parseInt(findUserId(userId));
+    }
+
+    public static String prepareHeader(String encodedToken, int userId) {
+        return userId + DELIMITER + encodedToken;
     }
 }
 

@@ -2,7 +2,6 @@ package com.gamesage.store.security.service;
 
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.User;
-import com.gamesage.store.exception.WrongCredentialsException;
 import com.gamesage.store.service.TokenService;
 import com.gamesage.store.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +45,8 @@ public class AuthService {
         return String.format("%s-%s", System.currentTimeMillis(), UUID.randomUUID());
     }
 
-    public void revokeAccess(AuthToken authToken) {
-        boolean isRevoked = tokenService.invalidateToken(authToken);
-        if (!isRevoked) throw new WrongCredentialsException();
+    public boolean revokeAccess(AuthToken authToken) {
+        return tokenService.invalidateToken(authToken);
     }
 }
 

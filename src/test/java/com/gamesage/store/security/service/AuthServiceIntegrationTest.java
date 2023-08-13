@@ -18,54 +18,33 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 class AuthServiceIntegrationTest {
 
-    @Autowired
-    private AuthService authService;
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private AuthService authService;
+	@Autowired
+	private UserService userService;
 
-    @Test
-    void authenticateUser_Success() {
-        User user = new User(0, "user11111", "lerida", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN);
-        User savedUser = userService.createOne(user);
-        assertNotNull(userService.findByLogin(user.getLogin()));
+	@Test
+	void authenticateUser_Success() {
+		User user = new User(0, "user11111", "lerida", new Tier(
+				3, "SILVER", 10.d), BigDecimal.TEN);
+		User savedUser = userService.createOne(user);
+		assertNotNull(userService.findByLogin(user.getLogin()));
 
-        AuthToken foundToken = (authService.authenticateUser(new User(
-                0, "user11111", "lerida", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN
-        )));
-        assertNotNull(foundToken);
-        assertNotNull(foundToken.getValue());
-        assertEquals(savedUser.getId(), foundToken.getUserId());
-    }
+		AuthToken foundToken = (authService.authenticateUser(new User(
+				0, "user11111", "lerida", new Tier(
+				3, "SILVER", 10.d), BigDecimal.TEN
+		)));
+		assertNotNull(foundToken);
+		assertNotNull(foundToken.getValue());
+		assertEquals(savedUser.getId(), foundToken.getUserId());
+	}
 
-    @Test
-    void authenticateUser_Exception() {
-        User user = new User(null, "user1", "lerida", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN);
+	@Test
+	void authenticateUser_Exception() {
+		User user = new User(null, "user1", "lerida", new Tier(
+				3, "SILVER", 10.d), BigDecimal.TEN);
 
-        assertThrows(WrongCredentialsException.class, () -> authService.authenticateUser(user));
-    }
-
-//    @Test
-//    void revokeAccess_Success() {
-//        User user = new User(0, "user11111", "lerida", new Tier(
-//                3, "SILVER", 10.d), BigDecimal.TEN);
-//        User savedUser = userService.createOne(user);
-//        assertNotNull(userService.findByLogin(user.getLogin()));
-//
-//        AuthToken foundToken = authService.authenticateUser(new User(
-//                0, "user11111", "lerida", new Tier(
-//                3, "SILVER", 10.d), BigDecimal.TEN
-//        ));
-//        authService.revokeAccess(foundToken.getValue());
-//
-//        assertNull();
-//        AuthToken foundTokenAfterRemoving = authService.authenticateUser(new User(
-//                0, "user11111", "lerida", new Tier(
-//                3, "SILVER", 10.d), BigDecimal.TEN
-//        ));
-//        assertEquals(foundTokenAfterRemoving.getExpirationDateTime(), LocalDateTime.now().plus(7, ChronoUnit.DAYS));
-//    }
+		assertThrows(WrongCredentialsException.class, () -> authService.authenticateUser(user));
+	}
 }
 
