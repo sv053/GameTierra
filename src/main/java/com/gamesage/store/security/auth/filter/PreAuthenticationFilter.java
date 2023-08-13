@@ -24,9 +24,7 @@ public class PreAuthenticationFilter extends AbstractPreAuthenticatedProcessingF
         if (null == token || token.isEmpty()) {
             return null;
         }
-        int expectedUserId = Integer.parseInt(TokenParser.findStringPart(
-                token,
-                TokenParser.USER_ID_PART_NUMBER));
+        int expectedUserId = TokenParser.convertUserIdToInteger(token);
         if (0 >= expectedUserId) {
             return null;
         }

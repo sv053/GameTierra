@@ -39,7 +39,7 @@ class LoginControllerIntegrationTest extends ControllerIntegrationTest {
     void givenCorrectCreds_shouldLoginAndReturn200() throws Exception {
         User savedUser = userService.createOne(user);
         String actualToken = loginAndGetToken(userJson);
-        String tokenWithoutUserId = TokenParser.findStringPart(actualToken, TokenParser.TOKEN_VALUE_PART_NUMBER);
+        String tokenWithoutUserId = TokenParser.findTokenValue(actualToken);
 
         String expectedToken = tokenService
                 .findTokenByUserId(savedUser.getId())

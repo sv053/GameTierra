@@ -3,6 +3,8 @@ package com.gamesage.store.security.config;
 import com.gamesage.store.controller.CustomLogoutHandler;
 import com.gamesage.store.security.auth.filter.FilterChainExceptionHandler;
 import com.gamesage.store.security.auth.filter.PreAuthenticationFilter;
+import com.gamesage.store.security.service.AuthService;
+import com.gamesage.store.service.TokenService;
 import com.gamesage.store.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,18 +24,23 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final UserService userService;
-    private final FilterChainExceptionHandler exceptionHandler;
+	private final UserService userService;
+	private final FilterChainExceptionHandler exceptionHandler;
+	private final AuthService authService;
+	private final TokenService tokenService;
 
-    public WebSecurityConfig(UserService userService, FilterChainExceptionHandler exceptionHandler) {
-        this.userService = userService;
-        this.exceptionHandler = exceptionHandler;
-    }
+	public WebSecurityConfig(UserService userService, FilterChainExceptionHandler exceptionHandler,
+	                         AuthService authService, TokenService tokenService) {
+		this.userService = userService;
+		this.exceptionHandler = exceptionHandler;
+		this.authService = authService;
+		this.tokenService = tokenService;
+	}
 
-    @Override
-    public AuthenticationManager authenticationManagerBean() {
-        PreAuthenticatedAuthenticationProvider preAuthenticatedAuthProvider = new PreAuthenticatedAuthenticationProvider();
-        preAuthenticatedAuthProvider.setPreAuthenticatedUserDetailsService(userService);
+	@Override
+	public AuthenticationManager authenticationManagerBean() {
+		PreAuthenticatedAuthenticationProvider preAuthenticatedAuthProvider = new PreAuthenticatedAuthenticationProvider();
+		preAuthenticatedAuthProvider.setPreAuthenticatedUserDetailsService(userService);
         return new ProviderManager(preAuthenticatedAuthProvider);
     }
 
@@ -46,7 +53,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public LogoutHandler customLogoutHandler() {
-        return new CustomLogoutHandler();
+	    return new CustomLogoutHandler(authService, tokenService);
     }
 
     @Override
@@ -63,7 +70,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .addLogoutHandler(customLogoutHandler())
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK));
-
     }
 }
 

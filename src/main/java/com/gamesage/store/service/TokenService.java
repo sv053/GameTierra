@@ -3,7 +3,6 @@ package com.gamesage.store.service;
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.repository.TokenRepository;
 import com.gamesage.store.util.TokenParser;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,50 +11,48 @@ import java.util.Optional;
 @Service
 public class TokenService {
 
-    private final TokenRepository tokenRepository;
-    private final BCryptPasswordEncoder encoder;
+	private final TokenRepository tokenRepository;
+	private final BCryptPasswordEncoder encoder;
 
-    public TokenService(TokenRepository tokenRepository, BCryptPasswordEncoder encoder) {
-        this.tokenRepository = tokenRepository;
-        this.encoder = encoder;
-    }
+	public TokenService(TokenRepository tokenRepository, BCryptPasswordEncoder encoder) {
+		this.tokenRepository = tokenRepository;
+		this.encoder = encoder;
+	}
 
-    public Optional<AuthToken> findTokenById(Integer id) {
-        return tokenRepository.findById(id);
-    }
+	public Optional<AuthToken> findTokenById(Integer id) {
+		return tokenRepository.findById(id);
+	}
 
-    public Optional<AuthToken> findTokenByUserId(Integer userId) {
-        return tokenRepository.findByUserId(userId);
-    }
+	public Optional<AuthToken> findTokenByUserId(Integer userId) {
+		return tokenRepository.findByUserId(userId);
+	}
 
-    public AuthToken createToken(AuthToken authToken) {
-        AuthToken tokenToSave = authToken.withTokenValue(authToken, encoder.encode(authToken.getValue()));
-        AuthToken savedToken = tokenRepository.createOne(tokenToSave);
-        int userId = savedToken.getUserId();
-        String tokenValue = TokenParser.prepareTokenForHeader(authToken.getValue(), userId);
-        return authToken.withIdAndValue(authToken, tokenValue, savedToken.getId());
-    }
+	public AuthToken createToken(AuthToken authToken) {
+		AuthToken tokenToSave = authToken.withTokenValue(authToken.getId(), encoder.encode(authToken.getValue()), authToken.getUserId(), authToken.getExpirationDateTime());
+		AuthToken savedToken = tokenRepository.createOne(tokenToSave);
+		int userId = savedToken.getUserId();
+		String tokenValue = TokenParser.prepareHeader(authToken.getValue(), userId);
+		return authToken.withTokenValue(savedToken.getId(), tokenValue, userId, authToken.getExpirationDateTime());
+	}
 
-    public AuthToken updateToken(AuthToken authToken) {
-        return tokenRepository.updateByUserId(authToken);
-    }
+	public AuthToken updateToken(AuthToken authToken) {
+		return tokenRepository.updateByUserId(authToken);
+	}
 
-    @Scheduled(cron = "${com.gamesage.store.cleanup}")
-    public void removeExpiredTokens() {
-        tokenRepository.removeExpired();
-    }
+	public boolean matchTokens(AuthToken tokenFromUser, AuthToken existedToken) {
+		return encoder.matches(tokenFromUser.getValue(), existedToken.getValue());
+	}
 
-    public boolean invalidateToken(AuthToken authToken) {
-        boolean isCorrectInputToken = false;
-        Optional<AuthToken> tokenFromDatabase = findTokenByUserId(authToken.getUserId());
-        if (tokenFromDatabase.isPresent()) {
-            AuthToken existedToken = tokenFromDatabase.get();
-            String tokenToInvalidate = TokenParser.findStringPart(authToken.getValue(), TokenParser.TOKEN_VALUE_PART_NUMBER);
-            if (encoder.matches(tokenToInvalidate, existedToken.getValue())) {
-                isCorrectInputToken = tokenRepository.removeByUserId(authToken.getUserId());
-            }
-        }
-        return isCorrectInputToken;
-    }
+	public boolean invalidateToken(AuthToken authToken) {
+		Optional<AuthToken> tokenFromDatabase = findTokenByUserId(authToken.getUserId());
+		if (tokenFromDatabase.isPresent()) {
+			AuthToken existedToken = tokenFromDatabase.get();
+			String tokenToInvalidate = TokenParser.findTokenValue(authToken.getValue());
+			if (matchTokens(authToken, existedToken)) {
+				return tokenRepository.removeByUserId(authToken.getUserId());
+			}
+		}
+		return false;
+	}
 }
 
