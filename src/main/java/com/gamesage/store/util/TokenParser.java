@@ -1,29 +1,34 @@
 package com.gamesage.store.util;
 
+
+import org.springframework.util.NumberUtils;
+
 public final class TokenParser {
 
-    public static final int USER_ID_PART_NUMBER = 0;
-    public static final int TOKEN_VALUE_PART_NUMBER = 1;
+    private static final int USER_ID_PART_NUMBER = 0;
+    private static final int TOKEN_VALUE_PART_NUMBER = 1;
     public static final String DELIMITER = "&";
     private static final String DELIMITER_REGEX = String.format("\\%s", DELIMITER);
+
 
     private TokenParser() {
     }
 
     private static String findTokenPart(String headerWithToken, int partNumber) {
-        return headerWithToken.split(DELIMITER_REGEX)[partNumber];
+        var tokenParts = headerWithToken.split(DELIMITER_REGEX);
+        return tokenParts.length > partNumber ? tokenParts[partNumber] : "";
     }
 
-    private static String findUserId(String headerWithToken) {
-        return findTokenPart(headerWithToken, USER_ID_PART_NUMBER);
+    public static Integer findUserId(String headerWithToken) {
+        int id = -1;
+        if (headerWithToken == null || headerWithToken.isEmpty()) {
+            id = NumberUtils.parseNumber(headerWithToken, Integer.class);
+        }
+        return id;//NumberUtils.isCreatable(findTokenPart(headerWithToken, USER_ID_PART_NUMBER), Integer.class, );
     }
 
     public static String findTokenValue(String headerWithToken) {
         return findTokenPart(headerWithToken, TOKEN_VALUE_PART_NUMBER);
-    }
-
-    public static Integer convertUserIdToInteger(String userId) {
-        return Integer.parseInt(findUserId(userId));
     }
 
     public static String prepareHeader(String encodedToken, int userId) {

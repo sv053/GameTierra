@@ -92,9 +92,6 @@ public class DbTokenRepository implements TokenRepository {
 		}, keyHolder);
 
 		Integer id = keyHolder.getKeyAs(Integer.class);
-//        jdbcTemplate.update(UPDATE_TOKEN
-//                , authToken.getValue()
-//                , id);
 
 		return new AuthToken(
 				id,

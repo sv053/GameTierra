@@ -2,6 +2,7 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.repository.TokenRepository;
+import com.gamesage.store.exception.WrongCredentialsException;
 import com.gamesage.store.util.TokenParser;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ public class TokenService {
 	}
 
 	public Optional<AuthToken> findTokenByUserId(Integer userId) {
+		if (0 >= userId) {
+			throw new WrongCredentialsException();
+		}
 		return tokenRepository.findByUserId(userId);
 	}
 

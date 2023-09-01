@@ -30,7 +30,7 @@ public class CustomLogoutHandler implements LogoutHandler {
 		String tokenFromHeader = request.getHeader(HeaderName.TOKEN_HEADER);
 
 		if (Objects.nonNull(tokenFromHeader) && StringUtils.hasText(tokenFromHeader)) {
-			Integer userId = TokenParser.convertUserIdToInteger(tokenFromHeader);
+			Integer userId = TokenParser.findUserId(tokenFromHeader);
 			if (Objects.isNull(userId) || userId <= 0) {
 				throw new WrongCredentialsException();
 			}

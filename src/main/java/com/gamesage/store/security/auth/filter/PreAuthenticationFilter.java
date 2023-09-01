@@ -24,15 +24,14 @@ public class PreAuthenticationFilter extends AbstractPreAuthenticatedProcessingF
         if (null == token || token.isEmpty()) {
             return null;
         }
-        int expectedUserId = TokenParser.convertUserIdToInteger(token);
+        int expectedUserId = TokenParser.findUserId(token);
         if (0 >= expectedUserId) {
             return null;
         }
         Optional<AuthToken> authToken = tokenService.findTokenByUserId(expectedUserId);
         if (authToken.isPresent()) {
             String encodedToken = authToken.get().getValue();
-            int substringIndex = token.indexOf(TokenParser.DELIMITER) + TokenParser.DELIMITER.length();
-            String rawToken = token.substring(substringIndex);
+            String rawToken = TokenParser.findTokenValue(authToken.get().getValue());
             if (encoder.matches(rawToken, encodedToken)) {
                 return encodedToken;
             }

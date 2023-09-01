@@ -55,19 +55,17 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(TOKEN_HEADER_NAME, token))
                 .andExpect(status().isOk());
-        // .andExpect(jsonPath("$.*.id").isNotEmpty());
     }
 
     @Test
-    void givenUserWithoutToken_whenFindAllUsers_then403() throws Exception {
+    void givenUserWithoutToken_whenFindAllUsers_thenForbidden() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(API_USER_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    void givenUnauthorizedUser_whenFindAllUsers_then403() throws Exception {
-//        String wrongToken = "123" + (char) 0x1C + "cfgjgvuikhyvbfbu";
+    void givenUnauthorizedUser_whenFindAllUsers_thenForbidden() throws Exception {
         String wrongToken = "1" + DELIMITER + "cfgjgvuikhyvbfbu";
 
         mockMvc.perform(MockMvcRequestBuilders.get(API_USER_ENDPOINT)

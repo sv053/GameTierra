@@ -28,8 +28,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-//import static org.awaitility.Awaitility.*;
-//import static org.awaitility.Duration.*;
 
 
 @SpringBootTest
@@ -68,13 +66,13 @@ class TokenServiceIntegrationTest {
 	}
 
 	@Test
-	void findByLogin_Success() {
+	void findByUserId_Success() {
 		User userWithoutToken = new User(null, "user111", "lerida", new Tier(
 				3, "SILVER", 10.d), BigDecimal.TEN);
 		User savedUser = userService.createOne(userWithoutToken);
 		AuthToken token = new AuthToken(1, "ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
 		tokenService.createToken(token);
-		Optional<AuthToken> foundToken = tokenService.findTokenById(savedUser.getId());
+		Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
 		String foundTokenValue = "";
 		if (foundToken.isPresent()) {
 			foundTokenValue = foundToken.get().getValue();
@@ -84,9 +82,14 @@ class TokenServiceIntegrationTest {
 		assertTrue(encoder.matches(token.getValue(), foundTokenValue));
 	}
 
-	//@Test
-	void findByLogin_Failure_Exception() {
-		assertThrows(WrongCredentialsException.class, () -> tokenService.findTokenByUserId(88888888));
+	@Test
+	void findByUserId_WrongId_EmptyResult() {
+		assertEquals(Optional.empty(), tokenService.findTokenByUserId(888888888));
+	}
+
+	@Test
+	void findByUserId_lessThanZeroId_Failure_Exception() {
+		assertThrows(WrongCredentialsException.class, () -> tokenService.findTokenByUserId(-1));
 	}
 
 	@Test
@@ -96,9 +99,14 @@ class TokenServiceIntegrationTest {
 		User savedUser = userService.createOne(user);
 		AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
 		tokenService.createToken(token);
-		AuthToken foundToken = (tokenService.findTokenById(savedUser.getId()).get());
+		Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
+		String foundTokenValue = "";
+		if (foundToken.isPresent()) {
+			foundTokenValue = foundToken.get().getValue();
+		}
 
-		assertTrue(encoder.matches(token.getValue(), foundToken.getValue()));
+		assert foundToken != null;
+		assertTrue(encoder.matches(token.getValue(), foundTokenValue));
 	}
 
 	@Test
@@ -107,10 +115,13 @@ class TokenServiceIntegrationTest {
 				3, "SILVER", 10.d), BigDecimal.TEN);
 		User savedUser = userService.createOne(user);
 		AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now().minus(100, ChronoUnit.DAYS));
-		AuthToken savedToken = tokenService.createToken(token);
-		AuthToken foundToken = (tokenService.findTokenById(savedUser.getId())).get();
-
-		assertTrue(encoder.matches(token.getValue(), foundToken.getValue()));
+		tokenService.createToken(token);
+		Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
+		String foundTokenValue = "";
+		if (foundToken.isPresent()) {
+			foundTokenValue = foundToken.get().getValue();
+		}
+		assertTrue(encoder.matches(token.getValue(), foundTokenValue));
 
 		tokenCleanupService.removeExpiredTokens();
 
@@ -128,36 +139,19 @@ class TokenServiceIntegrationTest {
 		assertThat(count).isEqualTo(1L);
 	}
 
-//	@Test
-//	void testScheduledTasks() {
-//		await().atMost(10, TimeUnit.SECONDS)
-//				.until(() -> {
-//					String[] taskBeanNames = applicationContext.getBeanNamesForAnnotation(Scheduled.class);
-//					for (String beanName : taskBeanNames) {
-//						Object bean = applicationContext.getBean(beanName);
-//						if (bean instanceof Runnable) {
-//							Scheduled scheduledAnnotation = applicationContext.findAnnotationOnBean(beanName, Scheduled.class);
-//							if (scheduledAnnotation != null && scheduledAnnotation.cron().equals(cleanupCronExpression)) {
-//								return true;
-//							}
-//						}
-//					}
-//					return false;
-//				});
-//
-//		assertThat(taskFound).isTrue();
-//	}
-
 	@Test
 	public void expiredTokenRemoveScheduler() throws InterruptedException {
 		User user = new User(null, "agamer", "lerida", new Tier(
 				3, "SILVER", 10.d), BigDecimal.TEN);
 		User savedUser = userService.createOne(user);
 		AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now().minus(100, ChronoUnit.DAYS));
-		AuthToken savedToken = tokenService.createToken(token);
-		AuthToken foundToken = (tokenService.findTokenById(savedUser.getId())).get();
-
-		assertTrue(encoder.matches(token.getValue(), foundToken.getValue()));
+		tokenService.createToken(token);
+		Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
+		String foundTokenValue = "";
+		if (foundToken.isPresent()) {
+			foundTokenValue = foundToken.get().getValue();
+		}
+		assertTrue(encoder.matches(token.getValue(), foundTokenValue));
 
 		taskScheduler.schedule(() -> {
 			tokenCleanupService.removeExpiredTokens();
@@ -167,6 +161,28 @@ class TokenServiceIntegrationTest {
 		assertTrue(latch.await(10, TimeUnit.SECONDS));
 
 		assertEquals(Optional.empty(), tokenService.findTokenById(0));
+	}
+
+	@Test
+	public void expiredTokenRemoveScheduler_tooEarlyToRemoveToken() throws InterruptedException {
+		User user = new User(null, "agamer", "lerida", new Tier(
+				3, "SILVER", 10.d), BigDecimal.TEN);
+		User savedUser = userService.createOne(user);
+		AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now().plus(100, ChronoUnit.DAYS));
+		tokenService.createToken(token);
+		Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
+		String foundTokenValue = "";
+		if (foundToken.isPresent()) {
+			foundTokenValue = foundToken.get().getValue();
+		}
+		taskScheduler.schedule(() -> {
+			tokenCleanupService.removeExpiredTokens();
+			latch.countDown();
+		}, new Date(System.currentTimeMillis() + 1000));
+
+		assertTrue(latch.await(10, TimeUnit.SECONDS));
+		assertNotNull(tokenService.findTokenById(0));
+		assertTrue(encoder.matches(token.getValue(), foundTokenValue));
 	}
 }
 
