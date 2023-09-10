@@ -31,7 +31,7 @@ public class PreAuthenticationFilter extends AbstractPreAuthenticatedProcessingF
         Optional<AuthToken> authToken = tokenService.findTokenByUserId(expectedUserId);
         if (authToken.isPresent()) {
             String encodedToken = authToken.get().getValue();
-            String rawToken = TokenParser.findTokenValue(authToken.get().getValue());
+            String rawToken = TokenParser.findTokenValue(token);
             if (encoder.matches(rawToken, encodedToken)) {
                 return encodedToken;
             }

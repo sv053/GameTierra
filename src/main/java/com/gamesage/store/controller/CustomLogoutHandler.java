@@ -12,7 +12,6 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Objects;
 import java.util.Optional;
 
 public class CustomLogoutHandler implements LogoutHandler {
@@ -29,9 +28,9 @@ public class CustomLogoutHandler implements LogoutHandler {
 	public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
 		String tokenFromHeader = request.getHeader(HeaderName.TOKEN_HEADER);
 
-		if (Objects.nonNull(tokenFromHeader) && StringUtils.hasText(tokenFromHeader)) {
+		if (StringUtils.hasText(tokenFromHeader)) {
 			Integer userId = TokenParser.findUserId(tokenFromHeader);
-			if (Objects.isNull(userId) || userId <= 0) {
+			if (userId <= 0) {
 				throw new WrongCredentialsException();
 			}
 			Optional<AuthToken> savedToken = tokenService.findTokenByUserId(userId);

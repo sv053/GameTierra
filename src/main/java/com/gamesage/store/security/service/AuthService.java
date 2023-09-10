@@ -32,13 +32,11 @@ public class AuthService {
         LocalDateTime localDateTime = LocalDateTime.now().plus(tokenExpiryInterval, ChronoUnit.DAYS);
         Integer savedUserId = userService.findByCredentials(user.getLogin(), user.getPassword()).getId();
         Optional<AuthToken> existedToken = tokenService.findTokenByUserId(savedUserId);
-        AuthToken tokenForHeader;
         if (existedToken.isPresent()) {
-            tokenForHeader = tokenService.updateToken(new AuthToken(generateToken(), savedUserId, localDateTime));
+            return tokenService.updateToken(new AuthToken(generateToken(), savedUserId, localDateTime));
         } else {
-            tokenForHeader = tokenService.createToken(new AuthToken(generateToken(), savedUserId, localDateTime));
+            return tokenService.createToken(new AuthToken(generateToken(), savedUserId, localDateTime));
         }
-        return tokenForHeader;
     }
 
     private String generateToken() {

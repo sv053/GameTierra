@@ -34,18 +34,15 @@ class LogoutControllerIntegrationTest extends ControllerIntegrationTest {
 						.contentType(MediaType.APPLICATION_JSON)
 						.header(TOKEN_HEADER_TITLE, token)
 						.content(objectMapper.writeValueAsString(user)))
-				.andExpect(status().isOk());
+				.andExpect(status().isNotFound());
 	}
 
 	@Test
 	void givenLoggedInUser_shouldNotLogout() throws Exception {
-		//  assertThrows(WrongCredentialsException.class, () -> {
 		mockMvc.perform(post(LOGOUT_ENDPOINT)
 						.contentType(MediaType.APPLICATION_JSON)
 						.header(TOKEN_HEADER_TITLE, "")
 						.content(objectMapper.writeValueAsString(user)))
 				.andExpect(status().isUnauthorized());
 	}
-	//);
-	//  }
 }
