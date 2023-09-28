@@ -41,8 +41,12 @@ public class AuthToken {
 		return value;
 	}
 
-	public AuthToken withTokenValue(Integer id, String tokenValue, Integer userId, LocalDateTime expirationDateTime) {
-		return new AuthToken(id, tokenValue, userId, expirationDateTime);
+	public AuthToken withTokenValue(AuthToken authToken, String tokenValue) {
+		return new AuthToken(
+				authToken.getId(),
+				tokenValue,
+				authToken.getUserId(),
+				authToken.getExpirationDateTime());
 	}
 
 	@Override

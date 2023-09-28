@@ -1,7 +1,6 @@
 package com.gamesage.store.util;
 
-import com.gamesage.store.exception.NoTokenHeaderException;
-import com.gamesage.store.exception.WrongCredentialsException;
+import com.gamesage.store.exception.NoTokenException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,7 +12,35 @@ class TokenParserTest {
 	void findUserId_EmptyInput_Exception() {
 		String empty = "";
 
-		assertThrows(NoTokenHeaderException.class, () -> TokenParser.findUserId(empty));
+		assertThrows(NoTokenException.class, () -> TokenParser.findUserId(empty));
+	}
+
+	@Test
+	void findUserId_EmptyButDelimiter_Exception() {
+		String empty = "&";
+
+		assertThrows(NoTokenException.class, () -> TokenParser.findUserId(empty));
+	}
+
+	@Test
+	void findUserId_ZeroInput_Exception() {
+		String empty = "0&eszrdgkuop";
+
+		assertThrows(NoTokenException.class, () -> TokenParser.findUserId(empty));
+	}
+
+	@Test
+	void findUserId_NegativeInput_Exception() {
+		String empty = "-111&eszrdgkuop";
+
+		assertThrows(NoTokenException.class, () -> TokenParser.findUserId(empty));
+	}
+
+	@Test
+	void findUserId_NaNInput_Exception() {
+		String empty = "cjkx_&eszrdgkuop";
+
+		assertThrows(NoTokenException.class, () -> TokenParser.findUserId(empty));
 	}
 
 	@Test
@@ -31,13 +58,13 @@ class TokenParserTest {
 		String expectedUserId = "wrongid";
 		String headerWithToken = expectedUserId + "&eszrdgkuop";
 
-		assertThrows(WrongCredentialsException.class, () -> TokenParser.findUserId(headerWithToken));
+		assertThrows(NoTokenException.class, () -> TokenParser.findUserId(headerWithToken));
 	}
 
 	@Test
 	void testFindUserIdWithInvalidHeader() {
 		String wrongFormatHeaderWithToken = "iuhiuiijo";
 
-		assertThrows(NoTokenHeaderException.class, () -> TokenParser.findUserId(wrongFormatHeaderWithToken));
+		assertThrows(NoTokenException.class, () -> TokenParser.findUserId(wrongFormatHeaderWithToken));
 	}
 }

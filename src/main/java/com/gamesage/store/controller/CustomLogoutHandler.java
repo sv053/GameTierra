@@ -1,7 +1,7 @@
 package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.AuthToken;
-import com.gamesage.store.exception.WrongCredentialsException;
+import com.gamesage.store.exception.NoTokenException;
 import com.gamesage.store.security.auth.HeaderName;
 import com.gamesage.store.security.service.AuthService;
 import com.gamesage.store.service.TokenService;
@@ -31,7 +31,7 @@ public class CustomLogoutHandler implements LogoutHandler {
 		if (StringUtils.hasText(tokenFromHeader)) {
 			Integer userId = TokenParser.findUserId(tokenFromHeader);
 			if (userId <= 0) {
-				throw new WrongCredentialsException();
+				throw new NoTokenException(tokenFromHeader);
 			}
 			Optional<AuthToken> savedToken = tokenService.findTokenByUserId(userId);
 			if (savedToken.isPresent()) {
@@ -39,10 +39,10 @@ public class CustomLogoutHandler implements LogoutHandler {
 				AuthToken authToken = new AuthToken(token, userId);
 				authService.revokeAccess(authToken);
 			} else {
-				throw new WrongCredentialsException();
+				throw new NoTokenException(tokenFromHeader);
 			}
 		} else {
-			throw new WrongCredentialsException();
+			throw new NoTokenException(tokenFromHeader);
 		}
 	}
 }

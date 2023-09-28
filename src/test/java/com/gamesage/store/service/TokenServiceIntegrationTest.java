@@ -4,17 +4,19 @@ import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.exception.WrongCredentialsException;
+import com.gamesage.store.logger.LoggerManager;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -32,8 +34,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-@PropertySource("classpath:application.properties")
+@TestPropertySource("classpath:application-test.properties")
 class TokenServiceIntegrationTest {
+
+	private static final Logger logger = LoggerManager.getLogger();
 
 	private final CountDownLatch latch = new CountDownLatch(1);
 	@Autowired
@@ -60,9 +64,11 @@ class TokenServiceIntegrationTest {
 		User savedUser = userService.createOne(userWithoutToken);
 		AuthToken tokenToCreate = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
 		AuthToken tokenToFind = tokenService.createToken(tokenToCreate);
-		AuthToken foundToken = tokenService.findTokenByUserId(tokenToFind.getUserId()).get();
-
-		assertTrue(encoder.matches(tokenToCreate.getValue(), foundToken.getValue()));
+		Optional<AuthToken> foundToken = tokenService.findTokenByUserId(tokenToFind.getUserId());
+		if (foundToken.isEmpty()) {
+			logger.error("#findByTokenValue_Success foundToken is empty");
+		}
+		assertTrue(encoder.matches(tokenToCreate.getValue(), foundToken.get().getValue()));
 	}
 
 	@Test
@@ -105,7 +111,6 @@ class TokenServiceIntegrationTest {
 			foundTokenValue = foundToken.get().getValue();
 		}
 
-		assert foundToken != null;
 		assertTrue(encoder.matches(token.getValue(), foundTokenValue));
 	}
 
@@ -145,11 +150,15 @@ class TokenServiceIntegrationTest {
 				3, "SILVER", 10.d), BigDecimal.TEN);
 		User savedUser = userService.createOne(user);
 		AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now().minus(100, ChronoUnit.DAYS));
-		tokenService.createToken(token);
+		AuthToken createdToken = tokenService.createToken(token);
+		logger.info("#expiredTokenRemoveScheduler foundToken has been created " + createdToken);
+
 		Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
 		String foundTokenValue = "";
 		if (foundToken.isPresent()) {
 			foundTokenValue = foundToken.get().getValue();
+		} else {
+			logger.error("#expiredTokenRemoveScheduler foundToken is empty");
 		}
 		assertTrue(encoder.matches(token.getValue(), foundTokenValue));
 
@@ -161,6 +170,7 @@ class TokenServiceIntegrationTest {
 		assertTrue(latch.await(10, TimeUnit.SECONDS));
 
 		assertEquals(Optional.empty(), tokenService.findTokenById(0));
+		logger.info("#expiredTokenRemoveScheduler foundToken has been removed " + tokenService.findTokenById(0));
 	}
 
 	@Test

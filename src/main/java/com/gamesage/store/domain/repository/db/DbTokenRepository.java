@@ -2,7 +2,6 @@ package com.gamesage.store.domain.repository.db;
 
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.repository.TokenRepository;
-import com.gamesage.store.util.TokenParser;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -29,8 +28,6 @@ public class DbTokenRepository implements TokenRepository {
 			" WHERE id = ? ";
 	private static final String INSERT_USER_TOKEN = "INSERT INTO token (token_value, user_id, expiration_date) " +
 			" VALUES (?, ?, ?) ";
-	private static final String UPDATE_TOKEN = "UPDATE token SET token_value = ? " +
-			"WHERE id = ?";
 	private static final String UPDATE_TOKEN_BY_USER_ID = "UPDATE token SET token_value = ? " +
 			"WHERE user_id = ?";
 	private static final String REMOVE_EXPIRED_TOKENS = "DELETE " +
@@ -101,15 +98,11 @@ public class DbTokenRepository implements TokenRepository {
 	}
 
 	@Override
-	public AuthToken updateByUserId(AuthToken authToken) {
+	public AuthToken updateByUserId(AuthToken authToken, Integer userId) {
 		jdbcTemplate.update(UPDATE_TOKEN_BY_USER_ID
 				, authToken.getValue()
-				, authToken.getUserId());
-		return new AuthToken(
-				authToken.getId(),
-				authToken.getUserId() + TokenParser.DELIMITER,
-				authToken.getUserId(),
-				authToken.getExpirationDateTime());
+				, userId);
+		return authToken;
 	}
 
 	@Override

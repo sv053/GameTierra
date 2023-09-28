@@ -47,16 +47,6 @@ class CustomLogoutHandlerTest {
 		when(tokenService.invalidateToken(new AuthToken(invalidToken, userId)))
 				.thenThrow(new WrongCredentialsException());
 
-		CustomLogoutHandler customLogoutHandler = new CustomLogoutHandler(authService, tokenService);
-//		try {
-//			customLogoutHandler.logout(request, response, authentication);
-//			//fail("Expected WrongCredentialsException to be thrown");
-//		} catch (WrongCredentialsException e) {
-//			// Expected exception
-//		}
-//		assertThrows(WrongCredentialsException.class,
-//				() -> customLogoutHandler.logout(request, response, null));
 		verify(authService, never()).revokeAccess(any(AuthToken.class));
-
 	}
 }
