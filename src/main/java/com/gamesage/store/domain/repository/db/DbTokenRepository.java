@@ -28,7 +28,7 @@ public class DbTokenRepository implements TokenRepository {
 			" WHERE id = ? ";
 	private static final String INSERT_USER_TOKEN = "INSERT INTO token (token_value, user_id, expiration_date) " +
 			" VALUES (?, ?, ?) ";
-	private static final String UPDATE_TOKEN_BY_USER_ID = "UPDATE token SET token_value = ? " +
+	private static final String UPDATE_TOKEN_BY_USER_ID = "UPDATE token SET token_value = ?, expiration_date = ? " +
 			"WHERE user_id = ?";
 	private static final String REMOVE_EXPIRED_TOKENS = "DELETE " +
 			" FROM token " +
@@ -101,6 +101,7 @@ public class DbTokenRepository implements TokenRepository {
 	public AuthToken updateByUserId(AuthToken authToken, Integer userId) {
 		jdbcTemplate.update(UPDATE_TOKEN_BY_USER_ID
 				, authToken.getValue()
+				, Timestamp.valueOf(authToken.getExpirationDateTime())
 				, userId);
 		return authToken;
 	}
