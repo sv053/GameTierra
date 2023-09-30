@@ -46,40 +46,46 @@ class TokenServiceIntegrationTest {
 	private TokenCleanupService tokenCleanupService;
 	@Autowired
 	private UserService userService;
-	@Autowired
-	private BCryptPasswordEncoder encoder;
-	@Autowired
-	private TaskScheduler taskScheduler;
-	@Autowired
-	private ScheduledTaskHolder scheduledTaskHolder;
-	@Autowired
-	private ApplicationContext applicationContext;
-	@Value("${com.gamesage.store.cleanup}")
-	private String cleanupCronExpression;
+@Autowired
+private BCryptPasswordEncoder encoder;
+@Autowired
+private TaskScheduler taskScheduler;
+@Autowired
+private ScheduledTaskHolder scheduledTaskHolder;
+@Autowired
+private ApplicationContext applicationContext;
+@Value("${com.gamesage.store.cleanup}")
+private String cleanupCronExpression;
+@Value("${com.gamesage.store.tokenExpiryInterval}")
+private int tokenExpiryInterval;
 
-	@Test
-	void findByTokenValue_Success() {
-		User userWithoutToken = new User(null, "user1", "lerida", new Tier(
-				3, "SILVER", 10.d), BigDecimal.TEN);
-		User savedUser = userService.createOne(userWithoutToken);
-		AuthToken tokenToCreate = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
-		AuthToken tokenToFind = tokenService.createToken(tokenToCreate);
-		Optional<AuthToken> foundToken = tokenService.findTokenByUserId(tokenToFind.getUserId());
-		if (foundToken.isEmpty()) {
-			logger.error("#findByTokenValue_Success foundToken is empty");
-		}
-		assertTrue(encoder.matches(tokenToCreate.getValue(), foundToken.get().getValue()));
-	}
+@Test
+void findByTokenValue_Success() {
+    User userWithoutToken = new User(null, "user1", "lerida", new Tier(
+        3, "SILVER", 10.d), BigDecimal.TEN);
+    User savedUser = userService.createOne(userWithoutToken);
+    AuthToken tokenToCreate = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
+    AuthToken tokenToFind = tokenService.createToken(tokenToCreate);
+    Optional<AuthToken> foundToken = tokenService.findTokenByUserId(tokenToFind.getUserId());
+    String fountTokenValue = "";
+    if (foundToken.isEmpty()) {
+        logger.error("#findByTokenValue_Success foundToken is empty");
+    } else {
+        fountTokenValue = foundToken.get().getValue();
+    }
+    assertNotNull(foundToken);
+    assertTrue(encoder.matches(tokenToCreate.getValue(), fountTokenValue));
+}
 
-	@Test
-	void findByUserId_Success() {
-		User userWithoutToken = new User(null, "user111", "lerida", new Tier(
-				3, "SILVER", 10.d), BigDecimal.TEN);
-		User savedUser = userService.createOne(userWithoutToken);
-		AuthToken token = new AuthToken(1, "ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
-		tokenService.createToken(token);
-		Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
-		String foundTokenValue = "";
+@Test
+void findByUserId_Success() {
+    User userWithoutToken = new User(null, "user111", "lerida", new Tier(
+        3, "SILVER", 10.d), BigDecimal.TEN);
+    User savedUser = userService.createOne(userWithoutToken);
+    AuthToken token = new AuthToken(1, "ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
+    tokenService.createToken(token);
+    Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
+    String foundTokenValue = "";
 		if (foundToken.isPresent()) {
 			foundTokenValue = foundToken.get().getValue();
 		}
@@ -114,24 +120,6 @@ class TokenServiceIntegrationTest {
 		assertTrue(encoder.matches(token.getValue(), foundTokenValue));
 	}
 
-	@Test
-	void removeExpiredTokens_Success() {
-		User user = new User(null, "agamer", "lerida", new Tier(
-				3, "SILVER", 10.d), BigDecimal.TEN);
-		User savedUser = userService.createOne(user);
-		AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now().minus(100, ChronoUnit.DAYS));
-		tokenService.createToken(token);
-		Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
-		String foundTokenValue = "";
-		if (foundToken.isPresent()) {
-			foundTokenValue = foundToken.get().getValue();
-		}
-		assertTrue(encoder.matches(token.getValue(), foundTokenValue));
-
-		tokenCleanupService.removeExpiredTokens();
-
-		assertEquals(Optional.empty(), tokenService.findTokenById(0));
-	}
 
 	@Test
 	void removeExpiredTokensScheduler_Success() {
@@ -163,36 +151,68 @@ class TokenServiceIntegrationTest {
 		assertTrue(encoder.matches(token.getValue(), foundTokenValue));
 
 		taskScheduler.schedule(() -> {
-			tokenCleanupService.removeExpiredTokens();
-			latch.countDown();
-		}, new Date(System.currentTimeMillis() + 5000));
+            tokenCleanupService.removeExpiredTokens();
+            latch.countDown();
+        }, new Date(System.currentTimeMillis() + 5000));
 
-		assertTrue(latch.await(10, TimeUnit.SECONDS));
+        assertTrue(latch.await(10, TimeUnit.SECONDS));
 
-		assertEquals(Optional.empty(), tokenService.findTokenById(0));
-		logger.info("#expiredTokenRemoveScheduler foundToken has been removed " + tokenService.findTokenById(0));
-	}
+        assertEquals(Optional.empty(), tokenService.findTokenById(0));
+        logger.info("#expiredTokenRemoveScheduler foundToken has been removed " + tokenService.findTokenById(0));
+    }
 
-	@Test
-	public void expiredTokenRemoveScheduler_tooEarlyToRemoveToken() throws InterruptedException {
-		User user = new User(null, "agamer", "lerida", new Tier(
-				3, "SILVER", 10.d), BigDecimal.TEN);
-		User savedUser = userService.createOne(user);
-		AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now().plus(100, ChronoUnit.DAYS));
-		tokenService.createToken(token);
-		Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
-		String foundTokenValue = "";
-		if (foundToken.isPresent()) {
-			foundTokenValue = foundToken.get().getValue();
-		}
-		taskScheduler.schedule(() -> {
-			tokenCleanupService.removeExpiredTokens();
-			latch.countDown();
-		}, new Date(System.currentTimeMillis() + 1000));
+@Test
+void removeExpiredTokens_Success() {
+    User user = new User(null, "agamer", "lerida", new Tier(
+        3, "SILVER", 10.d), BigDecimal.TEN);
+    User savedUser = userService.createOne(user);
+    LocalDateTime localDateTime = LocalDateTime.now().minus(tokenExpiryInterval, ChronoUnit.DAYS);
 
-		assertTrue(latch.await(10, TimeUnit.SECONDS));
-		assertNotNull(tokenService.findTokenById(0));
-		assertTrue(encoder.matches(token.getValue(), foundTokenValue));
-	}
+    AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), localDateTime);
+    tokenService.createToken(token);
+    Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
+    String foundTokenValue = "";
+    if (foundToken.isPresent()) {
+        foundTokenValue = foundToken.get().getValue();
+    }
+    assertNotNull(tokenService.findTokenById(0));
+    assertFalse(foundTokenValue.isBlank());
+
+    assertTrue(encoder.matches(token.getValue(), foundTokenValue));
+
+    tokenCleanupService.removeExpiredTokens();
+
+    assertEquals(Optional.empty(), tokenService.findTokenById(0));
+}
+
+@Test
+public void expiredTokenRemoveScheduler_tooEarlyToRemoveToken() {
+    User user = new User(null, "agamer", "lerida", new Tier(
+        3, "SILVER", 10.d), BigDecimal.TEN);
+    User savedUser = userService.createOne(user);
+    int userId = savedUser.getId();
+    LocalDateTime localDateTime = LocalDateTime.now().plus(tokenExpiryInterval, ChronoUnit.DAYS);
+    AuthToken token = new AuthToken("ftyzrdtcfjyiuh", userId, localDateTime);
+    tokenService.createToken(token);
+    Optional<AuthToken> foundTokenBeforeRemoving = tokenService.findTokenByUserId(userId);
+    String foundTokenValueBeforeRemoving = "";
+    if (foundTokenBeforeRemoving.isPresent()) {
+        foundTokenValueBeforeRemoving = foundTokenBeforeRemoving.get().getValue();
+    }
+    assertFalse(foundTokenValueBeforeRemoving.isBlank());
+    assertTrue(encoder.matches(token.getValue(), foundTokenValueBeforeRemoving));
+
+    tokenCleanupService.removeExpiredTokens();
+
+    Optional<AuthToken> foundTokenAfterRemoving = tokenService.findTokenByUserId(userId);
+
+    assertNotNull(foundTokenAfterRemoving);
+
+    String foundTokenValueAfterRemoving = "";
+    if (foundTokenBeforeRemoving.isPresent()) {
+        foundTokenValueAfterRemoving = foundTokenBeforeRemoving.get().getValue();
+    }
+    assertTrue(encoder.matches(token.getValue(), foundTokenValueAfterRemoving));
+}
 }
 

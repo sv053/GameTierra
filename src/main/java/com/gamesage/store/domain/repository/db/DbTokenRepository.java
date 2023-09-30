@@ -108,7 +108,7 @@ public class DbTokenRepository implements TokenRepository {
 
 	@Override
 	public void removeExpired() {
-		jdbcTemplate.update(REMOVE_EXPIRED_TOKENS, LocalDateTime.now());
+		jdbcTemplate.update(REMOVE_EXPIRED_TOKENS, Timestamp.valueOf(LocalDateTime.now()));
 	}
 
 	@Override
