@@ -4,9 +4,9 @@ import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.exception.WrongCredentialsException;
-import com.gamesage.store.logger.LoggerManager;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestPropertySource("classpath:application-test.properties")
 class TokenServiceIntegrationTest {
 
-	private static final Logger logger = LoggerManager.getLogger();
+private static final Logger logger = LoggerFactory.getLogger(TokenServiceIntegrationTest.class);
 
 	private final CountDownLatch latch = new CountDownLatch(1);
 	@Autowired
