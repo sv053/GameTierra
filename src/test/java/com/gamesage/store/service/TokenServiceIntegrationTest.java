@@ -39,13 +39,13 @@ class TokenServiceIntegrationTest {
 
 private static final Logger logger = LoggerFactory.getLogger(TokenServiceIntegrationTest.class);
 
-	private final CountDownLatch latch = new CountDownLatch(1);
-	@Autowired
-	private TokenService tokenService;
-	@Autowired
-	private TokenCleanupService tokenCleanupService;
-	@Autowired
-	private UserService userService;
+private final CountDownLatch latch = new CountDownLatch(1);
+@Autowired
+private TokenService tokenService;
+@Autowired
+private TokenCleanupService tokenCleanupService;
+@Autowired
+private UserService userService;
 @Autowired
 private BCryptPasswordEncoder encoder;
 @Autowired
@@ -89,7 +89,6 @@ void findByUserId_Success() {
 		if (foundToken.isPresent()) {
 			foundTokenValue = foundToken.get().getValue();
 		}
-
 		assertTrue(foundToken.isPresent());
 		assertTrue(encoder.matches(token.getValue(), foundTokenValue));
 	}
@@ -116,7 +115,6 @@ void findByUserId_Success() {
 		if (foundToken.isPresent()) {
 			foundTokenValue = foundToken.get().getValue();
 		}
-
 		assertTrue(encoder.matches(token.getValue(), foundTokenValue));
 	}
 
@@ -177,7 +175,6 @@ void removeExpiredTokens_Success() {
     }
     assertNotNull(tokenService.findTokenById(0));
     assertFalse(foundTokenValue.isBlank());
-
     assertTrue(encoder.matches(token.getValue(), foundTokenValue));
 
     tokenCleanupService.removeExpiredTokens();
