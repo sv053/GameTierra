@@ -10,25 +10,25 @@ import java.util.List;
 @RequestMapping("/games")
 public class GameController {
 
-	private final GameService gameService;
+    private final GameService gameService;
 
-	public GameController(GameService gameService) {
-		this.gameService = gameService;
-	}
+    public GameController(GameService gameService) {
+        this.gameService = gameService;
+    }
 
-	@GetMapping("/{id}")
-	public Game findGameById(@PathVariable Integer id) {
-		return gameService.findById(id);
-	}
+    @GetMapping("/{id}")
+    public Game findGameById(@PathVariable Integer id) {
+        return gameService.findById(id);
+    }
 
-	@GetMapping
-	public List<Game> findAllGames() {
-		return gameService.findAll();
-	}
+    @GetMapping
+    public List<Game> findAllGames() {
+        return gameService.findAll();
+    }
 
-	@PostMapping
-	public List<Game> createGames(@RequestBody List<Game> gamesToSave) {
-		return gameService.createAll(gamesToSave);
-	}
+    @PostMapping
+    public List<Game> createGames(@RequestBody List<Game> gamesToSave) {
+        return gameService.createAll(gamesToSave);
+    }
 }
 

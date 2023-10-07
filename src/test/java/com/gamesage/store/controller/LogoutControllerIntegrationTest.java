@@ -13,35 +13,35 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class LogoutControllerIntegrationTest extends ControllerIntegrationTest {
 
-	protected static final String LOGOUT_ENDPOINT = "/logout";
-	private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
-	private String userJson;
-	private User user;
-	private String token;
+    protected static final String LOGOUT_ENDPOINT = "/logout";
+    private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
+    private String userJson;
+    private User user;
+    private String token;
 
-	@BeforeAll
-	void setup() throws Exception {
-		userJson = Files.readString(Path.of(userJsonResource.getURI()));
-		User userToSave = objectMapper.readValue(userJson, User.class);
-		user = userService.createOne(userToSave);
-		token = loginAndGetToken(userJson);
-	}
+    @BeforeAll
+    void setup() throws Exception {
+        userJson = Files.readString(Path.of(userJsonResource.getURI()));
+        User userToSave = objectMapper.readValue(userJson, User.class);
+        user = userService.createOne(userToSave);
+        token = loginAndGetToken(userJson);
+    }
 
-	@Test
-	void givenLoggedInUser_shouldLogout() throws Exception {
-		mockMvc.perform(post(LOGOUT_ENDPOINT)
-						.contentType(MediaType.APPLICATION_JSON)
-						.header(TOKEN_HEADER_TITLE, token)
-						.content(objectMapper.writeValueAsString(user)))
-				.andExpect(status().isForbidden());
-	}
+    @Test
+    void givenLoggedInUser_shouldLogout() throws Exception {
+        mockMvc.perform(post(LOGOUT_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(TOKEN_HEADER_TITLE, token)
+                        .content(objectMapper.writeValueAsString(user)))
+                .andExpect(status().isForbidden());
+    }
 
-	@Test
-	void givenLoggedInUser_shouldNotLogout() throws Exception {
-		mockMvc.perform(post(LOGOUT_ENDPOINT)
-						.contentType(MediaType.APPLICATION_JSON)
-						.header(TOKEN_HEADER_TITLE, "")
-						.content(objectMapper.writeValueAsString(user)))
-				.andExpect(status().isForbidden());
-	}
+    @Test
+    void givenLoggedInUser_shouldNotLogout() throws Exception {
+        mockMvc.perform(post(LOGOUT_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(TOKEN_HEADER_TITLE, "")
+                        .content(objectMapper.writeValueAsString(user)))
+                .andExpect(status().isForbidden());
+    }
 }

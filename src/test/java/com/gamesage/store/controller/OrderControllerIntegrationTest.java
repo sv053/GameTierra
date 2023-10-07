@@ -50,20 +50,20 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
 
     @Test
     void givenWrongCreds_shouldNotFindOrderById() throws Exception {
-	    int wrongId = -15;
-	    mockMvc.perform(get(ORDER_ID_ENDPOINT, wrongId)
-					    .header(TOKEN_HEADER_TITLE, WRONG_TOKEN_HEADER)
-					    .contentType(MediaType.APPLICATION_JSON))
-			    .andExpect(status().isForbidden());
+        int wrongId = -15;
+        mockMvc.perform(get(ORDER_ID_ENDPOINT, wrongId)
+                        .header(TOKEN_HEADER_TITLE, WRONG_TOKEN_HEADER)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
-	@Test
-	void givenUnknownUser_shouldNotFindOrderById() throws Exception {
-		int wrongId = -15;
-		mockMvc.perform(get(ORDER_ID_ENDPOINT, wrongId)
-						.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isForbidden());
-	}
+    @Test
+    void givenUnknownUser_shouldNotFindOrderById() throws Exception {
+        int wrongId = -15;
+        mockMvc.perform(get(ORDER_ID_ENDPOINT, wrongId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
 
     @Test
     void givenRightCreds_shouldFindAllOrders() throws Exception {

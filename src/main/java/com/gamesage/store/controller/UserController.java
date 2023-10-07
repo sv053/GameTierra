@@ -13,30 +13,30 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-	private final UserService userService;
+    private final UserService userService;
 
-	public UserController(UserService userService) {
-		this.userService = userService;
-	}
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
-	@GetMapping("/{id}")
-	public User findUserById(@PathVariable Integer id) {
-		return userService.findById(id);
-	}
+    @GetMapping("/{id}")
+    public User findUserById(@PathVariable Integer id) {
+        return userService.findById(id);
+    }
 
-	@GetMapping
-	public List<User> findAllUsers() {
-		return userService.findAll();
-	}
+    @GetMapping
+    public List<User> findAllUsers() {
+        return userService.findAll();
+    }
 
-	@PostMapping
-	public User createOne(@RequestBody User user) {
-		return userService.createOne(user);
-	}
+    @PostMapping
+    public User createOne(@RequestBody User user) {
+        return userService.createOne(user);
+    }
 
-	@PostMapping("/{id}/topup")
-	public PaymentResponse tryTopUp(@PathVariable int id, @Valid @RequestBody PaymentRequest paymentRequest) {
-		return userService.topUpBalance(paymentRequest, id);
-	}
+    @PostMapping("/{id}/topup")
+    public PaymentResponse tryTopUp(@PathVariable int id, @Valid @RequestBody PaymentRequest paymentRequest) {
+        return userService.topUpBalance(paymentRequest, id);
+    }
 }
 

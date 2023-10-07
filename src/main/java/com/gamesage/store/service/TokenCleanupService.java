@@ -9,18 +9,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class TokenCleanupService {
 
-	private static final Logger logger = LoggerFactory.getLogger(TokenCleanupService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TokenCleanupService.class);
 
-	private final TokenRepository tokenRepository;
+    private final TokenRepository tokenRepository;
 
-	public TokenCleanupService(TokenRepository tokenRepository) {
-		this.tokenRepository = tokenRepository;
-	}
+    public TokenCleanupService(TokenRepository tokenRepository) {
+        this.tokenRepository = tokenRepository;
+    }
 
-	@Scheduled(cron = "${com.gamesage.store.cleanup}")
-	public void removeExpiredTokens() {
-		logger.debug("#removeExpiredTokens started");
-		tokenRepository.removeExpired();
-	}
+    @Scheduled(cron = "${com.gamesage.store.cleanup}")
+    public void removeExpiredTokens() {
+        logger.debug("#removeExpiredTokens started");
+        tokenRepository.removeExpired();
+    }
 }
 
