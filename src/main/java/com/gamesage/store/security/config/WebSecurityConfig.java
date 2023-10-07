@@ -24,23 +24,23 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	private final UserService userService;
-	private final FilterChainExceptionHandler exceptionHandler;
-	private final AuthService authService;
-	private final TokenService tokenService;
+    private final UserService userService;
+    private final FilterChainExceptionHandler exceptionHandler;
+    private final AuthService authService;
+    private final TokenService tokenService;
 
-	public WebSecurityConfig(UserService userService, FilterChainExceptionHandler exceptionHandler,
-	                         AuthService authService, TokenService tokenService) {
-		this.userService = userService;
-		this.exceptionHandler = exceptionHandler;
-		this.authService = authService;
-		this.tokenService = tokenService;
-	}
+    public WebSecurityConfig(UserService userService, FilterChainExceptionHandler exceptionHandler,
+                             AuthService authService, TokenService tokenService) {
+        this.userService = userService;
+        this.exceptionHandler = exceptionHandler;
+        this.authService = authService;
+        this.tokenService = tokenService;
+    }
 
-	@Override
-	public AuthenticationManager authenticationManagerBean() {
-		PreAuthenticatedAuthenticationProvider preAuthenticatedAuthProvider = new PreAuthenticatedAuthenticationProvider();
-		preAuthenticatedAuthProvider.setPreAuthenticatedUserDetailsService(userService);
+    @Override
+    public AuthenticationManager authenticationManagerBean() {
+        PreAuthenticatedAuthenticationProvider preAuthenticatedAuthProvider = new PreAuthenticatedAuthenticationProvider();
+        preAuthenticatedAuthProvider.setPreAuthenticatedUserDetailsService(userService);
         return new ProviderManager(preAuthenticatedAuthProvider);
     }
 
@@ -53,7 +53,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public LogoutHandler customLogoutHandler() {
-	    return new CustomLogoutHandler(authService, tokenService);
+        return new CustomLogoutHandler(authService, tokenService);
     }
 
     @Override

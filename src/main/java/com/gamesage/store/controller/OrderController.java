@@ -11,25 +11,25 @@ import java.util.List;
 @RequestMapping("/cart")
 public class OrderController {
 
-	private final OrderService orderService;
+    private final OrderService orderService;
 
-	public OrderController(OrderService orderService) {
-		this.orderService = orderService;
-	}
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
-	@GetMapping("/{id}")
-	public Order findOrderById(@PathVariable Integer id) {
-		return orderService.findById(id);
-	}
+    @GetMapping("/{id}")
+    public Order findOrderById(@PathVariable Integer id) {
+        return orderService.findById(id);
+    }
 
-	@GetMapping
-	public List<Order> findAllOrders() {
-		return orderService.findAll();
-	}
+    @GetMapping
+    public List<Order> findAllOrders() {
+        return orderService.findAll();
+    }
 
-	@PostMapping("/{gameId}/{userId}")
-	public PurchaseIntent buyGame(@PathVariable Integer gameId, @PathVariable Integer userId) {
-		return orderService.buyGame(gameId, userId);
-	}
+    @PostMapping("/{gameId}/{userId}")
+    public PurchaseIntent buyGame(@PathVariable Integer gameId, @PathVariable Integer userId) {
+        return orderService.buyGame(gameId, userId);
+    }
 }
 

@@ -16,33 +16,33 @@ import java.util.Optional;
 
 public class CustomLogoutHandler implements LogoutHandler {
 
-	private final AuthService authService;
-	private final TokenService tokenService;
+    private final AuthService authService;
+    private final TokenService tokenService;
 
-	public CustomLogoutHandler(AuthService authService, TokenService tokenService) {
-		this.authService = authService;
-		this.tokenService = tokenService;
-	}
+    public CustomLogoutHandler(AuthService authService, TokenService tokenService) {
+        this.authService = authService;
+        this.tokenService = tokenService;
+    }
 
-	@Override
-	public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-		String tokenFromHeader = request.getHeader(HeaderName.TOKEN_HEADER);
+    @Override
+    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        String tokenFromHeader = request.getHeader(HeaderName.TOKEN_HEADER);
 
-		if (StringUtils.hasText(tokenFromHeader)) {
-			Integer userId = TokenParser.findUserId(tokenFromHeader);
-			if (userId <= 0) {
-				throw new NoTokenException(tokenFromHeader);
-			}
-			Optional<AuthToken> savedToken = tokenService.findTokenByUserId(userId);
-			if (savedToken.isPresent()) {
-				String token = TokenParser.findTokenValue(tokenFromHeader);
-				AuthToken authToken = new AuthToken(token, userId);
-				authService.revokeAccess(authToken);
-			} else {
-				throw new NoTokenException(tokenFromHeader);
-			}
-		} else {
-			throw new NoTokenException(tokenFromHeader);
-		}
-	}
+        if (StringUtils.hasText(tokenFromHeader)) {
+            Integer userId = TokenParser.findUserId(tokenFromHeader);
+            if (userId <= 0) {
+                throw new NoTokenException(tokenFromHeader);
+            }
+            Optional<AuthToken> savedToken = tokenService.findTokenByUserId(userId);
+            if (savedToken.isPresent()) {
+                String token = TokenParser.findTokenValue(tokenFromHeader);
+                AuthToken authToken = new AuthToken(token, userId);
+                authService.revokeAccess(authToken);
+            } else {
+                throw new NoTokenException(tokenFromHeader);
+            }
+        } else {
+            throw new NoTokenException(tokenFromHeader);
+        }
+    }
 }
