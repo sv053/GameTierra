@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -30,7 +29,7 @@ public class TokenService {
     }
 
     public Optional<AuthToken> findTokenByUserId(Integer userId) {
-        logger.info("findTokenByUserId# userId - " + userId);
+        logger.info(" userId - " + userId);
         if (0 >= userId) {
             throw new WrongCredentialsException();
         }
@@ -45,7 +44,7 @@ public class TokenService {
 
         AuthToken tokenHeader = new AuthToken(tokenValue, authToken.getUserId(), authToken.getExpirationDateTime())
             .withId(savedToken.getId());
-        logger.info("#createToken createdToken - " + tokenHeader);
+        logger.info(" createdToken - " + tokenHeader);
 
         return tokenHeader;
     }
@@ -69,16 +68,16 @@ public class TokenService {
     }
 
     public boolean invalidateToken(AuthToken authToken) {
-        logger.info(LocalDateTime.now() + " TokenService#invalidateToken : check token " + authToken);
+        logger.info(" : check token " + authToken);
 
         Optional<AuthToken> tokenFromDatabase = findTokenByUserId(authToken.getUserId());
         if (tokenFromDatabase.isPresent()) {
-            logger.info("#invalidateToken : token exists in db " + authToken);
+            logger.info(" : token exists in db " + authToken);
 
             AuthToken existedToken = tokenFromDatabase.get();
             String tokenToInvalidate = TokenParser.findTokenValue(authToken.getValue());
             if (matchTokens(authToken, existedToken)) {
-                logger.info("#invalidateToken token was invalidated : " + tokenToInvalidate);
+                logger.info(" token was invalidated : " + tokenToInvalidate);
 
                 return tokenRepository.removeByUserId(authToken.getUserId());
             }

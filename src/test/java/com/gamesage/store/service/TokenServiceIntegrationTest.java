@@ -137,14 +137,14 @@ void findByUserId_Success() {
 		User savedUser = userService.createOne(user);
 		AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now().minus(100, ChronoUnit.DAYS));
 		AuthToken createdToken = tokenService.createToken(token);
-		logger.info("#expiredTokenRemoveScheduler foundToken has been created " + createdToken);
+		logger.info(" foundToken has been created " + createdToken);
 
 		Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
 		String foundTokenValue = "";
 		if (foundToken.isPresent()) {
 			foundTokenValue = foundToken.get().getValue();
 		} else {
-			logger.error("#expiredTokenRemoveScheduler foundToken is empty");
+            logger.error(" foundToken is empty");
 		}
 		assertTrue(encoder.matches(token.getValue(), foundTokenValue));
 
@@ -156,7 +156,7 @@ void findByUserId_Success() {
         assertTrue(latch.await(10, TimeUnit.SECONDS));
 
         assertEquals(Optional.empty(), tokenService.findTokenById(0));
-        logger.info("#expiredTokenRemoveScheduler foundToken has been removed " + tokenService.findTokenById(0));
+        logger.info(" foundToken has been removed " + tokenService.findTokenById(0));
     }
 
 @Test
