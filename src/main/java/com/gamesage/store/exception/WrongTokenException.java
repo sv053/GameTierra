@@ -10,3 +10,4 @@ public class WrongTokenException extends RuntimeException {
 		super(String.format("Token does not meet requirements %s ___", header));
 	}
 }
+

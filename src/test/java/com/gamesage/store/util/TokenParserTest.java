@@ -68,3 +68,4 @@ class TokenParserTest {
         assertThrows(WrongTokenException.class, () -> TokenParser.findUserId(wrongFormatHeaderWithToken));
     }
 }
+
