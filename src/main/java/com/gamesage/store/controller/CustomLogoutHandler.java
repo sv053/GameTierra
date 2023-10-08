@@ -27,14 +27,14 @@ public class CustomLogoutHandler implements LogoutHandler {
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         String tokenFromHeader = request.getHeader(HeaderName.TOKEN_HEADER);
 
-            Integer userId = TokenParser.findUserId(tokenFromHeader);
-            Optional<AuthToken> savedToken = tokenService.findTokenByUserId(userId);
-            if (savedToken.isPresent()) {
-                String token = TokenParser.findTokenValue(tokenFromHeader);
-                AuthToken authToken = new AuthToken(token, userId);
-                authService.revokeAccess(authToken);
+        Integer userId = TokenParser.findUserId(tokenFromHeader);
+        Optional<AuthToken> savedToken = tokenService.findTokenByUserId(userId);
+        if (savedToken.isPresent()) {
+            String token = TokenParser.findTokenValue(tokenFromHeader);
+            AuthToken authToken = new AuthToken(token, userId);
+            authService.revokeAccess(authToken);
         } else {
-                throw new WrongTokenException(tokenFromHeader);
+            throw new WrongTokenException(tokenFromHeader);
         }
     }
 }
