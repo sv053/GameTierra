@@ -5,12 +5,10 @@ import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.Order;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.OrderService;
-import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -70,23 +68,14 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
         orderService.buyGame(game.getId(), user.getId());
         orderService.buyGame(savedGames.get(1).getId(), user.getId());
 
-        MvcResult result = mockMvc.perform(get(API_ORDER_ENDPOINT)
-                        .header(TOKEN_HEADER_TITLE, token)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                //  .andExpect(jsonPath("$.*.game"))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        System.out.println(jsonResponse);
-
-// Проверка значения jsonPath
-        JsonPath jsonPath = JsonPath.compile("$.*.game.name");
-        List<String> gameNames = jsonPath.read(jsonResponse);
-        System.out.println(gameNames);
-//                .andExpect(jsonPath("$.*.game.name", containsInAnyOrder(
-//                        game.getName(), savedGames.get(1).getName())))
-//                .andExpect(jsonPath("$.*.user.login").isNotEmpty());
+        var v = mockMvc.perform(get(API_ORDER_ENDPOINT)
+                .header(TOKEN_HEADER_TITLE, token)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].user.login").value(user.getLogin()))
+            .andExpect(jsonPath("$[0].user.id").value(user.getId()))
+            .andExpect(jsonPath("$[0].game.name").value(game.getName()))
+            .andExpect(jsonPath("$[0].game.id").value(game.getId()));
     }
 
     @Test
