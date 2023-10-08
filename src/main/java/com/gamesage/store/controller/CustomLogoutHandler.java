@@ -1,7 +1,7 @@
 package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.AuthToken;
-import com.gamesage.store.exception.NoTokenException;
+import com.gamesage.store.exception.WrongTokenException;
 import com.gamesage.store.security.auth.HeaderName;
 import com.gamesage.store.security.service.AuthService;
 import com.gamesage.store.service.TokenService;
@@ -34,7 +34,7 @@ public class CustomLogoutHandler implements LogoutHandler {
                 AuthToken authToken = new AuthToken(token, userId);
                 authService.revokeAccess(authToken);
         } else {
-            throw new NoTokenException(tokenFromHeader);
+                throw new WrongTokenException(tokenFromHeader);
         }
     }
 }
