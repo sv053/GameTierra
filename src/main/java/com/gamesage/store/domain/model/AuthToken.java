@@ -31,15 +31,15 @@ public AuthToken(Integer id, String tokenValue, Integer userId, LocalDateTime ex
     this.value = tokenValue;
     this.userId = userId;
     this.expirationDateTime = expirationDateTime;
-    }
+}
 
-    public Integer getId() {
-        return id;
-    }
+public Integer getId() {
+    return id;
+}
 
-    public LocalDateTime getExpirationDateTime() {
-        return expirationDateTime;
-    }
+public LocalDateTime getExpirationDateTime() {
+    return expirationDateTime;
+}
 
 public Integer getUserId() {
     return userId;
@@ -66,15 +66,15 @@ public boolean equals(Object o) {
         && Objects.equals(value, thatToken.getValue());
 }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), value, userId, expirationDateTime);
-    }
+@Override
+public int hashCode() {
+    return Objects.hash(super.hashCode(), value, userId, expirationDateTime);
+}
 
-    @Override
-    public String toString() {
-        return "AuthToken{" +
-                ", id='" + id + '\'' +
+@Override
+public String toString() {
+    return "AuthToken{" +
+        ", id='" + id + '\'' +
                 ", token='" + value + '\'' +
                 ", userId=" + userId +
                 ", expirationDateTime=" + expirationDateTime +
