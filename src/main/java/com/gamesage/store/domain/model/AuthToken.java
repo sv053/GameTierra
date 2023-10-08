@@ -5,24 +5,32 @@ import java.util.Objects;
 
 public class AuthToken {
 
-    private final Integer id;
-    private final Integer userId;
-    private final String value;
-    private final LocalDateTime expirationDateTime;
+private final Integer id;
+private final Integer userId;
+private final String value;
+private final LocalDateTime expirationDateTime;
 
-    public AuthToken(String tokenValue, Integer userId) {
-        this(null, tokenValue, userId, null);
-    }
+public AuthToken(Integer userId) {
+    this(null, null, userId, null);
+}
 
-    public AuthToken(String tokenValue, Integer userId, LocalDateTime expirationDateTime) {
-        this(null, tokenValue, userId, expirationDateTime);
-    }
+public AuthToken(String tokenValue, Integer userId) {
+    this(null, tokenValue, userId, null);
+}
 
-    public AuthToken(Integer id, String tokenValue, Integer userId, LocalDateTime expirationDateTime) {
-        this.id = id;
-        this.value = tokenValue;
-        this.userId = userId;
-        this.expirationDateTime = expirationDateTime;
+public AuthToken(Integer userId, LocalDateTime expirationDateTime) {
+    this(null, userId, expirationDateTime);
+}
+
+public AuthToken(String tokenValue, Integer userId, LocalDateTime expirationDateTime) {
+    this(null, tokenValue, userId, expirationDateTime);
+}
+
+public AuthToken(Integer id, String tokenValue, Integer userId, LocalDateTime expirationDateTime) {
+    this.id = id;
+    this.value = tokenValue;
+    this.userId = userId;
+    this.expirationDateTime = expirationDateTime;
     }
 
     public Integer getId() {
@@ -33,30 +41,30 @@ public class AuthToken {
         return expirationDateTime;
     }
 
-    public Integer getUserId() {
-        return userId;
-    }
+public Integer getUserId() {
+    return userId;
+}
 
-    public String getValue() {
-        return value;
-    }
+public String getValue() {
+    return value;
+}
 
-    public AuthToken withTokenValue(AuthToken authToken, String tokenValue) {
-        return new AuthToken(
-                authToken.getId(),
-                tokenValue,
-                authToken.getUserId(),
-                authToken.getExpirationDateTime());
-    }
+public AuthToken withTokenValue(String token) {
+    return new AuthToken(token, userId, expirationDateTime);
+}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AuthToken thatToken = (AuthToken) o;
-        return Objects.equals(userId, thatToken.getUserId())
-                && Objects.equals(value, thatToken.getValue());
-    }
+public AuthToken withId(Integer tokenId) {
+    return new AuthToken(tokenId, value, userId, expirationDateTime);
+}
+
+@Override
+public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    AuthToken thatToken = (AuthToken) o;
+    return Objects.equals(userId, thatToken.getUserId())
+        && Objects.equals(value, thatToken.getValue());
+}
 
     @Override
     public int hashCode() {

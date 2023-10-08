@@ -38,23 +38,26 @@ public class TokenService {
     }
 
     public AuthToken createToken(AuthToken authToken) {
-        AuthToken tokenToSave = authToken.withTokenValue(authToken, encoder.encode(authToken.getValue()));
+        AuthToken tokenToSave = new AuthToken(authToken.getUserId(), authToken.getExpirationDateTime())
+            .withTokenValue(encoder.encode(authToken.getValue()));
         AuthToken savedToken = tokenRepository.createOne(tokenToSave);
-        int userId = savedToken.getUserId();
-        String tokenValue = TokenParser.prepareHeader(authToken.getValue(), userId);
+        String tokenValue = TokenParser.prepareHeader(authToken.getValue(), savedToken.getUserId());
 
-        AuthToken tokenHeader = authToken.withTokenValue(authToken, tokenValue);
+        AuthToken tokenHeader = new AuthToken(tokenValue, authToken.getUserId(), authToken.getExpirationDateTime())
+            .withId(savedToken.getId());
         logger.info("#createToken createdToken - " + tokenHeader);
 
         return tokenHeader;
     }
 
     public AuthToken updateTokenAndReturnHeader(AuthToken authToken) {
-        AuthToken tokenWithEncodedValue = authToken.withTokenValue(authToken, encoder.encode(authToken.getValue()));
+        AuthToken tokenWithEncodedValue = new AuthToken(authToken.getUserId())
+            .withTokenValue(encoder.encode(authToken.getValue()));
         tokenRepository.updateByUserId(tokenWithEncodedValue, authToken.getUserId());
 
         String tokenHeader = TokenParser.prepareHeader(authToken.getValue(), authToken.getUserId());
-        return authToken.withTokenValue(authToken, tokenHeader);
+        return new AuthToken(authToken.getUserId())
+            .withTokenValue(tokenHeader);
     }
 
     public boolean matchTokens(AuthToken tokenFromUser, AuthToken existedToken) {
