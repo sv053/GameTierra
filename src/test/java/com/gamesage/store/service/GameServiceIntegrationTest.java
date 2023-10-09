@@ -41,15 +41,15 @@ class GameServiceIntegrationTest {
     @Test
     void createAGame_Success() {
         assertAll(
-                () -> assertTrue(gameService.findAll().contains(game)),
-                () -> assertNotNull(game.getId()));
+            () -> assertTrue(gameService.findAll().contains(game)),
+            () -> assertNotNull(game.getId()));
     }
 
     @Test
     void createGames_Success() {
         List<Game> games = List.of(
-                new Game("Detroit: Become Humano", BigDecimal.TEN),
-                new Game("Detroit: Become Androido", BigDecimal.TEN));
+            new Game("Detroit: Become Humano", BigDecimal.TEN),
+            new Game("Detroit: Become Androido", BigDecimal.TEN));
 
         List<Game> createdGames = gameService.createAll(games);
         List<Game> retrievedGames = gameService.findAll();

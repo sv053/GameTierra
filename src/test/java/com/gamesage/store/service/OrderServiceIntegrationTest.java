@@ -32,7 +32,7 @@ class OrderServiceIntegrationTest {
     @BeforeEach
     void init() {
         User userToCreate = new User(null, "aqua", "marina", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN);
+            3, "SILVER", 10.d), BigDecimal.TEN);
         user = userService.createOne(userToCreate);
         game = gameService.createOne(new Game("future in the past", BigDecimal.TEN));
     }
@@ -51,21 +51,21 @@ class OrderServiceIntegrationTest {
     void buyGame_Success() {
         LocalDateTime beforeDateTime = LocalDateTime.now();
         PurchaseIntent expectedPurchase =
-                new PurchaseIntent
-                        .Builder(game)
-                        .gameIsBought(true)
-                        .buyer(user)
-                        .message(PurchaseIntent.PurchaseMessage.PURCHASE_SUCCESSFUL)
-                        .orderDateTime(beforeDateTime)
-                        .build();
+            new PurchaseIntent
+                .Builder(game)
+                .gameIsBought(true)
+                .buyer(user)
+                .message(PurchaseIntent.PurchaseMessage.PURCHASE_SUCCESSFUL)
+                .orderDateTime(beforeDateTime)
+                .build();
         PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
 
         assertAll(
-                () -> assertTrue(result.isBought()),
-                () -> assertEquals(expectedPurchase.getBuyer(), result.getBuyer()),
-                () -> assertEquals(expectedPurchase.getTargetGame(), result.getTargetGame()),
-                () -> assertEquals(expectedPurchase.getMessage(), result.getMessage()),
-                () -> assertBetweenTimePoints(beforeDateTime, result.getOrderDateTime())
+            () -> assertTrue(result.isBought()),
+            () -> assertEquals(expectedPurchase.getBuyer(), result.getBuyer()),
+            () -> assertEquals(expectedPurchase.getTargetGame(), result.getTargetGame()),
+            () -> assertEquals(expectedPurchase.getMessage(), result.getMessage()),
+            () -> assertBetweenTimePoints(beforeDateTime, result.getOrderDateTime())
         );
     }
 
@@ -79,13 +79,13 @@ class OrderServiceIntegrationTest {
     @Test
     void buyGame_targetGameIsCorrect_Success() {
         PurchaseIntent expectedPurchase =
-                new PurchaseIntent
-                        .Builder(game)
-                        .gameIsBought(true)
-                        .buyer(user)
-                        .message(PurchaseIntent.PurchaseMessage.PURCHASE_SUCCESSFUL)
-                        .orderDateTime(LocalDateTime.now())
-                        .build();
+            new PurchaseIntent
+                .Builder(game)
+                .gameIsBought(true)
+                .buyer(user)
+                .message(PurchaseIntent.PurchaseMessage.PURCHASE_SUCCESSFUL)
+                .orderDateTime(LocalDateTime.now())
+                .build();
         PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
 
         assertEquals(expectedPurchase.getTargetGame(), result.getTargetGame());
@@ -94,13 +94,13 @@ class OrderServiceIntegrationTest {
     @Test
     void buyGame_BuyerIsCorrect_Success() {
         PurchaseIntent expectedPurchase =
-                new PurchaseIntent
-                        .Builder(game)
-                        .gameIsBought(true)
-                        .buyer(user)
-                        .message(PurchaseIntent.PurchaseMessage.PURCHASE_SUCCESSFUL)
-                        .orderDateTime(LocalDateTime.now())
-                        .build();
+            new PurchaseIntent
+                .Builder(game)
+                .gameIsBought(true)
+                .buyer(user)
+                .message(PurchaseIntent.PurchaseMessage.PURCHASE_SUCCESSFUL)
+                .orderDateTime(LocalDateTime.now())
+                .build();
         PurchaseIntent result = orderService.buyGame(game.getId(), user.getId());
 
         assertEquals(expectedPurchase.getBuyer(), result.getBuyer());
@@ -117,8 +117,8 @@ class OrderServiceIntegrationTest {
     void assertBetweenTimePoints(LocalDateTime initDateTime, LocalDateTime orderDateTime) {
         LocalDateTime afterOrderDateTime = LocalDateTime.now();
         assertTrue(
-                (initDateTime.isBefore(orderDateTime) || initDateTime.isEqual(orderDateTime))
-                        && (orderDateTime.isBefore(afterOrderDateTime) || orderDateTime.isEqual(afterOrderDateTime))
+            (initDateTime.isBefore(orderDateTime) || initDateTime.isEqual(orderDateTime))
+                && (orderDateTime.isBefore(afterOrderDateTime) || orderDateTime.isEqual(afterOrderDateTime))
         );
     }
 }

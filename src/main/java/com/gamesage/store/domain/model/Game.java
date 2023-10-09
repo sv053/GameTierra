@@ -60,9 +60,9 @@ public class Game {
     @Override
     public String toString() {
         return "Game{" + "id='" + id
-                + '\'' + ", name='" + name
-                + '\'' + ", price=$" + price
-                + '}' + '\n';
+            + '\'' + ", name='" + name
+            + '\'' + ", price=$" + price
+            + '}' + '\n';
     }
 }
 

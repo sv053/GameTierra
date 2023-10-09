@@ -45,7 +45,7 @@ class CustomLogoutHandlerTest {
         when(request.getHeader(HeaderName.TOKEN_HEADER)).thenReturn(invalidToken);
         when(tokenService.findTokenByUserId(userId)).thenReturn(Optional.of(authToken));
         when(tokenService.invalidateToken(new AuthToken(invalidToken, userId)))
-                .thenThrow(new WrongCredentialsException());
+            .thenThrow(new WrongCredentialsException());
 
         verify(authService, never()).revokeAccess(any(AuthToken.class));
     }

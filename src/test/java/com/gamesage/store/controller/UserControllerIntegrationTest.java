@@ -37,8 +37,8 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
     @BeforeAll
     void setup() throws Exception {
         objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+            .registerModule(new JavaTimeModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         String userJson = Files.readString(Path.of(userJsonResource.getURI()));
         User userToCreate = objectMapper.readValue(userJson, User.class);
         user = userService.createOne(userToCreate);
@@ -48,23 +48,23 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
     @Test
     void givenAuthorizedUser_whenFindAllUsers_thenSuccess() throws Exception {
         User secondUser = new User(null, "second", "secondPass", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN);
+            3, "SILVER", 10.d), BigDecimal.TEN);
         User secondSavedUser = userService.createOne(secondUser);
 
         mockMvc.perform(MockMvcRequestBuilders.get(API_USER_ENDPOINT)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(TOKEN_HEADER_NAME, token))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isNotEmpty())
-                .andExpect(jsonPath("$[0].login").value(user.getLogin()))
-                .andExpect(jsonPath("$[1].login").value(secondUser.getLogin()));
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(TOKEN_HEADER_NAME, token))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isNotEmpty())
+            .andExpect(jsonPath("$[0].login").value(user.getLogin()))
+            .andExpect(jsonPath("$[1].login").value(secondUser.getLogin()));
     }
 
     @Test
     void givenUserWithoutToken_whenFindAllUsers_thenForbidden() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(API_USER_ENDPOINT)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
     }
 
     @Test
@@ -72,9 +72,9 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
         String wrongToken = "1" + DELIMITER + "cfgjgvuikhyvbfbu";
 
         mockMvc.perform(MockMvcRequestBuilders.get(API_USER_ENDPOINT)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(TOKEN_HEADER_NAME, wrongToken))
-                .andExpect(status().isForbidden());
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(TOKEN_HEADER_NAME, wrongToken))
+            .andExpect(status().isForbidden());
     }
 
     @Test
@@ -83,46 +83,46 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
         User userUnsaved = objectMapper.readValue(nonExistentUserJson, User.class);
 
         mockMvc.perform(post(API_USER_ENDPOINT)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(nonExistentUserJson))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.login").value(userUnsaved.getLogin()))
-                .andExpect(jsonPath("$.tier.level").value(userUnsaved.getTier().getLevel()))
-                .andExpect(jsonPath("$.tier.id").value(userUnsaved.getTier().getId()))
-                .andExpect(jsonPath("$.tier.cashbackPercentage").value(userUnsaved.getTier().getCashbackPercentage()));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(nonExistentUserJson))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.login").value(userUnsaved.getLogin()))
+            .andExpect(jsonPath("$.tier.level").value(userUnsaved.getTier().getLevel()))
+            .andExpect(jsonPath("$.tier.id").value(userUnsaved.getTier().getId()))
+            .andExpect(jsonPath("$.tier.cashbackPercentage").value(userUnsaved.getTier().getCashbackPercentage()));
     }
 
     @Test
     void givenUser_whenTryTopUp_thenFails() throws Exception {
         Card cardWithWrongNumber = new Card(156L,
-                "Jack Black",
-                LocalDate.of(2025, 3, 30),
-                111);
+            "Jack Black",
+            LocalDate.of(2025, 3, 30),
+            111);
         PaymentRequest errorPaymentRequest = new PaymentRequest(BigDecimal.ONE, cardWithWrongNumber);
 
         mockMvc.perform(post(TOPUP_ENDPOINT, user.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(errorPaymentRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.transactionId").isNotEmpty())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.responseError").value(ResponseError.INVALID_CARD_NUMBER.getCardErrorMessage()));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(errorPaymentRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.transactionId").isNotEmpty())
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.responseError").value(ResponseError.INVALID_CARD_NUMBER.getCardErrorMessage()));
     }
 
     @Test
     void givenUser_whenTryTopUp_thenSuccess() throws Exception {
         Card cardWithCorrectNumber = new Card(1567123425635896L,
-                "Jack Black",
-                LocalDate.of(2025, 3, 30),
-                111);
+            "Jack Black",
+            LocalDate.of(2025, 3, 30),
+            111);
         PaymentRequest okPaymentRequest = new PaymentRequest(BigDecimal.ONE, cardWithCorrectNumber);
         mockMvc.perform(post(TOPUP_ENDPOINT, user.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(okPaymentRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.transactionId").isNotEmpty())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.responseError").isEmpty());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(okPaymentRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.transactionId").isNotEmpty())
+            .andExpect(jsonPath("$.success").value(true))
+            .andExpect(jsonPath("$.responseError").isEmpty());
     }
 }
 

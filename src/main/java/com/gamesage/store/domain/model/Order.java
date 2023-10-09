@@ -53,9 +53,9 @@ public class Order {
         Order order = (Order) o;
 
         return Objects.equals(id, order.id)
-                && Objects.equals(user, order.user)
-                && Objects.equals(game, order.game)
-                && Objects.equals(dateTime, order.dateTime);
+            && Objects.equals(user, order.user)
+            && Objects.equals(game, order.game)
+            && Objects.equals(dateTime, order.dateTime);
     }
 
     @Override

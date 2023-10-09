@@ -49,10 +49,10 @@ public class PurchaseIntent {
         PurchaseIntent purchase = (PurchaseIntent) o;
 
         return Objects.equals(isBought, purchase.isBought())
-                && Objects.equals(purchaseMessage, purchase.getMessage())
-                && Objects.equals(targetGame, purchase.getTargetGame())
-                && Objects.equals(buyer, purchase.getBuyer())
-                && Objects.equals(orderDateTime, purchase.getOrderDateTime());
+            && Objects.equals(purchaseMessage, purchase.getMessage())
+            && Objects.equals(targetGame, purchase.getTargetGame())
+            && Objects.equals(buyer, purchase.getBuyer())
+            && Objects.equals(orderDateTime, purchase.getOrderDateTime());
     }
 
     @Override

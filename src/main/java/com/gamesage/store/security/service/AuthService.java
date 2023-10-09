@@ -35,7 +35,7 @@ public class AuthService {
         if (existedToken.isPresent()) {
             return tokenService.updateTokenAndReturnHeader(new AuthToken(generateToken(), savedUserId, localDateTime));
         }
-            return tokenService.createToken(new AuthToken(generateToken(), savedUserId, localDateTime));
+        return tokenService.createToken(new AuthToken(generateToken(), savedUserId, localDateTime));
     }
 
     private String generateToken() {

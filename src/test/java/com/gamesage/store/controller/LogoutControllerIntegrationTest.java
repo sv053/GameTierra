@@ -30,18 +30,18 @@ class LogoutControllerIntegrationTest extends ControllerIntegrationTest {
     @Test
     void givenLoggedInUser_shouldLogout() throws Exception {
         mockMvc.perform(post(LOGOUT_ENDPOINT)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(TOKEN_HEADER_TITLE, token)
-                        .content(objectMapper.writeValueAsString(user)))
-                .andExpect(status().isForbidden());
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(TOKEN_HEADER_TITLE, token)
+                .content(objectMapper.writeValueAsString(user)))
+            .andExpect(status().isForbidden());
     }
 
     @Test
     void givenLoggedInUser_shouldNotLogout() throws Exception {
         mockMvc.perform(post(LOGOUT_ENDPOINT)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(TOKEN_HEADER_TITLE, "")
-                        .content(objectMapper.writeValueAsString(user)))
-                .andExpect(status().isForbidden());
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(TOKEN_HEADER_TITLE, "")
+                .content(objectMapper.writeValueAsString(user)))
+            .andExpect(status().isForbidden());
     }
 }

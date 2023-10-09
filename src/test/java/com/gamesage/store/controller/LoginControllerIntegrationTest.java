@@ -42,9 +42,9 @@ class LoginControllerIntegrationTest extends ControllerIntegrationTest {
         String tokenWithoutUserId = TokenParser.findTokenValue(actualToken);
 
         String expectedToken = tokenService
-                .findTokenByUserId(savedUser.getId())
-                .map(AuthToken::getValue)
-                .orElseThrow(() -> new EntityNotFoundException("token for " + user.getLogin()));
+            .findTokenByUserId(savedUser.getId())
+            .map(AuthToken::getValue)
+            .orElseThrow(() -> new EntityNotFoundException("token for " + user.getLogin()));
 
         assertTrue(encoder.matches(tokenWithoutUserId, expectedToken));
     }
@@ -52,9 +52,9 @@ class LoginControllerIntegrationTest extends ControllerIntegrationTest {
     @Test
     void givenUserCredsDoNotExist_shouldNotLoginAndReturn401() throws Exception {
         mockMvc.perform(post(LOGIN_ENDPOINT)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user)))
-                .andExpect(status().isUnauthorized());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user)))
+            .andExpect(status().isUnauthorized());
     }
 }
 

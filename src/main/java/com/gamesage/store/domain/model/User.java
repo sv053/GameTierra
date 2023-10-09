@@ -114,13 +114,13 @@ public class User {
     @Override
     public String toString() {
         return "\nUser{"
-                + "id=" + id
-                + ", login=" + login
-                + ", tier=" + tier
-                + ", cashback=" + tier.getCashbackPercentage() * 100 + "%}"
-                + ", balance=$" + balance
-                + ", \ngames=\n" + getGames()
-                + '}';
+            + "id=" + id
+            + ", login=" + login
+            + ", tier=" + tier
+            + ", cashback=" + tier.getCashbackPercentage() * 100 + "%}"
+            + ", balance=$" + balance
+            + ", \ngames=\n" + getGames()
+            + '}';
     }
 }
 

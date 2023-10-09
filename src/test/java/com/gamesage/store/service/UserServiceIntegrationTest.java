@@ -30,7 +30,7 @@ class UserServiceIntegrationTest {
     @Test
     void findById_Success() {
         User user = new User(null, "aquamarina", "delmar", new Tier(
-                3, null, 10.d), BigDecimal.TEN);
+            3, null, 10.d), BigDecimal.TEN);
         User userToFind = userService.createOne(user);
         User foundUser = userService.findById(userToFind.getId());
 
@@ -46,11 +46,11 @@ class UserServiceIntegrationTest {
     void findAll_Success() {
         List<User> usersToAdd = new ArrayList<>();
         usersToAdd.add(userService.createOne(new User(null, "primero", "key1", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN)));
+            3, "SILVER", 10.d), BigDecimal.TEN)));
         usersToAdd.add(userService.createOne(new User(null, "segundo", "key2", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN)));
+            3, "SILVER", 10.d), BigDecimal.TEN)));
         usersToAdd.add(userService.createOne(new User(null, "tercero", "key3", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN)));
+            3, "SILVER", 10.d), BigDecimal.TEN)));
         List<User> users = userService.findAll();
 
         assertTrue(users.containsAll(usersToAdd));
@@ -59,19 +59,19 @@ class UserServiceIntegrationTest {
     @Test
     void createUser_Success() {
         User user = new User(null, "loco", "lerida", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN);
+            3, "SILVER", 10.d), BigDecimal.TEN);
         User addedUser = userService.createOne(user);
         List<User> users = userService.findAll();
         assertAll(
-                () -> assertTrue(users.contains(addedUser)),
-                () -> assertNotNull(addedUser.getId()));
+            () -> assertTrue(users.contains(addedUser)),
+            () -> assertNotNull(addedUser.getId()));
     }
 
     @Test
     void updateUserBalance_Success() {
         BigDecimal balance = BigDecimal.TEN;
         User user = userService.createOne(new User(null, "luara", "cuarto", new Tier(
-                3, "SILVER", 10.d), balance));
+            3, "SILVER", 10.d), balance));
         assertEquals(balance, user.getBalance());
 
         BigDecimal amount = BigDecimal.ONE;
@@ -87,9 +87,9 @@ class UserServiceIntegrationTest {
         int userId = 1;
         BigDecimal amount = BigDecimal.TEN;
         Card card = new Card(1111_2222_3333_4444L,
-                "TA IA",
-                LocalDate.of(LocalDate.now().getYear() + 1, 1, 1),
-                888);
+            "TA IA",
+            LocalDate.of(LocalDate.now().getYear() + 1, 1, 1),
+            888);
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
         assertThrows(EntityNotFoundException.class, () -> userService.topUpBalance(paymentRequest, userId));
     }
@@ -98,13 +98,13 @@ class UserServiceIntegrationTest {
     void topUpBalance_Success_RightUserId() {
         BigDecimal balance = BigDecimal.valueOf(10.d);
         User user = userService.createOne(new User(null, "lsla", "canaria", new Tier(
-                3, "SILVER", 10.d), balance));
+            3, "SILVER", 10.d), balance));
         BigDecimal amount = BigDecimal.valueOf(10.d);
 
         Card card = new Card(1111_2222_3333_4444L,
-                "TA IA",
-                LocalDate.of(LocalDate.now().getYear() + 1, 1, 1),
-                888);
+            "TA IA",
+            LocalDate.of(LocalDate.now().getYear() + 1, 1, 1),
+            888);
         PaymentRequest paymentRequest = new PaymentRequest(amount, card);
 
         userService.topUpBalance(paymentRequest, user.getId());
