@@ -37,47 +37,43 @@ public class TokenService {
     }
 
     public AuthToken createToken(AuthToken authToken) {
-        AuthToken tokenToSave = new AuthToken(authToken.getUserId(), authToken.getExpirationDateTime())
-            .withTokenValue(encoder.encode(authToken.getValue()));
+        AuthToken tokenToSave = authToken.withTokenValue(encoder.encode(authToken.getValue()));
         AuthToken savedToken = tokenRepository.createOne(tokenToSave);
         String tokenValue = TokenParser.prepareHeader(authToken.getValue(), savedToken.getUserId());
 
-        AuthToken tokenHeader = new AuthToken(tokenValue, authToken.getUserId(), authToken.getExpirationDateTime())
-            .withId(savedToken.getId());
-        logger.info(" createdToken - " + tokenHeader);
+        AuthToken tokenHeader = authToken.withTokenValue(tokenValue).withId(savedToken.getId());
+        logger.info(" token was created ");
 
         return tokenHeader;
     }
 
     public AuthToken updateTokenAndReturnHeader(AuthToken authToken) {
-        AuthToken tokenWithEncodedValue = new AuthToken(authToken.getUserId())
-            .withTokenValue(encoder.encode(authToken.getValue()));
+        AuthToken tokenWithEncodedValue = authToken.withTokenValue(encoder.encode(authToken.getValue()));
         tokenRepository.updateByUserId(tokenWithEncodedValue, authToken.getUserId());
 
         String tokenHeader = TokenParser.prepareHeader(authToken.getValue(), authToken.getUserId());
-        return new AuthToken(authToken.getUserId())
-            .withTokenValue(tokenHeader);
+        return authToken.withTokenValue(tokenHeader);
     }
 
     public boolean matchTokens(AuthToken tokenFromUser, AuthToken existedToken) {
         boolean ifMatches = encoder.matches(tokenFromUser.getValue(), existedToken.getValue());
         if (ifMatches) {
-            logger.warn(" #matchTokens tokens do not match: " + tokenFromUser + " | " + existedToken);
+            logger.warn(" tokens do not match ");
         }
         return ifMatches;
     }
 
     public boolean invalidateToken(AuthToken authToken) {
-        logger.info(" : check token " + authToken);
+        logger.info(" check if token is valid ");
 
         Optional<AuthToken> tokenFromDatabase = findTokenByUserId(authToken.getUserId());
         if (tokenFromDatabase.isPresent()) {
-            logger.info(" : token exists in db " + authToken);
+            logger.info(" token exists in db ");
 
             AuthToken existedToken = tokenFromDatabase.get();
-            String tokenToInvalidate = TokenParser.findTokenValue(authToken.getValue());
+            TokenParser.findTokenValue(authToken.getValue());
             if (matchTokens(authToken, existedToken)) {
-                logger.info(" token was invalidated : " + tokenToInvalidate);
+                logger.info(" token was invalidated ");
 
                 return tokenRepository.removeByUserId(authToken.getUserId());
             }

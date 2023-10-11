@@ -4,9 +4,8 @@ import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.exception.WrongCredentialsException;
+import com.gamesage.store.exception.WrongTokenException;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,8 +36,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestPropertySource("classpath:application-test.properties")
 class TokenServiceIntegrationTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(TokenServiceIntegrationTest.class);
-
     private final CountDownLatch latch = new CountDownLatch(1);
     @Autowired
     private TokenService tokenService;
@@ -67,9 +64,9 @@ class TokenServiceIntegrationTest {
         AuthToken tokenToCreate = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
         AuthToken tokenToFind = tokenService.createToken(tokenToCreate);
         Optional<AuthToken> foundToken = tokenService.findTokenByUserId(tokenToFind.getUserId());
-        String fountTokenValue = "";
+        String fountTokenValue;
         if (foundToken.isEmpty()) {
-            logger.error("#findByTokenValue_Success foundToken is empty");
+            throw new WrongTokenException();
         } else {
             fountTokenValue = foundToken.get().getValue();
         }
@@ -137,14 +134,11 @@ class TokenServiceIntegrationTest {
         User savedUser = userService.createOne(user);
         AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now().minus(100, ChronoUnit.DAYS));
         AuthToken createdToken = tokenService.createToken(token);
-        logger.info(" foundToken has been created " + createdToken);
 
         Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
         String foundTokenValue = "";
         if (foundToken.isPresent()) {
             foundTokenValue = foundToken.get().getValue();
-        } else {
-            logger.error(" foundToken is empty");
         }
         assertTrue(encoder.matches(token.getValue(), foundTokenValue));
 
@@ -156,7 +150,6 @@ class TokenServiceIntegrationTest {
         assertTrue(latch.await(10, TimeUnit.SECONDS));
 
         assertEquals(Optional.empty(), tokenService.findTokenById(0));
-        logger.info(" foundToken has been removed " + tokenService.findTokenById(0));
     }
 
     @Test

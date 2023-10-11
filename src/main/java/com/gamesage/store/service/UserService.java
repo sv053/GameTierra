@@ -55,8 +55,9 @@ public class UserService implements UserDetailsService, AuthenticationUserDetail
 
     public User findByCredentials(String login, String pass) {
         User user = findByLogin(login);
-        if (!encoder.matches(pass, user.getPassword()))
+        if (!encoder.matches(pass, user.getPassword())) {
             throw new WrongCredentialsException();
+        }
         return user;
     }
 

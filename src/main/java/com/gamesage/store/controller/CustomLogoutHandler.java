@@ -34,7 +34,7 @@ public class CustomLogoutHandler implements LogoutHandler {
             AuthToken authToken = new AuthToken(token, userId);
             authService.revokeAccess(authToken);
         } else {
-            throw new WrongTokenException(tokenFromHeader);
+            throw new WrongTokenException();
         }
     }
 }
