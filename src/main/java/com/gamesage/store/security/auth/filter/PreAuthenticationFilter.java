@@ -4,7 +4,6 @@ import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.security.auth.HeaderName;
 import com.gamesage.store.service.TokenService;
 import com.gamesage.store.util.TokenParser;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 
@@ -13,10 +12,13 @@ import java.util.Optional;
 
 public class PreAuthenticationFilter extends AbstractPreAuthenticatedProcessingFilter {
 
-    @Autowired
-    TokenService tokenService;
-    @Autowired
-    private BCryptPasswordEncoder encoder;
+    private final TokenService tokenService;
+    private final BCryptPasswordEncoder encoder;
+
+    public PreAuthenticationFilter(TokenService tokenService, BCryptPasswordEncoder encoder) {
+        this.tokenService = tokenService;
+        this.encoder = encoder;
+    }
 
     @Override
     protected Object getPreAuthenticatedPrincipal(HttpServletRequest httpServletRequest) {

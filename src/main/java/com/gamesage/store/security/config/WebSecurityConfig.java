@@ -15,6 +15,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
@@ -28,13 +29,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final FilterChainExceptionHandler exceptionHandler;
     private final AuthService authService;
     private final TokenService tokenService;
+    private final BCryptPasswordEncoder encoder;
 
     public WebSecurityConfig(UserService userService, FilterChainExceptionHandler exceptionHandler,
-                             AuthService authService, TokenService tokenService) {
+                             AuthService authService, TokenService tokenService, BCryptPasswordEncoder encoder) {
         this.userService = userService;
         this.exceptionHandler = exceptionHandler;
         this.authService = authService;
         this.tokenService = tokenService;
+        this.encoder = encoder;
     }
 
     @Override
@@ -46,7 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PreAuthenticationFilter preAuthenticationFilter() {
-        PreAuthenticationFilter filter = new PreAuthenticationFilter();
+        PreAuthenticationFilter filter = new PreAuthenticationFilter(tokenService, encoder);
         filter.setAuthenticationManager(authenticationManagerBean());
         return filter;
     }

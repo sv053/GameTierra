@@ -25,7 +25,7 @@ class CustomLogoutHandlerTest {
     private final Integer userId = 123;
     private final String headerWithToken = "123&goierjgodfv";
 
-    AuthToken authToken = new AuthToken(headerWithToken, userId);
+    private final AuthToken authToken = new AuthToken(headerWithToken, userId);
 
     @Test
     void testLogout_validToken() {
@@ -42,11 +42,15 @@ class CustomLogoutHandlerTest {
     @Test
     void testLogout_invalidToken() {
         String invalidToken = "123&fyt";
+        AuthToken authToken = new AuthToken(invalidToken, userId);
         when(request.getHeader(HeaderName.TOKEN_HEADER)).thenReturn(invalidToken);
         when(tokenService.findTokenByUserId(userId)).thenReturn(Optional.of(authToken));
-        when(tokenService.invalidateToken(new AuthToken(invalidToken, userId)))
+        when(tokenService.invalidateToken(authToken))
             .thenThrow(new WrongCredentialsException());
 
-        verify(authService, never()).revokeAccess(any(AuthToken.class));
+        CustomLogoutHandler customLogoutHandler = new CustomLogoutHandler(authService, tokenService);
+        customLogoutHandler.logout(request, response, authentication);
+
+        verify(authService, never()).revokeAccess(authToken);
     }
 }
