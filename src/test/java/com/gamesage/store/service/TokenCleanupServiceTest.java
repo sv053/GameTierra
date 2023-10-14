@@ -64,18 +64,19 @@ class TokenCleanupServiceTest {
 
         AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), localDateTime);
         tokenService.createToken(token);
-        Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
-        String foundTokenValue = "";
-        if (foundToken.isPresent()) {
-            foundTokenValue = foundToken.get().getValue();
+        Optional<AuthToken> findTokenAttempt = tokenService.findTokenByUserId(savedUser.getId());
+        AuthToken foundToken = null;
+        if (findTokenAttempt.isPresent()) {
+            foundToken = findTokenAttempt.get();
         }
-        assertNotNull(tokenService.findTokenById(0));
-        assertFalse(foundTokenValue.isBlank());
-        assertTrue(encoder.matches(token.getValue(), foundTokenValue));
+        assertNotNull(foundToken);
+        assertNotNull(tokenService.findTokenById(foundToken.getId()));
+        assertFalse(foundToken.getValue().isBlank());
+        assertTrue(encoder.matches(token.getValue(), foundToken.getValue()));
 
         tokenCleanupService.removeExpiredTokens();
 
-        assertEquals(Optional.empty(), tokenService.findTokenById(0));
+        assertEquals(Optional.empty(), tokenService.findTokenById(foundToken.getId()));
     }
 
     @Test
