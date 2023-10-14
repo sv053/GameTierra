@@ -7,6 +7,7 @@ import com.gamesage.store.domain.repository.UserFunctionRepository;
 import com.gamesage.store.exception.AlreadyTakenLoginException;
 import com.gamesage.store.exception.EntityNotFoundException;
 import com.gamesage.store.exception.WrongCredentialsException;
+import com.gamesage.store.exception.WrongTokenException;
 import com.gamesage.store.paymentapi.PaymentProcessingApi;
 import com.gamesage.store.paymentapi.PaymentRequest;
 import com.gamesage.store.paymentapi.PaymentResponse;
@@ -107,7 +108,8 @@ public class UserService implements UserDetailsService, AuthenticationUserDetail
         Integer userId = TokenParser.findUserId(token.getCredentials().toString());
 
         Optional<AuthToken> tokenEntity = tokenService.findTokenByUserId(userId);
-        User user = findById(tokenEntity.orElseThrow(WrongCredentialsException::new).getUserId());
+        AuthToken foundToken = tokenEntity.orElseThrow(WrongTokenException::new);
+        User user = findById(foundToken.getUserId());
         return new AppUser(user);
     }
 }

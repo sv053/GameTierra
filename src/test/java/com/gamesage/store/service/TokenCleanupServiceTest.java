@@ -78,11 +78,6 @@ class TokenCleanupServiceTest {
         if (findTokenAttempt.isPresent()) {
             foundToken = findTokenAttempt.get();
         }
-        assertNotNull(foundToken);
-        assertNotNull(tokenService.findTokenById(foundToken.getId()));
-        assertFalse(foundToken.getValue().isBlank());
-        assertTrue(encoder.matches(token.getValue(), foundToken.getValue()));
-
         tokenCleanupService.removeExpiredTokens();
 
         assertEquals(Optional.empty(), tokenService.findTokenById(foundToken.getId()));

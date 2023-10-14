@@ -4,7 +4,6 @@ import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.exception.WrongCredentialsException;
-import com.gamesage.store.exception.WrongTokenException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,12 +38,7 @@ class TokenServiceIntegrationTest {
         AuthToken tokenToCreate = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
         AuthToken tokenToFind = tokenService.createToken(tokenToCreate);
         Optional<AuthToken> foundToken = tokenService.findTokenByUserId(tokenToFind.getUserId());
-        String fountTokenValue;
-        if (foundToken.isEmpty()) {
-            throw new WrongTokenException();
-        } else {
-            fountTokenValue = foundToken.get().getValue();
-        }
+        String fountTokenValue = foundToken.get().getValue();
         assertNotNull(foundToken);
         assertTrue(encoder.matches(tokenToCreate.getValue(), fountTokenValue));
     }

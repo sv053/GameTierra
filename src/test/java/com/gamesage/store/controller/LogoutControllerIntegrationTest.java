@@ -15,13 +15,12 @@ class LogoutControllerIntegrationTest extends ControllerIntegrationTest {
 
     private static final String LOGOUT_ENDPOINT = "/logout";
     private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
-    private String userJson;
     private User user;
     private String token;
 
     @BeforeAll
     void setup() throws Exception {
-        userJson = Files.readString(Path.of(userJsonResource.getURI()));
+        String userJson = Files.readString(Path.of(userJsonResource.getURI()));
         User userToSave = objectMapper.readValue(userJson, User.class);
         user = userService.createOne(userToSave);
         token = loginAndGetToken(userJson);

@@ -29,8 +29,8 @@ public class TokenService {
     }
 
     public Optional<AuthToken> findTokenByUserId(Integer userId) {
-        logger.info(" userId - " + userId);
         if (0 >= userId) {
+            logger.info(" no user exists with id  " + userId);
             throw new WrongCredentialsException();
         }
         return tokenRepository.findByUserId(userId);
@@ -41,8 +41,8 @@ public class TokenService {
         AuthToken savedToken = tokenRepository.createOne(tokenToSave);
         String tokenValue = TokenParser.prepareHeader(authToken.getValue(), savedToken.getUserId());
 
-        AuthToken tokenHeader = authToken.withTokenValue(tokenValue).withId(savedToken.getId());
-        logger.info(" token was created ");
+        AuthToken tokenHeader = savedToken.withTokenValue(tokenValue);
+        logger.info(String.format(" token for user with id %s was created ", tokenHeader.getUserId()));
 
         return tokenHeader;
     }
@@ -56,24 +56,16 @@ public class TokenService {
     }
 
     public boolean matchTokens(AuthToken tokenFromUser, AuthToken existedToken) {
-        boolean ifMatches = encoder.matches(tokenFromUser.getValue(), existedToken.getValue());
-        if (ifMatches) {
-            logger.warn(" tokens do not match ");
-        }
-        return ifMatches;
+        return encoder.matches(tokenFromUser.getValue(), existedToken.getValue());
     }
 
     public boolean invalidateToken(AuthToken authToken) {
-        logger.info(" check if token is valid ");
-
         Optional<AuthToken> tokenFromDatabase = findTokenByUserId(authToken.getUserId());
         if (tokenFromDatabase.isPresent()) {
-            logger.info(" token exists in db ");
-
             AuthToken existedToken = tokenFromDatabase.get();
             TokenParser.findTokenValue(authToken.getValue());
             if (matchTokens(authToken, existedToken)) {
-                logger.info(" token was invalidated ");
+                logger.info(String.format(" token for user with id %s is preparing to be invalidated... ", existedToken.getUserId()));
 
                 return tokenRepository.removeByUserId(authToken.getUserId());
             }
