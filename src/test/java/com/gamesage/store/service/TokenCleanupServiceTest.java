@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -47,12 +47,21 @@ class TokenCleanupServiceTest {
     @Test
     void removeExpiredTokensScheduler_Success() {
         Set<ScheduledTask> scheduledTasks = scheduledTaskHolder.getScheduledTasks();
-        long count = scheduledTasks.stream()
+        var tasks = scheduledTasks.stream()
             .filter(scheduledTask -> scheduledTask.getTask() instanceof CronTask)
             .map(scheduledTask -> (CronTask) scheduledTask.getTask())
             .filter(cronTask -> cronTask.getExpression().equals(cleanupCronExpression))
-            .count();
-        assertThat(count).isEqualTo(1L);
+            .collect(Collectors.toList());
+
+        boolean containsMethod = tasks.stream()
+            .anyMatch(task -> isTaskForMethod(task, "removeExpiredTokens"));
+
+        assertTrue(containsMethod);
+    }
+
+    boolean isTaskForMethod(CronTask cronTask, String methodName) {
+        var taskMethod = cronTask.toString();
+        return taskMethod.contains(methodName);
     }
 
     @Test

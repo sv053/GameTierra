@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class LogoutControllerIntegrationTest extends ControllerIntegrationTest {
 
-    protected static final String LOGOUT_ENDPOINT = "/logout";
+    private static final String LOGOUT_ENDPOINT = "/logout";
     private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
     private String userJson;
     private User user;
