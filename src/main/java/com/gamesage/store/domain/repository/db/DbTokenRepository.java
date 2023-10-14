@@ -2,8 +2,6 @@ package com.gamesage.store.domain.repository.db;
 
 import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.repository.TokenRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -20,7 +18,6 @@ import java.util.Optional;
 @Repository
 public class DbTokenRepository implements TokenRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(DbTokenRepository.class);
 
     private static final String SELECT_ALL_TOKENS_QUERY = "SELECT id, token_value, user_id, expiration_date " +
         " FROM token ";
@@ -111,9 +108,8 @@ public class DbTokenRepository implements TokenRepository {
     }
 
     @Override
-    public void removeExpired() {
-        int removedTokenAmount = jdbcTemplate.update(REMOVE_EXPIRED_TOKENS, Timestamp.valueOf(LocalDateTime.now()));
-        logger.info(" removed tokens: " + removedTokenAmount);
+    public int removeExpired() {
+        return jdbcTemplate.update(REMOVE_EXPIRED_TOKENS, Timestamp.valueOf(LocalDateTime.now()));
     }
 
     @Override
