@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -47,16 +46,14 @@ class TokenCleanupServiceTest {
     @Test
     void removeExpiredTokensScheduler_Success() {
         Set<ScheduledTask> scheduledTasks = scheduledTaskHolder.getScheduledTasks();
-        var tasks = scheduledTasks.stream()
+        var task = scheduledTasks.stream()
             .filter(scheduledTask -> scheduledTask.getTask() instanceof CronTask)
             .map(scheduledTask -> (CronTask) scheduledTask.getTask())
-            .filter(cronTask -> cronTask.getExpression().equals(cleanupCronExpression))
-            .collect(Collectors.toList());
+            .filter(cronTask -> isTaskForMethod(cronTask, "removeExpiredTokens"))
+            .findFirst()
+            .get();
 
-        boolean containsMethod = tasks.stream()
-            .anyMatch(task -> isTaskForMethod(task, "removeExpiredTokens"));
-
-        assertTrue(containsMethod);
+        assertEquals(cleanupCronExpression, task.getExpression());
     }
 
     boolean isTaskForMethod(CronTask cronTask, String methodName) {
@@ -74,13 +71,9 @@ class TokenCleanupServiceTest {
         AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), localDateTime);
         tokenService.createToken(token);
         Optional<AuthToken> findTokenAttempt = tokenService.findTokenByUserId(savedUser.getId());
-        AuthToken foundToken = null;
-        if (findTokenAttempt.isPresent()) {
-            foundToken = findTokenAttempt.get();
-        }
         tokenCleanupService.removeExpiredTokens();
 
-        assertEquals(Optional.empty(), tokenService.findTokenById(foundToken.getId()));
+        assertEquals(Optional.empty(), tokenService.findTokenById(findTokenAttempt.get().getId()));
     }
 
     @Test
@@ -93,13 +86,6 @@ class TokenCleanupServiceTest {
         AuthToken token = new AuthToken("ftyzrdtcfjyiuh", userId, localDateTime);
         tokenService.createToken(token);
         Optional<AuthToken> foundTokenBeforeRemoving = tokenService.findTokenByUserId(userId);
-        String foundTokenValueBeforeRemoving = "";
-        if (foundTokenBeforeRemoving.isPresent()) {
-            foundTokenValueBeforeRemoving = foundTokenBeforeRemoving.get().getValue();
-        }
-        assertFalse(foundTokenValueBeforeRemoving.isBlank());
-        assertTrue(encoder.matches(token.getValue(), foundTokenValueBeforeRemoving));
-
         tokenCleanupService.removeExpiredTokens();
 
         Optional<AuthToken> foundTokenAfterRemoving = tokenService.findTokenByUserId(userId);

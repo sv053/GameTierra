@@ -17,9 +17,9 @@ class TokenParserTest {
 
     @Test
     void findUserId_DelimiterOnly_Exception() {
-        String empty = "&";
+        String delimiterOnly = "&";
 
-        assertThrows(WrongTokenException.class, () -> TokenParser.findUserId(empty));
+        assertThrows(WrongTokenException.class, () -> TokenParser.findUserId(delimiterOnly));
     }
 
     @Test

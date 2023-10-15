@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,17 +31,16 @@ class LogoutControllerIntegrationTest extends ControllerIntegrationTest {
     void givenLoggedInUser_shouldLogout() throws Exception {
         mockMvc.perform(post(LOGOUT_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(TOKEN_HEADER_TITLE, token)
-                .content(objectMapper.writeValueAsString(user)))
-            .andExpect(status().isForbidden());
+                .header(TOKEN_HEADER_TITLE, token))
+            .andExpect(status().isOk());
     }
 
     @Test
     void givenLoggedInUser_shouldNotLogout() throws Exception {
         mockMvc.perform(post(LOGOUT_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(TOKEN_HEADER_TITLE, "")
-                .content(objectMapper.writeValueAsString(user)))
-            .andExpect(status().isForbidden());
+                .header(TOKEN_HEADER_TITLE, ""))
+            .andExpect(result -> assertEquals(
+                "Token does not meet requirements", result.getResolvedException().getMessage()));
     }
 }

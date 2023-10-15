@@ -63,7 +63,6 @@ public class TokenService {
         Optional<AuthToken> tokenFromDatabase = findTokenByUserId(authToken.getUserId());
         if (tokenFromDatabase.isPresent()) {
             AuthToken existedToken = tokenFromDatabase.get();
-            TokenParser.findTokenValue(authToken.getValue());
             if (matchTokens(authToken, existedToken)) {
                 logger.info(String.format(" token for user with id %s is preparing to be invalidated... ", existedToken.getUserId()));
 
