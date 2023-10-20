@@ -30,7 +30,7 @@ public class TokenService {
 
     public Optional<AuthToken> findTokenByUserId(Integer userId) {
         if (0 >= userId) {
-            logger.info(" no user exists with id  " + userId);
+            logger.info("Wrong token: no user exists with id  " + userId);
             throw new WrongCredentialsException();
         }
         return tokenRepository.findByUserId(userId);
@@ -42,7 +42,7 @@ public class TokenService {
         String tokenValue = TokenParser.prepareHeader(authToken.getValue(), savedToken.getUserId());
 
         AuthToken tokenHeader = savedToken.withTokenValue(tokenValue);
-        logger.info(String.format(" token for user with id %s was created ", tokenHeader.getUserId()));
+        logger.info("Token  was created for user with id " + tokenHeader.getUserId());
 
         return tokenHeader;
     }
@@ -64,8 +64,7 @@ public class TokenService {
         if (tokenFromDatabase.isPresent()) {
             AuthToken existedToken = tokenFromDatabase.get();
             if (matchTokens(authToken, existedToken)) {
-                logger.info(String.format(" token for user with id %s is preparing to be invalidated... ", existedToken.getUserId()));
-
+                logger.info("Token is preparing to be invalidated for user with id " + existedToken.getUserId());
                 return tokenRepository.removeByUserId(authToken.getUserId());
             }
         }

@@ -8,7 +8,6 @@ import org.springframework.http.MediaType;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,14 +15,13 @@ class LogoutControllerIntegrationTest extends ControllerIntegrationTest {
 
     private static final String LOGOUT_ENDPOINT = "/logout";
     private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
-    private User user;
     private String token;
 
     @BeforeAll
     void setup() throws Exception {
         String userJson = Files.readString(Path.of(userJsonResource.getURI()));
         User userToSave = objectMapper.readValue(userJson, User.class);
-        user = userService.createOne(userToSave);
+        userService.createOne(userToSave);
         token = loginAndGetToken(userJson);
     }
 
@@ -36,11 +34,27 @@ class LogoutControllerIntegrationTest extends ControllerIntegrationTest {
     }
 
     @Test
-    void givenLoggedInUser_shouldNotLogout() throws Exception {
+    void givenUnloggedUserEmptyToken_shouldNotLogout() throws Exception {
         mockMvc.perform(post(LOGOUT_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(TOKEN_HEADER_TITLE, ""))
-            .andExpect(result -> assertEquals(
-                "Token does not meet requirements", result.getResolvedException().getMessage()));
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void givenUnloggedUserEmptyTokenValuePart_shouldNotLogout() throws Exception {
+        mockMvc.perform(post(LOGOUT_ENDPOINT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(TOKEN_HEADER_TITLE, "159&"))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void givenUnloggedUserDelimeterOnlyToken_shouldNotLogout() throws Exception {
+        mockMvc.perform(post(LOGOUT_ENDPOINT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(TOKEN_HEADER_TITLE, "&"))
+            .andExpect(status().isUnauthorized());
     }
 }
+

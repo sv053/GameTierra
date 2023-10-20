@@ -20,7 +20,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Transactional
@@ -85,18 +86,11 @@ class TokenCleanupServiceTest {
         LocalDateTime localDateTime = LocalDateTime.now().plus(tokenExpiryInterval, ChronoUnit.DAYS);
         AuthToken token = new AuthToken("ftyzrdtcfjyiuh", userId, localDateTime);
         tokenService.createToken(token);
-        Optional<AuthToken> foundTokenBeforeRemoving = tokenService.findTokenByUserId(userId);
         tokenCleanupService.removeExpiredTokens();
 
         Optional<AuthToken> foundTokenAfterRemoving = tokenService.findTokenByUserId(userId);
 
-        assertNotNull(foundTokenAfterRemoving);
-
-        String foundTokenValueAfterRemoving = "";
-        if (foundTokenBeforeRemoving.isPresent()) {
-            foundTokenValueAfterRemoving = foundTokenBeforeRemoving.get().getValue();
-        }
-        assertTrue(encoder.matches(token.getValue(), foundTokenValueAfterRemoving));
+        assertTrue(encoder.matches(token.getValue(), foundTokenAfterRemoving.get().getValue()));
     }
 }
 
