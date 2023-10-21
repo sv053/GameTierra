@@ -40,7 +40,6 @@ public class TokenService {
         AuthToken tokenToSave = authToken.withTokenValue(encoder.encode(authToken.getValue()));
         AuthToken savedToken = tokenRepository.createOne(tokenToSave);
         String tokenValue = TokenParser.prepareHeader(authToken.getValue(), savedToken.getUserId());
-
         AuthToken tokenHeader = savedToken.withTokenValue(tokenValue);
         logger.info("Token for user with id {} was created ", tokenHeader.getUserId());
 
@@ -55,15 +54,12 @@ public class TokenService {
         return authToken.withTokenValue(tokenHeader);
     }
 
-    public boolean matchTokens(AuthToken tokenFromUser, AuthToken existedToken) {
-        return encoder.matches(tokenFromUser.getValue(), existedToken.getValue());
-    }
-
     public boolean invalidateToken(AuthToken authToken) {
         Optional<AuthToken> tokenFromDatabase = findTokenByUserId(authToken.getUserId());
         if (tokenFromDatabase.isPresent()) {
             AuthToken existedToken = tokenFromDatabase.get();
-            if (matchTokens(authToken, existedToken)) {
+            boolean tokensMatch = encoder.matches(authToken.getValue(), existedToken.getValue());
+            if (tokensMatch) {
                 logger.info("Token for user with id {} is preparing to be invalidated", existedToken.getUserId());
                 return tokenRepository.removeByUserId(authToken.getUserId());
             }
