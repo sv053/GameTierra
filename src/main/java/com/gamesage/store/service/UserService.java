@@ -107,8 +107,8 @@ public class UserService implements UserDetailsService, AuthenticationUserDetail
     public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
         Integer userId = TokenParser.findUserId(token.getCredentials().toString());
 
-        Optional<AuthToken> tokenEntity = tokenService.findTokenByUserId(userId);
-        AuthToken foundToken = tokenEntity.orElseThrow(WrongTokenException::new);
+        AuthToken foundToken = tokenService.findTokenByUserId(userId)
+            .orElseThrow(WrongTokenException::new);
         User user = findById(foundToken.getUserId());
         return new AppUser(user);
     }
