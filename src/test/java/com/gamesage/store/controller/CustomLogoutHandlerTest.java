@@ -5,10 +5,11 @@ import com.gamesage.store.security.auth.HeaderName;
 import com.gamesage.store.security.service.AuthService;
 import com.gamesage.store.service.TokenService;
 import com.gamesage.store.util.TokenParser;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class CustomLogoutHandlerTest {
 
     @Mock
@@ -32,14 +34,10 @@ class CustomLogoutHandlerTest {
 
     private final Integer userId = 123;
     private final String headerWithToken = "123&goierjgodfv";
-    private AuthToken validAuthToken;
+    private final AuthToken validAuthToken = new AuthToken(headerWithToken, userId);
 
-
-    @BeforeEach
-    void setUp() {
-        validAuthToken = new AuthToken(headerWithToken, userId);
-        MockitoAnnotations.openMocks(this);
-    }
+    @InjectMocks
+    private CustomLogoutHandler customLogoutHandler;
 
     @Test
     void testLogout_validToken() {
@@ -47,7 +45,6 @@ class CustomLogoutHandlerTest {
         when(request.getHeader(HeaderName.TOKEN_HEADER)).thenReturn(headerWithToken);
         when(tokenService.findTokenByUserId(userId)).thenReturn(Optional.of(validAuthToken));
 
-        CustomLogoutHandler customLogoutHandler = new CustomLogoutHandler(authService, tokenService);
         customLogoutHandler.logout(request, response, authentication);
 
         String validToken = TokenParser.findTokenValue(headerWithToken);
@@ -61,7 +58,6 @@ class CustomLogoutHandlerTest {
         when(request.getHeader(HeaderName.TOKEN_HEADER)).thenReturn(headerWithToken);
         when(tokenService.findTokenByUserId(userId)).thenReturn(Optional.of(validAuthToken));
 
-        CustomLogoutHandler customLogoutHandler = new CustomLogoutHandler(authService, tokenService);
         customLogoutHandler.logout(request, response, authentication);
 
         verify(authService, never()).revokeAccess(invalidAuthToken);
