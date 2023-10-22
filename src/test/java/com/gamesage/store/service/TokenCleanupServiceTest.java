@@ -51,10 +51,10 @@ class TokenCleanupServiceTest {
             .filter(scheduledTask -> scheduledTask.getTask() instanceof CronTask)
             .map(scheduledTask -> (CronTask) scheduledTask.getTask())
             .filter(cronTask -> isTaskForMethod(cronTask, "removeExpiredTokens"))
-            .findFirst()
-            .get();
+            .findFirst();
+        String foundTokenValue = task.map(CronTask::getExpression).orElse("");
 
-        assertEquals(cleanupCronExpression, task.getExpression());
+        assertEquals(cleanupCronExpression, foundTokenValue);
     }
 
     boolean isTaskForMethod(CronTask cronTask, String methodName) {
@@ -68,13 +68,11 @@ class TokenCleanupServiceTest {
             3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(user);
         LocalDateTime localDateTime = LocalDateTime.now().minus(tokenExpiryInterval, ChronoUnit.DAYS);
-
         AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), localDateTime);
         tokenService.createToken(token);
-        Optional<AuthToken> findTokenAttempt = tokenService.findTokenByUserId(savedUser.getId());
         tokenCleanupService.removeExpiredTokens();
 
-        assertEquals(Optional.empty(), tokenService.findTokenById(findTokenAttempt.get().getId()));
+        assertEquals(Optional.empty(), tokenService.findTokenById(user.getId()));
     }
 
     @Test
@@ -88,9 +86,10 @@ class TokenCleanupServiceTest {
         tokenService.createToken(token);
         tokenCleanupService.removeExpiredTokens();
 
-        Optional<AuthToken> foundTokenAfterRemoving = tokenService.findTokenByUserId(userId);
+        String foundTokenAfterRemoving = tokenService.findTokenByUserId(userId)
+            .map(AuthToken::getValue).orElse("");
 
-        assertTrue(encoder.matches(token.getValue(), foundTokenAfterRemoving.get().getValue()));
+        assertTrue(encoder.matches(token.getValue(), foundTokenAfterRemoving));
     }
 }
 

@@ -38,9 +38,9 @@ class TokenServiceIntegrationTest {
         AuthToken tokenToCreate = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
         AuthToken tokenToFind = tokenService.createToken(tokenToCreate);
         Optional<AuthToken> foundToken = tokenService.findTokenByUserId(tokenToFind.getUserId());
-        String fountTokenValue = foundToken.get().getValue();
-        assertNotNull(foundToken);
-        assertTrue(encoder.matches(tokenToCreate.getValue(), fountTokenValue));
+        String foundTokenValue = foundToken.map(AuthToken::getValue).orElse("");
+
+        assertTrue(encoder.matches(tokenToCreate.getValue(), foundTokenValue));
     }
 
     @Test
@@ -51,11 +51,8 @@ class TokenServiceIntegrationTest {
         AuthToken token = new AuthToken(1, "ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
         tokenService.createToken(token);
         Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
-        String foundTokenValue = "";
-        if (foundToken.isPresent()) {
-            foundTokenValue = foundToken.get().getValue();
-        }
-        assertTrue(foundToken.isPresent());
+        String foundTokenValue = foundToken.map(AuthToken::getValue).orElse("");
+
         assertTrue(encoder.matches(token.getValue(), foundTokenValue));
     }
 
@@ -77,10 +74,8 @@ class TokenServiceIntegrationTest {
         AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
         tokenService.createToken(token);
         Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
-        String foundTokenValue = "";
-        if (foundToken.isPresent()) {
-            foundTokenValue = foundToken.get().getValue();
-        }
+        String foundTokenValue = foundToken.map(AuthToken::getValue).orElse("");
+
         assertTrue(encoder.matches(token.getValue(), foundTokenValue));
     }
 }

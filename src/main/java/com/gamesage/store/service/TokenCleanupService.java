@@ -20,7 +20,7 @@ public class TokenCleanupService {
     @Scheduled(cron = "${com.gamesage.store.cleanup}")
     public void removeExpiredTokens() {
         int removedTokensAmount = tokenRepository.removeExpired();
-        logger.info("Removed tokens: {} ", removedTokensAmount);
+        logger.info("Removed {} tokens", removedTokensAmount);
     }
 }
 

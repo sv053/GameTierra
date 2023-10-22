@@ -50,11 +50,7 @@ public class AuthToken {
     }
 
     public AuthToken withTokenValue(String token) {
-        return new AuthToken(token, userId, expirationDateTime);
-    }
-
-    public AuthToken withId(Integer tokenId) {
-        return new AuthToken(tokenId, value, userId, expirationDateTime);
+        return new AuthToken(id, token, userId, expirationDateTime);
     }
 
     @Override

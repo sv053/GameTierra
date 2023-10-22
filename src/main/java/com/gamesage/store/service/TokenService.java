@@ -40,18 +40,18 @@ public class TokenService {
         AuthToken tokenToSave = authToken.withTokenValue(encoder.encode(authToken.getValue()));
         AuthToken savedToken = tokenRepository.createOne(tokenToSave);
         String tokenValue = TokenParser.prepareHeader(authToken.getValue(), savedToken.getUserId());
-        AuthToken tokenHeader = savedToken.withTokenValue(tokenValue);
-        logger.info("Token for user with id {} was created ", tokenHeader.getUserId());
+        AuthToken tokenForHeader = savedToken.withTokenValue(tokenValue);
+        logger.info("Token for user with id {} was created ", tokenForHeader.getUserId());
 
-        return tokenHeader;
+        return tokenForHeader;
     }
 
     public AuthToken updateTokenAndReturnHeader(AuthToken authToken) {
         AuthToken tokenWithEncodedValue = authToken.withTokenValue(encoder.encode(authToken.getValue()));
         tokenRepository.updateByUserId(tokenWithEncodedValue, authToken.getUserId());
 
-        String tokenHeader = TokenParser.prepareHeader(authToken.getValue(), authToken.getUserId());
-        return authToken.withTokenValue(tokenHeader);
+        String tokenForHeader = TokenParser.prepareHeader(authToken.getValue(), authToken.getUserId());
+        return authToken.withTokenValue(tokenForHeader);
     }
 
     public boolean invalidateToken(AuthToken authToken) {
