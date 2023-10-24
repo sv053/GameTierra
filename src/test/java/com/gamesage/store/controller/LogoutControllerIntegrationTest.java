@@ -28,33 +28,33 @@ class LogoutControllerIntegrationTest extends ControllerIntegrationTest {
     @Test
     void givenLoggedInUser_shouldLogout() throws Exception {
         mockMvc.perform(post(LOGOUT_ENDPOINT)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header(TOKEN_HEADER_TITLE, token))
-            .andExpect(status().isOk());
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(TOKEN_HEADER_TITLE, token))
+                .andExpect(status().isOk());
     }
 
     @Test
     void givenUnloggedUserEmptyToken_shouldNotLogout() throws Exception {
         mockMvc.perform(post(LOGOUT_ENDPOINT)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header(TOKEN_HEADER_TITLE, ""))
-            .andExpect(status().isUnauthorized());
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(TOKEN_HEADER_TITLE, ""))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     void givenUnloggedUserEmptyTokenValuePart_shouldNotLogout() throws Exception {
         mockMvc.perform(post(LOGOUT_ENDPOINT)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header(TOKEN_HEADER_TITLE, "159&"))
-            .andExpect(status().isUnauthorized());
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(TOKEN_HEADER_TITLE, "159&"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     void givenUnloggedUserDelimeterOnlyToken_shouldNotLogout() throws Exception {
         mockMvc.perform(post(LOGOUT_ENDPOINT)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header(TOKEN_HEADER_TITLE, "&"))
-            .andExpect(status().isUnauthorized());
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(TOKEN_HEADER_TITLE, "&"))
+                .andExpect(status().isUnauthorized());
     }
 }
 

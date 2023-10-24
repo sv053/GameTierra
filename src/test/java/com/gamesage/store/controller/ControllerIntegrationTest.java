@@ -44,12 +44,12 @@ abstract public class ControllerIntegrationTest {
 
     public String loginAndGetToken(String jsonObject) throws Exception {
         return mockMvc.perform(MockMvcRequestBuilders.post(LOGIN_ENDPOINT)
-                .content(jsonObject)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getHeader(TOKEN_HEADER_NAME);
+                        .content(jsonObject)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getHeader(TOKEN_HEADER_NAME);
     }
 
     @AfterAll

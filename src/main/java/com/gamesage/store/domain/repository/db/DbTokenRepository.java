@@ -20,23 +20,23 @@ public class DbTokenRepository implements TokenRepository {
 
 
     private static final String SELECT_ALL_TOKENS_QUERY = "SELECT id, token_value, user_id, expiration_date " +
-        " FROM token ";
+            " FROM token ";
     private static final String SELECT_TOKEN_BY_USER_ID = "SELECT id, token_value, user_id, expiration_date " +
-        " FROM token " +
-        " WHERE user_id = ? ";
+            " FROM token " +
+            " WHERE user_id = ? ";
     private static final String SELECT_TOKEN_BY_ID = "SELECT id, token_value, user_id, expiration_date " +
-        " FROM token " +
-        " WHERE id = ? ";
+            " FROM token " +
+            " WHERE id = ? ";
     private static final String INSERT_USER_TOKEN = "INSERT INTO token (token_value, user_id, expiration_date) " +
-        " VALUES (?, ?, ?) ";
+            " VALUES (?, ?, ?) ";
     private static final String UPDATE_TOKEN_BY_USER_ID = "UPDATE token SET token_value = ?, expiration_date = ? " +
-        "WHERE user_id = ?";
+            "WHERE user_id = ?";
     private static final String REMOVE_EXPIRED_TOKENS = "DELETE " +
-        " FROM token " +
-        " WHERE expiration_date < ? ";
+            " FROM token " +
+            " WHERE expiration_date < ? ";
     private static final String REMOVE_TOKEN_BY_USERID = "DELETE " +
-        " FROM token " +
-        " WHERE user_id = ? ";
+            " FROM token " +
+            " WHERE user_id = ? ";
     private final JdbcTemplate jdbcTemplate;
     private final TokenRowMapper tokenRowMapper;
 
@@ -54,9 +54,9 @@ public class DbTokenRepository implements TokenRepository {
     public Optional<AuthToken> findByUserId(Integer userId) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
-                SELECT_TOKEN_BY_USER_ID,
-                tokenRowMapper,
-                userId
+                    SELECT_TOKEN_BY_USER_ID,
+                    tokenRowMapper,
+                    userId
             ));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -67,9 +67,9 @@ public class DbTokenRepository implements TokenRepository {
     public Optional<AuthToken> findById(Integer id) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
-                SELECT_TOKEN_BY_ID,
-                tokenRowMapper,
-                id
+                    SELECT_TOKEN_BY_ID,
+                    tokenRowMapper,
+                    id
             ));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -81,8 +81,8 @@ public class DbTokenRepository implements TokenRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con
-                .prepareStatement(INSERT_USER_TOKEN,
-                    Statement.RETURN_GENERATED_KEYS);
+                    .prepareStatement(INSERT_USER_TOKEN,
+                            Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, authToken.getValue());
             ps.setInt(2, authToken.getUserId());
             ps.setTimestamp(3, Timestamp.valueOf(authToken.getExpirationDateTime()));
@@ -92,18 +92,18 @@ public class DbTokenRepository implements TokenRepository {
         Integer id = keyHolder.getKeyAs(Integer.class);
 
         return new AuthToken(
-            id,
-            authToken.getValue(),
-            authToken.getUserId(),
-            authToken.getExpirationDateTime());
+                id,
+                authToken.getValue(),
+                authToken.getUserId(),
+                authToken.getExpirationDateTime());
     }
 
     @Override
     public AuthToken updateByUserId(AuthToken authToken, Integer userId) {
         jdbcTemplate.update(UPDATE_TOKEN_BY_USER_ID
-            , authToken.getValue()
-            , Timestamp.valueOf(authToken.getExpirationDateTime())
-            , userId);
+                , authToken.getValue()
+                , Timestamp.valueOf(authToken.getExpirationDateTime())
+                , userId);
         return authToken;
     }
 
@@ -125,10 +125,10 @@ public class DbTokenRepository implements TokenRepository {
             Timestamp timestamp = rs.getTimestamp("expiration_date");
             LocalDateTime dateTime = timestamp.toLocalDateTime();
             return new AuthToken(
-                rs.getInt("id"),
-                rs.getString("token_value"),
-                rs.getInt("user_id"),
-                dateTime);
+                    rs.getInt("id"),
+                    rs.getString("token_value"),
+                    rs.getInt("user_id"),
+                    dateTime);
         }
     }
 }

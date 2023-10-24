@@ -50,17 +50,17 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
     void givenWrongCreds_shouldNotFindOrderById() throws Exception {
         int wrongId = -15;
         mockMvc.perform(get(ORDER_ID_ENDPOINT, wrongId)
-                .header(TOKEN_HEADER_TITLE, WRONG_TOKEN_HEADER)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
+                        .header(TOKEN_HEADER_TITLE, WRONG_TOKEN_HEADER)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     void givenUnknownUser_shouldNotFindOrderById() throws Exception {
         int wrongId = -15;
         mockMvc.perform(get(ORDER_ID_ENDPOINT, wrongId)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -69,13 +69,13 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
         orderService.buyGame(savedGames.get(1).getId(), user.getId());
 
         var v = mockMvc.perform(get(API_ORDER_ENDPOINT)
-                .header(TOKEN_HEADER_TITLE, token)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].user.login").value(user.getLogin()))
-            .andExpect(jsonPath("$[0].user.id").value(user.getId()))
-            .andExpect(jsonPath("$[0].game.name").value(game.getName()))
-            .andExpect(jsonPath("$[0].game.id").value(game.getId()));
+                        .header(TOKEN_HEADER_TITLE, token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].user.login").value(user.getLogin()))
+                .andExpect(jsonPath("$[0].user.id").value(user.getId()))
+                .andExpect(jsonPath("$[0].game.name").value(game.getName()))
+                .andExpect(jsonPath("$[0].game.id").value(game.getId()));
     }
 
     @Test
@@ -85,44 +85,44 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
         Order order = orderService.findAll().get(0);
 
         mockMvc.perform(get(ORDER_ID_ENDPOINT, order.getId())
-                .header(TOKEN_HEADER_TITLE, token)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.user.login").value(user.getLogin()))
-            .andExpect(jsonPath("$.user.id").value(order.getUser().getId()))
-            .andExpect(jsonPath("$.game.name").value(game.getName()))
-            .andExpect(jsonPath("$.game.id").value(game.getId()));
+                        .header(TOKEN_HEADER_TITLE, token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.user.login").value(user.getLogin()))
+                .andExpect(jsonPath("$.user.id").value(order.getUser().getId()))
+                .andExpect(jsonPath("$.game.name").value(game.getName()))
+                .andExpect(jsonPath("$.game.id").value(game.getId()));
     }
 
     @Test
     void givenRightCreds_shouldBuyGame() throws Exception {
         mockMvc.perform(post(ORDER_BUY_ENDPOINT, game.getId(), user.getId())
-                .header(TOKEN_HEADER_TITLE, token)
-                .content(userJson)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.bought").value(true))
-            .andExpect(jsonPath("$.buyer.id").value(user.getId()))
-            .andExpect(jsonPath("$.buyer.login").value(user.getLogin()))
-            .andExpect(jsonPath("$.targetGame.name").value(game.getName()));
+                        .header(TOKEN_HEADER_TITLE, token)
+                        .content(userJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.bought").value(true))
+                .andExpect(jsonPath("$.buyer.id").value(user.getId()))
+                .andExpect(jsonPath("$.buyer.login").value(user.getLogin()))
+                .andExpect(jsonPath("$.targetGame.name").value(game.getName()));
     }
 
     @Test
     void givenWrongCreds_shouldNotBuyGame() throws Exception {
         mockMvc.perform(post(ORDER_BUY_ENDPOINT, game.getId(), user.getId())
-                .header(TOKEN_HEADER_TITLE, WRONG_TOKEN_HEADER)
-                .content(userJson)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
+                        .header(TOKEN_HEADER_TITLE, WRONG_TOKEN_HEADER)
+                        .content(userJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     void givenEmptyToken_shouldNotBuyGame() throws Exception {
         mockMvc.perform(post(ORDER_BUY_ENDPOINT, game.getId(), user.getId())
-                .header(TOKEN_HEADER_TITLE, "")
-                .content(userJson)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
+                        .header(TOKEN_HEADER_TITLE, "")
+                        .content(userJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 }
 

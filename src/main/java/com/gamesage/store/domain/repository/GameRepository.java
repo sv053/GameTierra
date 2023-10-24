@@ -55,9 +55,9 @@ public class GameRepository implements CreateManyRepository<Game, Integer> {
 
     private void addGamesToMap(List<Game> gamesToAdd) {
         Map<Integer, Game> mapForNewGames = gamesToAdd.stream()
-            .collect(
-                Collectors.toMap(Game::getId, Function.identity(),
-                    (oldValue, newValue) -> (newValue)));
+                .collect(
+                        Collectors.toMap(Game::getId, Function.identity(),
+                                (oldValue, newValue) -> (newValue)));
         allGamesById.putAll(mapForNewGames);
     }
 }

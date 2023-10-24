@@ -24,8 +24,8 @@ public class LoginController {
     public ResponseEntity<User> login(@RequestBody User user) {
         AuthToken authToken = authService.authenticateUser(user);
         return ResponseEntity.ok()
-            .header(HeaderName.TOKEN_HEADER, authToken.getValue())
-            .body(user);
+                .header(HeaderName.TOKEN_HEADER, authToken.getValue())
+                .body(user);
     }
 }
 

@@ -108,7 +108,7 @@ public class UserService implements UserDetailsService, AuthenticationUserDetail
         Integer userId = TokenParser.findUserId(token.getCredentials().toString());
 
         AuthToken foundToken = tokenService.findTokenByUserId(userId)
-            .orElseThrow(WrongTokenException::new);
+                .orElseThrow(WrongTokenException::new);
         User user = findById(foundToken.getUserId());
         return new AppUser(user);
     }

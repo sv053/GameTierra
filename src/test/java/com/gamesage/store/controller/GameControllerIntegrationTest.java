@@ -30,36 +30,36 @@ public class GameControllerIntegrationTest extends ControllerIntegrationTest {
     @Test
     void shouldFindGameById() throws Exception {
         mockMvc.perform(get(GAME_ID_ENDPOINT, game.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.id").value(game.getId()))
-            .andExpect(jsonPath("$.name").value(game.getName()))
-            .andExpect(jsonPath("$.price").value(game.getPrice()));
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(game.getId()))
+                .andExpect(jsonPath("$.name").value(game.getName()))
+                .andExpect(jsonPath("$.price").value(game.getPrice()));
     }
 
     @Test
     void shouldThrowException_whenTryToFindGameById_IdDoesNotExist() throws Exception {
         int wrongId = -888;
         mockMvc.perform(get(GAME_ID_ENDPOINT, wrongId)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound());
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test
     void shouldFindAllGames() throws Exception {
         mockMvc.perform(get(API_GAME_ENDPOINT))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.*.name", containsInAnyOrder(
-                game.getName(),
-                savedGames.get(1).getName(),
-                savedGames.get(2).getName(),
-                savedGames.get(3).getName())))
-            .andExpect(jsonPath("$.*.id", containsInAnyOrder(
-                game.getId(),
-                savedGames.get(1).getId(),
-                savedGames.get(2).getId(),
-                savedGames.get(3).getId())));
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.*.name", containsInAnyOrder(
+                        game.getName(),
+                        savedGames.get(1).getName(),
+                        savedGames.get(2).getName(),
+                        savedGames.get(3).getName())))
+                .andExpect(jsonPath("$.*.id", containsInAnyOrder(
+                        game.getId(),
+                        savedGames.get(1).getId(),
+                        savedGames.get(2).getId(),
+                        savedGames.get(3).getId())));
     }
 
     @Test
@@ -71,11 +71,11 @@ public class GameControllerIntegrationTest extends ControllerIntegrationTest {
         Double secondGamePrice = gameTwo.getPrice().doubleValue();
 
         mockMvc.perform(post(API_GAME_ENDPOINT)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(gamesJson))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.*.name", containsInAnyOrder(gameOne.getName(), gameTwo.getName())))
-            .andExpect(jsonPath("$.*.price", containsInAnyOrder(firstGamePrice, secondGamePrice)));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(gamesJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.*.name", containsInAnyOrder(gameOne.getName(), gameTwo.getName())))
+                .andExpect(jsonPath("$.*.price", containsInAnyOrder(firstGamePrice, secondGamePrice)));
     }
 }
 

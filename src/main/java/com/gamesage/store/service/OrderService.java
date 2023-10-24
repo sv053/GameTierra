@@ -56,11 +56,11 @@ public class OrderService {
         }
         LocalDateTime dateTime = (order == null) ? LocalDateTime.now() : order.getDateTime();
         return new Builder(game)
-            .gameIsBought(canBuy)
-            .buyer(user)
-            .message(purchaseMessage)
-            .orderDateTime(dateTime)
-            .build();
+                .gameIsBought(canBuy)
+                .buyer(user)
+                .message(purchaseMessage)
+                .orderDateTime(dateTime)
+                .build();
     }
 
     private boolean canBuy(boolean canPay, boolean hasGame) {

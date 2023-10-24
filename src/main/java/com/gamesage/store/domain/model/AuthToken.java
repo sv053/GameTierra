@@ -59,7 +59,7 @@ public class AuthToken {
         if (o == null || getClass() != o.getClass()) return false;
         AuthToken thatToken = (AuthToken) o;
         return Objects.equals(userId, thatToken.getUserId())
-            && Objects.equals(value, thatToken.getValue());
+                && Objects.equals(value, thatToken.getValue());
     }
 
     @Override
@@ -70,11 +70,11 @@ public class AuthToken {
     @Override
     public String toString() {
         return "AuthToken{" +
-            ", id='" + id + '\'' +
-            ", token='" + value + '\'' +
-            ", userId=" + userId +
-            ", expirationDateTime=" + expirationDateTime +
-            '}';
+                ", id='" + id + '\'' +
+                ", token='" + value + '\'' +
+                ", userId=" + userId +
+                ", expirationDateTime=" + expirationDateTime +
+                '}';
     }
 }
 

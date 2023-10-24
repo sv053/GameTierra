@@ -48,10 +48,10 @@ class TokenCleanupServiceTest {
     void removeExpiredTokensScheduler_Success() {
         Set<ScheduledTask> scheduledTasks = scheduledTaskHolder.getScheduledTasks();
         var task = scheduledTasks.stream()
-            .filter(scheduledTask -> scheduledTask.getTask() instanceof CronTask)
-            .map(scheduledTask -> (CronTask) scheduledTask.getTask())
-            .filter(cronTask -> isTaskForMethod(cronTask, "removeExpiredTokens"))
-            .findFirst();
+                .filter(scheduledTask -> scheduledTask.getTask() instanceof CronTask)
+                .map(scheduledTask -> (CronTask) scheduledTask.getTask())
+                .filter(cronTask -> isTaskForMethod(cronTask, "removeExpiredTokens"))
+                .findFirst();
         String foundTokenValue = task.map(CronTask::getExpression).orElse("");
 
         assertEquals(cleanupCronExpression, foundTokenValue);
@@ -65,7 +65,7 @@ class TokenCleanupServiceTest {
     @Test
     void removeExpiredTokens_Success() {
         User user = new User(null, "agamer", "lerida", new Tier(
-            3, "SILVER", 10.d), BigDecimal.TEN);
+                3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(user);
         LocalDateTime localDateTime = LocalDateTime.now().minus(tokenExpiryInterval, ChronoUnit.DAYS);
         AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), localDateTime);
@@ -78,7 +78,7 @@ class TokenCleanupServiceTest {
     @Test
     public void expiredTokenRemoveScheduler_tooEarlyToRemoveToken() {
         User user = new User(null, "agamer", "lerida", new Tier(
-            3, "SILVER", 10.d), BigDecimal.TEN);
+                3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(user);
         int userId = savedUser.getId();
         LocalDateTime localDateTime = LocalDateTime.now().plus(tokenExpiryInterval, ChronoUnit.DAYS);
@@ -87,7 +87,7 @@ class TokenCleanupServiceTest {
         tokenCleanupService.removeExpiredTokens();
 
         String foundTokenAfterRemoving = tokenService.findTokenByUserId(userId)
-            .map(AuthToken::getValue).orElse("");
+                .map(AuthToken::getValue).orElse("");
 
         assertTrue(encoder.matches(token.getValue(), foundTokenAfterRemoving));
     }

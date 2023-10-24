@@ -62,17 +62,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()
-            .authorizeRequests()
-            .antMatchers("/login").anonymous()
-            .antMatchers(HttpMethod.GET, "/users", "/cart", "/users/**", "/cart/**").authenticated()
-            .antMatchers(HttpMethod.POST, "/cart/**").authenticated()
-            .and()
-            .addFilter(preAuthenticationFilter())
-            .addFilterBefore(exceptionHandler, LogoutFilter.class)
-            .logout()
-            .addLogoutHandler(customLogoutHandler())
-            .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK));
+                .csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/login").anonymous()
+                .antMatchers(HttpMethod.GET, "/users", "/cart", "/users/**", "/cart/**").authenticated()
+                .antMatchers(HttpMethod.POST, "/cart/**").authenticated()
+                .and()
+                .addFilter(preAuthenticationFilter())
+                .addFilterBefore(exceptionHandler, LogoutFilter.class)
+                .logout()
+                .addLogoutHandler(customLogoutHandler())
+                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK));
     }
 }
 

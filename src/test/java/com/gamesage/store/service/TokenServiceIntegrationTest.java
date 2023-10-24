@@ -33,7 +33,7 @@ class TokenServiceIntegrationTest {
     @Test
     void findByTokenValue_Success() {
         User userWithoutToken = new User(null, "user1", "lerida", new Tier(
-            3, "SILVER", 10.d), BigDecimal.TEN);
+                3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(userWithoutToken);
         AuthToken tokenToCreate = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
         AuthToken tokenToFind = tokenService.createToken(tokenToCreate);
@@ -46,7 +46,7 @@ class TokenServiceIntegrationTest {
     @Test
     void findByUserId_Success() {
         User userWithoutToken = new User(null, "user111", "lerida", new Tier(
-            3, "SILVER", 10.d), BigDecimal.TEN);
+                3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(userWithoutToken);
         AuthToken token = new AuthToken(1, "ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
         tokenService.createToken(token);
@@ -69,7 +69,7 @@ class TokenServiceIntegrationTest {
     @Test
     void saveTokenValue_Success() {
         User user = new User(null, "agamer", "lerida", new Tier(
-            3, "SILVER", 10.d), BigDecimal.TEN);
+                3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(user);
         AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
         tokenService.createToken(token);

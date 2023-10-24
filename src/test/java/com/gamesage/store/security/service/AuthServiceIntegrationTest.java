@@ -28,13 +28,13 @@ class AuthServiceIntegrationTest {
     @Test
     void authenticateUser_Success() {
         User user = new User(0, "user11111", "lerida", new Tier(
-            3, "SILVER", 10.d), BigDecimal.TEN);
+                3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(user);
         assertNotNull(userService.findByLogin(user.getLogin()));
 
         AuthToken foundToken = (authService.authenticateUser(new User(
-            0, "user11111", "lerida", new Tier(
-            3, "SILVER", 10.d), BigDecimal.TEN
+                0, "user11111", "lerida", new Tier(
+                3, "SILVER", 10.d), BigDecimal.TEN
         )));
         assertNotNull(foundToken);
         assertNotNull(foundToken.getValue());
@@ -44,7 +44,7 @@ class AuthServiceIntegrationTest {
     @Test
     void authenticateUser_Exception() {
         User user = new User(null, "user1", "lerida", new Tier(
-            3, "SILVER", 10.d), BigDecimal.TEN);
+                3, "SILVER", 10.d), BigDecimal.TEN);
 
         assertThrows(WrongCredentialsException.class, () -> authService.authenticateUser(user));
     }
