@@ -21,20 +21,21 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CustomLogoutHandlerTest {
 
+    private final Integer userId = 123;
+    private final String headerWithToken = "123&goierjgodfv";
+    private final AuthToken validAuthToken = new AuthToken(headerWithToken, userId);
+
     @Mock
     private Authentication authentication;
     @Mock
     private HttpServletResponse response;
     @Mock
     private HttpServletRequest request;
+
     @Mock
     private AuthService authService;
     @Mock
     private TokenService tokenService;
-
-    private final Integer userId = 123;
-    private final String headerWithToken = "123&goierjgodfv";
-    private final AuthToken validAuthToken = new AuthToken(headerWithToken, userId);
 
     @InjectMocks
     private CustomLogoutHandler customLogoutHandler;

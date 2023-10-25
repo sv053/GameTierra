@@ -20,8 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -47,14 +46,15 @@ class TokenCleanupServiceTest {
     @Test
     void removeExpiredTokensScheduler_Success() {
         Set<ScheduledTask> scheduledTasks = scheduledTaskHolder.getScheduledTasks();
-        var task = scheduledTasks.stream()
+        String foundTaskExpression = scheduledTasks.stream()
                 .filter(scheduledTask -> scheduledTask.getTask() instanceof CronTask)
                 .map(scheduledTask -> (CronTask) scheduledTask.getTask())
                 .filter(cronTask -> isTaskForMethod(cronTask, "removeExpiredTokens"))
-                .findFirst();
-        String foundTokenValue = task.map(CronTask::getExpression).orElse("");
+                .findFirst()
+                .map(CronTask::getExpression).orElse("");
 
-        assertEquals(cleanupCronExpression, foundTokenValue);
+        assertFalse(foundTaskExpression.isBlank());
+        assertEquals(cleanupCronExpression, foundTaskExpression);
     }
 
     boolean isTaskForMethod(CronTask cronTask, String methodName) {
@@ -89,6 +89,7 @@ class TokenCleanupServiceTest {
         String foundTokenAfterRemoving = tokenService.findTokenByUserId(userId)
                 .map(AuthToken::getValue).orElse("");
 
+        assertFalse(foundTokenAfterRemoving.isBlank());
         assertTrue(encoder.matches(token.getValue(), foundTokenAfterRemoving));
     }
 }

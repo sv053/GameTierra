@@ -68,7 +68,7 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
         orderService.buyGame(game.getId(), user.getId());
         orderService.buyGame(savedGames.get(1).getId(), user.getId());
 
-        var v = mockMvc.perform(get(API_ORDER_ENDPOINT)
+        mockMvc.perform(get(API_ORDER_ENDPOINT)
                         .header(TOKEN_HEADER_TITLE, token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
