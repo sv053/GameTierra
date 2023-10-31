@@ -4,6 +4,7 @@ import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.exception.WrongCredentialsException;
+import com.gamesage.store.util.TokenParser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,29 +32,16 @@ class TokenServiceIntegrationTest {
     private BCryptPasswordEncoder encoder;
 
     @Test
-    void findByTokenValue_Success() {
-        User userWithoutToken = new User(null, "user1", "lerida", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN);
-        User savedUser = userService.createOne(userWithoutToken);
-        AuthToken tokenToCreate = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
-        AuthToken tokenToFind = tokenService.createToken(tokenToCreate);
-        Optional<AuthToken> foundToken = tokenService.findTokenByUserId(tokenToFind.getUserId());
-        String foundTokenValue = foundToken.map(AuthToken::getValue).orElse("");
-
-        assertTrue(encoder.matches(tokenToCreate.getValue(), foundTokenValue));
-    }
-
-    @Test
     void findByUserId_Success() {
         User userWithoutToken = new User(null, "user111", "lerida", new Tier(
                 3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(userWithoutToken);
         AuthToken token = new AuthToken(1, "ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
         tokenService.createToken(token);
-        Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
-        String foundTokenValue = foundToken.map(AuthToken::getValue).orElse("");
+        String storedTokenValue = tokenService.findTokenByUserId(savedUser.getId())
+                .map(AuthToken::getValue).orElse("");
 
-        assertTrue(encoder.matches(token.getValue(), foundTokenValue));
+        assertTrue(encoder.matches(token.getValue(), storedTokenValue));
     }
 
     @Test
@@ -72,11 +60,10 @@ class TokenServiceIntegrationTest {
                 3, "SILVER", 10.d), BigDecimal.TEN);
         User savedUser = userService.createOne(user);
         AuthToken token = new AuthToken("ftyzrdtcfjyiuh", savedUser.getId(), LocalDateTime.now());
-        tokenService.createToken(token);
-        Optional<AuthToken> foundToken = tokenService.findTokenByUserId(savedUser.getId());
-        String foundTokenValue = foundToken.map(AuthToken::getValue).orElse("");
+        var savedToken = tokenService.createToken(token);
 
-        assertTrue(encoder.matches(token.getValue(), foundTokenValue));
+        assertNotNull(savedToken.getId());
+        assertEquals(token.getValue(), TokenParser.findTokenValue(savedToken.getValue()));
     }
 }
 
