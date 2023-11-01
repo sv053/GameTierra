@@ -46,5 +46,19 @@ CREATE TABLE IF NOT EXISTS 'token'
     CONSTRAINT 'user_fk' FOREIGN KEY ('user_id') REFERENCES 'user' ('id') ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS 'review'
+(
+    'id'              INTEGER,
+    'user_id'         INTEGER,
+    'game_id'         INTEGER,
+    'mark'            INTEGER,
+    'opinion'         TEXT,
+    'review_datetime' DATETIME_INTERVAL_CODE,
+    PRIMARY KEY ('id' AUTOINCREMENT),
+    CONSTRAINT 'user_fk' FOREIGN KEY ('user_id') REFERENCES 'user' ('id'),
+    CONSTRAINT 'game_fk' FOREIGN KEY ('game_id') REFERENCES 'game' ('id')
+);
+
+
 COMMIT;
 
