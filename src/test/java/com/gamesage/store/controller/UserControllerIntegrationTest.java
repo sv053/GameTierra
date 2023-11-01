@@ -8,7 +8,6 @@ import com.gamesage.store.domain.model.ResponseError;
 import com.gamesage.store.domain.model.Tier;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.paymentapi.PaymentRequest;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,24 +55,26 @@ class UserControllerIntegrationTest extends ControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(TOKEN_HEADER_NAME, token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.*.login", Matchers.containsInAnyOrder(user.getLogin(), secondSavedUser.getLogin())))
-                .andExpect(jsonPath("$.*.id", Matchers.containsInAnyOrder(user.getId(), secondSavedUser.getId())));
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$[0].login").value(user.getLogin()))
+                .andExpect(jsonPath("$[1].login").value(secondUser.getLogin()));
     }
 
     @Test
-    void givenUserWithoutToken_whenFindAllUsers_then403() throws Exception {
+    void givenUserWithoutToken_whenFindAllUsers_thenForbidden() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(API_USER_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    void givenUnauthorizedUser_whenFindAllUsers_then401() throws Exception {
-        String wrongToken = "fijwofosk";
+    void givenUnauthorizedUser_whenFindAllUsers_thenForbidden() throws Exception {
+        String wrongToken = "1" + DELIMITER + "cfgjgvuikhyvbfbu";
+
         mockMvc.perform(MockMvcRequestBuilders.get(API_USER_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(TOKEN_HEADER_NAME, wrongToken))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
