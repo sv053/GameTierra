@@ -11,8 +11,11 @@ public class GameReview {
     private List<Review> reviews;
     private Double avgUserExperience;
 
-    public GameReview(Integer gameId) {
+    public GameReview(Integer gameId, Integer id, List<Review> reviews, Double avgUserExperience) {
         this.gameId = gameId;
+        this.id = id;
+        this.reviews = reviews;
+        this.avgUserExperience = avgUserExperience;
     }
 
     public Integer getGameId() {

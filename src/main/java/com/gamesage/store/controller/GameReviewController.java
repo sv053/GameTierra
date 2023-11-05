@@ -2,7 +2,7 @@ package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.model.GameReview;
 import com.gamesage.store.domain.model.Review;
-import com.gamesage.store.service.GameReviewService;
+import com.gamesage.store.service.ReviewService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,35 +11,42 @@ import java.util.List;
 @RequestMapping("/reviews")
 public class GameReviewController {
 
-    private final GameReviewService gameReviewService;
+    private final ReviewService reviewService;
 
-    public GameReviewController(GameReviewService gameReviewService) {
-        this.gameReviewService = gameReviewService;
+    public GameReviewController(ReviewService reviewService) {
+        this.reviewService = reviewService;
     }
 
     @GetMapping("/{id}")
     public Review findReviewById(@PathVariable Integer id) throws Throwable {
-        return gameReviewService.findById(id);
+        return reviewService.findById(id);
     }
 
     @GetMapping("/game/{id}")
     public GameReview findReviewByGameId(@PathVariable Integer id) {
-        return gameReviewService.findByGameId(id);
+        return reviewService.findByGameId(id);
     }
 
     @GetMapping("/user/{id}")
     public List<Review> findReviewByUserId(@PathVariable Integer id) {
-        return gameReviewService.findByUserId(id);
+        return reviewService.findByUserId(id);
     }
 
     @GetMapping
-    public List<Review> findAllGameReviews() {
-        return gameReviewService.findAll();
+    public List<Review> findAllReviews() {
+        return reviewService.findAll();
     }
 
     @PostMapping
     public Review createReview(@RequestBody Review review) {
-        return gameReviewService.createReview(review.getGameId(), review.getUserId());
+        return reviewService.createReview(review);
     }
+
+    @PostMapping("/{id}")
+    public Review updateReview(@RequestBody Review review) {
+        return reviewService.createReview(review);
+    }
+
+
 }
 

@@ -20,9 +20,18 @@ public class Review {
 
     public Review(Integer id, Integer userId, Integer gameId, LocalDateTime localDateTime) {
         this.id = id;
-        this.dateTime = localDateTime;
         this.userId = userId;
         this.gameId = gameId;
+        this.dateTime = localDateTime;
+    }
+
+    public Review(Integer userId, Integer gameId, LocalDateTime dateTime, Integer id, Integer mark, String opinion) {
+        this.userId = userId;
+        this.gameId = gameId;
+        this.dateTime = dateTime;
+        this.id = id;
+        this.mark = mark;
+        this.opinion = opinion;
     }
 
     public Integer getUserId() {

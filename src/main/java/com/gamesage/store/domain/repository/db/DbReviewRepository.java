@@ -3,7 +3,7 @@ package com.gamesage.store.domain.repository.db;
 import com.gamesage.store.domain.model.Game;
 import com.gamesage.store.domain.model.GameReview;
 import com.gamesage.store.domain.model.Review;
-import com.gamesage.store.domain.repository.GameReviewsRepository;
+import com.gamesage.store.domain.repository.ReviewRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -17,27 +17,34 @@ import java.util.List;
 import java.util.Optional;
 
 @org.springframework.stereotype.Repository
-public class DbGameReviewsRepository implements GameReviewsRepository<Review, Integer, GameReview> {
+public class DbReviewRepository implements ReviewRepository<Review, Integer> {
 
-    private static final String INSERT_REVIEW = "INSERT INTO reviews (user_id, game_id, order_datetime) " +
+    private static final String INSERT_REVIEW = "INSERT INTO review (user_id, game_id, order_datetime) " +
             "VALUES (?, ?, ?) ";
     private static final String SELECT_REVIEWS_BY_USER_QUERY =
             "SELECT review.id AS id, game_id, review_datetime " +
                     " FROM review " +
                     " WHERE user_id = ?";
     private static final String SELECT_REVIEWS_BY_GAME_QUERY =
-            "SELECT review.id AS id, user_id, review_datetime " +
+            "SELECT review.id AS id, user_id, review_datetime, (AVG)mark as average_mark, opinion " +
                     " FROM review " +
-                    " WHERE game_id = ?";
+                    " LEFT JOIN game " +
+                    " ON game.id = review.game_id  " +
+                    " WHERE game_id = ? " +
+                    " group by id, user_id, review_datetime, opinion";
     private static final String SELECT_REVIEWS_QUERY =
             "SELECT review.id AS id, user_id, game_id, order_datetime, " +
                     " FROM review ";
     private final JdbcTemplate jdbcTemplate;
-    private final RowMapper<Review> rowMapper;
+    private final RowMapper<Review> reviewRowMapper;
+    private final RowMapper<GameReview> gameReviewRowMapper;
 
-    public DbGameReviewsRepository(JdbcTemplate jdbcTemplate, RowMapper<Review> rowMapper) {
+
+    public DbReviewRepository(JdbcTemplate jdbcTemplate, RowMapper<Review> reviewRowMapper,
+                              RowMapper<GameReview> gameReviewRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
-        this.rowMapper = rowMapper;
+        this.reviewRowMapper = reviewRowMapper;
+        this.gameReviewRowMapper = gameReviewRowMapper;
     }
 
     @Override
@@ -63,7 +70,7 @@ public class DbGameReviewsRepository implements GameReviewsRepository<Review, In
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
                     SELECT_REVIEWS_QUERY
-                    , rowMapper
+                    , reviewRowMapper
                     , id));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -72,12 +79,12 @@ public class DbGameReviewsRepository implements GameReviewsRepository<Review, In
 
     @Override
     public List<Review> findByUserId(Integer id) {
-        return jdbcTemplate.query(SELECT_REVIEWS_BY_USER_QUERY, rowMapper);
+        return jdbcTemplate.query(SELECT_REVIEWS_BY_USER_QUERY, reviewRowMapper);
     }
 
     @Override
     public GameReview findByGameId(Integer id) {
-        return null;
+        return jdbcTemplate.query(SELECT_REVIEWS_BY_GAME_QUERY, gameReviewRowMapper, id);
     }
 
     @Override
@@ -90,12 +97,7 @@ public class DbGameReviewsRepository implements GameReviewsRepository<Review, In
 
         @Override
         public Review mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Game game = new Game(
-                    rs.getInt("game_id"),
-                    rs.getString("name"),
-                    rs.getBigDecimal("price"));
-
-            Timestamp timestamp = rs.getTimestamp("order_datetime");
+            Timestamp timestamp = rs.getTimestamp("review_datetime");
             LocalDateTime dateTime = timestamp.toLocalDateTime();
 
             return new Review(
@@ -120,7 +122,10 @@ public class DbGameReviewsRepository implements GameReviewsRepository<Review, In
             LocalDateTime dateTime = timestamp.toLocalDateTime();
 
             return new GameReview(
-                    rs.getInt("id"));
+                    rs.getInt("gameId"),
+                    rs.getInt("id"),
+                    rs.getDouble(""),
+                    rs.getDouble("average_mark"));
         }
     }
 }
