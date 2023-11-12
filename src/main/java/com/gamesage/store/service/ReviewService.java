@@ -32,8 +32,16 @@ public class ReviewService {
         return repository.findByUserId(id);
     }
 
+    public List<Review> findByGameId(int id) {
+        return repository.findByGameId(id);
+    }
+
     public List<Review> findAll() {
         return repository.findAll();
+    }
+
+    private boolean existsReview(Review review) {
+        return repository.findById(review.getId()).isPresent();
     }
 
     @Transactional
@@ -48,7 +56,11 @@ public class ReviewService {
     }
 
     public Review updateReview(Review review) {
-        return repository.createOne(review);
+        if (existsReview(review)) {
+            return repository.createOne(review);
+        } else {
+            return repository.updateReview(review);
+        }
     }
 }
 

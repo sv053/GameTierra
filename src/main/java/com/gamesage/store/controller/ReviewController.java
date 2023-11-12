@@ -1,6 +1,5 @@
 package com.gamesage.store.controller;
 
-import com.gamesage.store.domain.model.GameReview;
 import com.gamesage.store.domain.model.Review;
 import com.gamesage.store.service.ReviewService;
 import org.springframework.web.bind.annotation.*;
@@ -9,11 +8,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reviews")
-public class GameReviewController {
+public class ReviewController {
 
     private final ReviewService reviewService;
 
-    public GameReviewController(ReviewService reviewService) {
+    public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
     }
 
@@ -23,7 +22,7 @@ public class GameReviewController {
     }
 
     @GetMapping("/game/{id}")
-    public GameReview findReviewByGameId(@PathVariable Integer id) {
+    public List<Review> findReviewByGameId(@PathVariable Integer id) {
         return reviewService.findByGameId(id);
     }
 
