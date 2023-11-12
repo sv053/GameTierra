@@ -93,5 +93,9 @@ public class ReviewService {
             return repository.updateReview(review);
         } else throw new CannotCreateEntityException();
     }
+
+    public void deleteAll() {
+        repository.deleteAll();
+    }
 }
 
