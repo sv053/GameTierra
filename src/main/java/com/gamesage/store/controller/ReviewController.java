@@ -38,12 +38,12 @@ public class ReviewController {
 
     @PostMapping
     public Review createReview(@RequestBody Review review) {
-        return reviewService.createReview(review);
+        return reviewService.updateOrCreateReview(review);
     }
 
     @PostMapping("/{id}")
     public Review updateReview(@RequestBody Review review) {
-        return reviewService.createReview(review);
+        return reviewService.updateOrCreateReview(review);
     }
 
 

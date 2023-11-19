@@ -9,7 +9,7 @@ public class Review {
     private final Integer gameId;
     private final LocalDateTime dateTime;
     private Integer id;
-    private Integer mark;
+    private Integer rating;
     private String opinion;
 
     public Review(Integer userId, Integer gameId) {
@@ -30,7 +30,7 @@ public class Review {
         this.gameId = gameId;
         this.dateTime = dateTime;
         this.id = id;
-        this.mark = mark;
+        this.rating = mark;
         this.opinion = opinion;
     }
 
@@ -50,12 +50,12 @@ public class Review {
         this.id = id;
     }
 
-    public Integer getMark() {
-        return mark;
+    public Integer getRating() {
+        return rating;
     }
 
-    public void setMark(Integer mark) {
-        this.mark = mark;
+    public void setRating(Integer rating) {
+        this.rating = rating;
     }
 
     public String getOpinion() {
@@ -75,12 +75,14 @@ public class Review {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Review review = (Review) o;
-        return userId.equals(review.userId) && gameId.equals(review.gameId) && Objects.equals(id, review.id) && Objects.equals(mark, review.mark) && Objects.equals(opinion, review.opinion);
+        return userId.equals(review.userId) && gameId.equals(review.gameId)
+                && Objects.equals(id, review.id) && Objects.equals(rating, review.rating)
+                && Objects.equals(opinion, review.opinion);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, gameId, id, mark, opinion);
+        return Objects.hash(userId, gameId, id, rating, opinion);
     }
 
     @Override
@@ -89,7 +91,7 @@ public class Review {
                 "userId=" + userId +
                 ", gameId=" + gameId +
                 ", id=" + id +
-                ", mark=" + mark +
+                ", rating=" + rating +
                 ", opinion='" + opinion + '\'' +
                 '}';
     }

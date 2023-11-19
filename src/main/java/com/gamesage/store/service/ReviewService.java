@@ -51,15 +51,14 @@ public class ReviewService {
         if (user.hasGame(game)) {
             repository.createOne(review);
         }
-
         return null;
     }
 
-    public Review updateReview(Review review) {
+    public Review updateOrCreateReview(Review review) {
         if (existsReview(review)) {
-            return repository.createOne(review);
-        } else {
             return repository.updateReview(review);
+        } else {
+            return createReview(review);
         }
     }
 }

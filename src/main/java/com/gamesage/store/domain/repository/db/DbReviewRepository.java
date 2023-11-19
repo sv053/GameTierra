@@ -65,7 +65,7 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
 
     public Review updateReview(Review review) {
         jdbcTemplate.update(UPDATE_REVIEW_QUERY
-                , review.getMark()
+                , review.getRating()
                 , review.getOpinion()
                 , review.getId());
         return review;

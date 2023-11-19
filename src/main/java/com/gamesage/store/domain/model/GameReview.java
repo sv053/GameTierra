@@ -9,13 +9,13 @@ public class GameReview {
 
     private Integer id;
     private List<Review> reviews;
-    private Double avgUserExperience;
+    private Double avgRating;
 
-    public GameReview(Integer gameId, Integer id, List<Review> reviews, Double avgUserExperience) {
+    public GameReview(Integer gameId, Integer id, List<Review> reviews, Double avgRating) {
         this.gameId = gameId;
         this.id = id;
         this.reviews = reviews;
-        this.avgUserExperience = avgUserExperience;
+        this.avgRating = avgRating;
     }
 
     public Integer getGameId() {
@@ -38,17 +38,17 @@ public class GameReview {
         this.reviews = reviews;
     }
 
-    public Double getAvgUserExperience() {
-        return avgUserExperience;
+    public Double getAvgRating() {
+        return avgRating;
     }
 
-    public void setAvgUserExperience() {
-        this.avgUserExperience = calculateAvgUserExperience();
+    public void setAvgRating() {
+        this.avgRating = calculateAvgUserExperience();
     }
 
     private Double calculateAvgUserExperience() {
         return reviews.stream()
-                .flatMapToInt(review -> IntStream.of(review.getMark()))
+                .flatMapToInt(review -> IntStream.of(review.getRating()))
                 .average()
                 .orElse(0);
     }
