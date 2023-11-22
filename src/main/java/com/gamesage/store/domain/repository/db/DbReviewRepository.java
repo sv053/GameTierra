@@ -26,12 +26,10 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
     private static final String SELECT_REVIEWS_BY_GAME_QUERY =
             "SELECT id, user_id, review_datetime, (AVG)mark as average_rating, opinion " +
                     " FROM review " +
-//                    " LEFT JOIN game " +
-//                    " ON game.id = review.game_id  " +
                     " WHERE game_id = ? " +
                     " group by id, user_id, review_datetime, opinion";
     private static final String SELECT_REVIEWS_QUERY =
-            "SELECT id, user_id, game_id, rating, opinion, order_datetime, " +
+            "SELECT id, user_id, game_id, rating, opinion, review_datetime " +
                     " FROM review ";
     private static final String UPDATE_REVIEW_QUERY =
             "UPDATE review SET rating = ?, opinion = ? " +
@@ -108,9 +106,12 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
 
             return new Review(
                     rs.getInt("id"),
-                    rs.getInt("userId"),
-                    rs.getInt("gameId"),
-                    dateTime);
+                    rs.getInt("user_id"),
+                    rs.getInt("game_id"),
+                    dateTime,
+                    rs.getInt("rating"),
+                    rs.getString("opinion")
+            );
         }
     }
 }

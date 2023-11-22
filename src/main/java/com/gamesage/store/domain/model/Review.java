@@ -25,7 +25,7 @@ public class Review {
         this.dateTime = localDateTime;
     }
 
-    public Review(Integer userId, Integer gameId, LocalDateTime dateTime, Integer id, Integer mark, String opinion) {
+    public Review(Integer id, Integer userId, Integer gameId, LocalDateTime dateTime, Integer mark, String opinion) {
         this.userId = userId;
         this.gameId = gameId;
         this.dateTime = dateTime;
