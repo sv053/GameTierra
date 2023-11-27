@@ -1,5 +1,8 @@
 package com.gamesage.store.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -25,13 +28,19 @@ public class Review {
         this.dateTime = localDateTime;
     }
 
-    public Review(Integer id, Integer userId, Integer gameId, LocalDateTime dateTime, Integer mark, String opinion) {
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+    public Review(@JsonProperty("id") Integer id,
+                  @JsonProperty("user_id") Integer userId,
+                  @JsonProperty("game_id") Integer gameId,
+                  @JsonProperty("rating") Integer rating,
+                  @JsonProperty("opinion") String opinion,
+                  @JsonProperty("review_dateTime") LocalDateTime dateTime) {
         this.userId = userId;
         this.gameId = gameId;
-        this.dateTime = dateTime;
         this.id = id;
-        this.rating = mark;
+        this.rating = rating;
         this.opinion = opinion;
+        this.dateTime = dateTime;
     }
 
     public Integer getUserId() {

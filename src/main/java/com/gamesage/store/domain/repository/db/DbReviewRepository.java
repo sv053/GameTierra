@@ -28,6 +28,10 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
                     " FROM review " +
                     " WHERE game_id = ? " +
                     " group by id, user_id, review_datetime, opinion";
+    private static final String SELECT_REVIEW_QUERY =
+            "SELECT id, user_id, game_id, rating, opinion, review_datetime " +
+                    " FROM review " +
+                    " WHERE id = ? ";
     private static final String SELECT_REVIEWS_QUERY =
             "SELECT id, user_id, game_id, rating, opinion, review_datetime " +
                     " FROM review ";
@@ -52,12 +56,16 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
                             Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, review.getUserId());
             ps.setInt(2, review.getGameId());
+            ps.setInt(3, review.getRating());
+            ps.setString(4, review.getOpinion());
             ps.setTimestamp(3, Timestamp.valueOf(review.getDateTime()));
             return ps;
         }, keyHolder);
         return new Review(keyHolder.getKeyAs(Integer.class),
                 review.getGameId(),
                 review.getUserId(),
+                review.getRating(),
+                review.getOpinion(),
                 review.getDateTime());
     }
 
@@ -73,7 +81,7 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
     public Optional<Review> findById(Integer id) {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(
-                    SELECT_REVIEWS_QUERY
+                    SELECT_REVIEW_QUERY
                     , reviewRowMapper
                     , id));
         } catch (EmptyResultDataAccessException e) {
@@ -108,9 +116,9 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
                     rs.getInt("id"),
                     rs.getInt("user_id"),
                     rs.getInt("game_id"),
-                    dateTime,
                     rs.getInt("rating"),
-                    rs.getString("opinion")
+                    rs.getString("opinion"),
+                    dateTime
             );
         }
     }
