@@ -61,5 +61,9 @@ public class ReviewService {
             return createReview(review);
         }
     }
+
+    public void deleteAll() {
+        repository.deleteAll();
+    }
 }
 

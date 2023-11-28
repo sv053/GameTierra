@@ -38,6 +38,8 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
     private static final String UPDATE_REVIEW_QUERY =
             "UPDATE review SET rating = ?, opinion = ? " +
                     "WHERE id = ?";
+    private static final String REMOVE_REVIEWS = "DELETE " +
+            " FROM review ";
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<Review> reviewRowMapper;
 
@@ -102,6 +104,11 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
     @Override
     public List<Review> findAll() {
         return jdbcTemplate.query(SELECT_REVIEWS_QUERY, reviewRowMapper);
+    }
+
+    @Override
+    public void deleteAll() {
+        jdbcTemplate.update(REMOVE_REVIEWS);
     }
 
     @Component

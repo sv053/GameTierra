@@ -9,5 +9,7 @@ public interface ReviewRepository<T, K> extends Repository<T, K> {
     List<T> findByGameId(Integer gameId);
 
     T updateReview(T review);
+
+    void deleteAll();
 }
 

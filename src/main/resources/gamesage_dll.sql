@@ -40,8 +40,9 @@ CREATE TABLE IF NOT EXISTS 'orders'
 
 CREATE TABLE IF NOT EXISTS 'token'
 (
-    'token_value' TEXT,
-    'user_id'     INTEGER,
+    'token_value'     TEXT,
+    'user_id'         INTEGER,
+    'expiration_date' DATETIME_INTERVAL_CODE,
     PRIMARY KEY ('user_id'),
     CONSTRAINT 'user_fk' FOREIGN KEY ('user_id') REFERENCES 'user' ('id') ON DELETE CASCADE
 );
@@ -51,7 +52,7 @@ CREATE TABLE IF NOT EXISTS 'review'
     'id'              INTEGER,
     'user_id'         INTEGER,
     'game_id'         INTEGER,
-    'mark'            INTEGER,
+    'rating'          INTEGER,
     'opinion'         TEXT,
     'review_datetime' DATETIME_INTERVAL_CODE,
     PRIMARY KEY ('id' AUTOINCREMENT),
