@@ -49,7 +49,7 @@ public class ReviewService {
         Game game = gameService.findById(review.getGameId());
         User user = userService.findById(review.getUserId());
         if (user.hasGame(game)) {
-            repository.createOne(review);
+            return repository.createOne(review);
         }
         return null;
     }

@@ -22,9 +22,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
 
-    private static final String API_ORDER_ENDPOINT = "/cart";
-    private static final String ORDER_ID_ENDPOINT = "/cart/{id}";
-    private static final String ORDER_BUY_ENDPOINT = "/cart/{gameId}/{userId}";
+    private static final String API_REVIEW_ENDPOINT = "/reviews";
+    private static final String REVIEW_ID_ENDPOINT = "/reviews/{id}";
+    private static final String ORDER_BUYREVIEW_ENDPOINT = "/reviews/{gameId}/{userId}";
     private static final String WRONG_TOKEN_HEADER = "unknownTokenValue";
     private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
 
@@ -48,28 +48,28 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
     }
 
     @Test
-    void givenWrongCreds_shouldNotFindOrderByIdAndReturn401() throws Exception {
+    void givenWrongCreds_shouldNotFindReviewById() throws Exception {
         int wrongId = -15;
-        mockMvc.perform(get(ORDER_ID_ENDPOINT, wrongId)
+        mockMvc.perform(get(REVIEW_ID_ENDPOINT, wrongId)
                         .header(TOKEN_HEADER_TITLE, WRONG_TOKEN_HEADER)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void givenUnknownUser_shouldNotFindOrderByIdAndReturn403() throws Exception {
+    void givenUnknownUser_shouldNotFindReviewById() throws Exception {
         int wrongId = -15;
-        mockMvc.perform(get(ORDER_ID_ENDPOINT, wrongId)
+        mockMvc.perform(get(REVIEW_ID_ENDPOINT, wrongId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    void givenRightCreds_shouldFindAllOrders() throws Exception {
+    void givenRightCreds_shouldFindAllReviews() throws Exception {
         orderService.buyGame(game.getId(), user.getId());
         orderService.buyGame(savedGames.get(1).getId(), user.getId());
 
-        mockMvc.perform(get(API_ORDER_ENDPOINT)
+        mockMvc.perform(get(REVIEW_ID_ENDPOINT)
                         .header(TOKEN_HEADER_TITLE, token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -79,12 +79,12 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
     }
 
     @Test
-    void givenRightCreds_shouldFindOrderById() throws Exception {
+    void givenRightCreds_shouldFindReviewById() throws Exception {
         orderService.buyGame(game.getId(), user.getId());
 
         Order order = orderService.findAll().get(0);
 
-        mockMvc.perform(get(ORDER_ID_ENDPOINT, order.getId())
+        mockMvc.perform(get(REVIEW_ID_ENDPOINT, order.getId())
                         .header(TOKEN_HEADER_TITLE, token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -95,21 +95,28 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
     }
 
     @Test
-    void givenRightCreds_shouldBuyGame() throws Exception {
-        mockMvc.perform(post(ORDER_BUY_ENDPOINT, game.getId(), user.getId())
+    void givenRightCreds_shouldWriteReview() throws Exception {
+        mockMvc.perform(post(REVIEW_ID_ENDPOINT, game.getId(), user.getId())
                         .header(TOKEN_HEADER_TITLE, token)
                         .content(userJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.bought").value(true))
-                .andExpect(jsonPath("$.buyer.id").value(user.getId()))
-                .andExpect(jsonPath("$.buyer.login").value(user.getLogin()))
-                .andExpect(jsonPath("$.targetGame.name").value(game.getName()));
+                .andExpect(jsonPath("$.userId").value(true))
+                .andExpect(jsonPath("$.gameId").value(user.getId()));
     }
 
     @Test
-    void givenWrongCreds_shouldNotBuyGame() throws Exception {
-        mockMvc.perform(post(ORDER_BUY_ENDPOINT, game.getId(), user.getId())
+    void givenWrongCreds_shouldNotWriteReview() throws Exception {
+        mockMvc.perform(post(REVIEW_ID_ENDPOINT, game.getId(), user.getId())
+                        .header(TOKEN_HEADER_TITLE, WRONG_TOKEN_HEADER)
+                        .content(userJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void hasNotGame_shouldNotWriteReview() throws Exception {
+        mockMvc.perform(post(REVIEW_ID_ENDPOINT, game.getId(), user.getId())
                         .header(TOKEN_HEADER_TITLE, WRONG_TOKEN_HEADER)
                         .content(userJson)
                         .contentType(MediaType.APPLICATION_JSON))

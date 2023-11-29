@@ -18,7 +18,7 @@ public class GameService {
     }
 
     public Game findById(int id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id, Game.class.getSimpleName()));
     }
 
     public List<Game> findAll() {
