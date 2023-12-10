@@ -1,9 +1,10 @@
 package com.gamesage.store.service;
 
-import com.gamesage.store.domain.model.Game;
+import com.gamesage.store.domain.model.GameReview;
 import com.gamesage.store.domain.model.Review;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.domain.repository.ReviewRepository;
+import com.gamesage.store.exception.CannotCreateEntityException;
 import com.gamesage.store.exception.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,41 +30,64 @@ public class ReviewService {
     }
 
     public List<Review> findByUserId(int id) {
-        return repository.findByUserId(id);
+        List<Review> foundReviews = repository.findByUserId(id);
+        if (foundReviews.isEmpty()) {
+            throw new EntityNotFoundException(id, Review.class.getSimpleName());
+        }
+        return foundReviews;
     }
 
     public List<Review> findByGameId(int id) {
-        return repository.findByGameId(id);
+        List<Review> foundReviews = repository.findByGameId(id);
+        if (foundReviews.isEmpty()) {
+            throw new EntityNotFoundException(id, Review.class.getSimpleName());
+        }
+        return foundReviews;
+    }
+
+    public GameReview createGameReview(List<Review> reviews, int gameId) {
+        return new GameReview(gameId, reviews).setAvgRating();
+    }
+
+    public GameReview prepareGameReview(int gameId) {
+        return createGameReview(findByGameId(gameId), gameId);
     }
 
     public List<Review> findAll() {
-        return repository.findAll();
+        List<Review> foundReviews = repository.findAll();
+        if (foundReviews.isEmpty()) {
+            throw new EntityNotFoundException(Review.class.getSimpleName());
+        }
+        return foundReviews;
     }
 
     private boolean existsReview(Review review) {
         return repository.findById(review.getId()).isPresent();
     }
 
-    @Transactional
-    public Review createReview(Review review) {
-        Game game = gameService.findById(review.getGameId());
-        User user = userService.findById(review.getUserId());
-        if (user.hasGame(game)) {
-            return repository.createOne(review);
-        }
-        return null;
-    }
 
-    public Review updateOrCreateReview(Review review) {
+    public Review updateOrCreateReview(Review review) throws Throwable {
         if (existsReview(review)) {
-            return repository.updateReview(review);
+            return updateReview(review);
         } else {
             return createReview(review);
         }
     }
 
-    public void deleteAll() {
-        repository.deleteAll();
+    @Transactional
+    public Review createReview(Review review) {
+        User user = userService.findById(review.getUserId());
+        if (user.hasGame(review.getGameId())) {
+            return repository.createOne(review);
+        } else throw new CannotCreateEntityException("User is not an owner");
+    }
+
+    public Review updateReview(Review review) throws Throwable {
+        Review existedReview = findById(review.getId());
+        if (existedReview.getGameId().equals(review.getGameId())
+                && existedReview.getUserId().equals(review.getUserId())) {
+            return repository.updateReview(review);
+        } else throw new CannotCreateEntityException();
     }
 }
 

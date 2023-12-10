@@ -17,14 +17,15 @@ import java.util.Optional;
 @org.springframework.stereotype.Repository
 public class DbReviewRepository implements ReviewRepository<Review, Integer> {
 
-    private static final String INSERT_REVIEW = "INSERT INTO review (user_id, game_id, rating, opinion, review_datetime) " +
-            "VALUES (?, ?, ?, ?, ?) ";
+    private static final String INSERT_REVIEW =
+            "INSERT INTO review (user_id, game_id, rating, opinion, review_datetime) " +
+                    "VALUES (?, ?, ?, ?, ?) ";
     private static final String SELECT_REVIEWS_BY_USER_QUERY =
-            "SELECT id, game_id, user_id, rating, opinion, review_datetime " +
+            "SELECT id, user_id, game_id, rating, opinion, review_datetime " +
                     " FROM review " +
                     " WHERE user_id = ?";
     private static final String SELECT_REVIEWS_BY_GAME_QUERY =
-            "SELECT id, user_id, review_datetime, (AVG)rating as average_rating, opinion " +
+            "SELECT id, user_id, game_id, rating as average_rating, opinion, review_datetime " +
                     " FROM review " +
                     " WHERE game_id = ? " +
                     " group by id, user_id, review_datetime, opinion";
@@ -64,8 +65,8 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
             return ps;
         }, keyHolder);
         return new Review(keyHolder.getKeyAs(Integer.class),
-                review.getGameId(),
                 review.getUserId(),
+                review.getGameId(),
                 review.getRating(),
                 review.getOpinion(),
                 review.getDateTime());
@@ -93,7 +94,7 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
 
     @Override
     public List<Review> findByUserId(Integer id) {
-        return jdbcTemplate.query(SELECT_REVIEWS_BY_USER_QUERY, reviewRowMapper);
+        return jdbcTemplate.query(SELECT_REVIEWS_BY_USER_QUERY, reviewRowMapper, id);
     }
 
     @Override

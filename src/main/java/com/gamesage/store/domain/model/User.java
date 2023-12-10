@@ -90,8 +90,8 @@ public class User {
         return price.compareTo(balance) <= 0;
     }
 
-    public boolean hasGame(Game game) {
-        return games.contains(game);
+    public boolean hasGame(int gameId) {
+        return games.stream().anyMatch(game -> game.getId() == gameId);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "\nUser{"
+        return "User{"
                 + "id=" + id
                 + ", login=" + login
                 + ", tier=" + tier

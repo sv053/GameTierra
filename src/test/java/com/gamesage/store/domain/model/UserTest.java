@@ -52,7 +52,7 @@ class UserTest {
         User user = new User(null, null, null, SampleData.TIERS.get(1), BigDecimal.valueOf(123.15d));
         user.addGame(game);
 
-        assertTrue(user.hasGame(game));
+        assertTrue(user.hasGame(game.getId()));
     }
 
     @Test
@@ -60,7 +60,7 @@ class UserTest {
         User user = new User(null, null, null, SampleData.TIERS.get(1), BigDecimal.valueOf(123));
         Game alienGame = new Game(1, "SKYRIM", BigDecimal.valueOf(87.88d));
 
-        assertFalse(user.hasGame(alienGame));
+        assertFalse(user.hasGame(alienGame.getId()));
     }
 
     @Test

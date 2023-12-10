@@ -10,7 +10,7 @@ public class Review {
 
     private final Integer userId;
     private final Integer gameId;
-    private final LocalDateTime dateTime;
+    private LocalDateTime dateTime;
     private Integer id;
     private Integer rating;
     private String opinion;
@@ -35,9 +35,9 @@ public class Review {
                   @JsonProperty("rating") Integer rating,
                   @JsonProperty("opinion") String opinion,
                   @JsonProperty("review_dateTime") LocalDateTime dateTime) {
+        this.id = id;
         this.userId = userId;
         this.gameId = gameId;
-        this.id = id;
         this.rating = rating;
         this.opinion = opinion;
         this.dateTime = dateTime;
@@ -75,6 +75,10 @@ public class Review {
         this.opinion = opinion;
     }
 
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+
     public LocalDateTime getDateTime() {
         return dateTime;
     }
@@ -86,12 +90,12 @@ public class Review {
         Review review = (Review) o;
         return userId.equals(review.userId) && gameId.equals(review.gameId)
                 && Objects.equals(id, review.id) && Objects.equals(rating, review.rating)
-                && Objects.equals(opinion, review.opinion);
+                && Objects.equals(opinion, review.opinion) && Objects.equals(dateTime, review.dateTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, gameId, id, rating, opinion);
+        return Objects.hash(userId, gameId, id, rating, opinion, dateTime);
     }
 
     @Override
@@ -102,6 +106,7 @@ public class Review {
                 ", id=" + id +
                 ", rating=" + rating +
                 ", opinion='" + opinion + '\'' +
+                ", dateTime='" + dateTime + '\'' +
                 '}';
     }
 }

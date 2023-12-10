@@ -1,21 +1,19 @@
 package com.gamesage.store.domain.model;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
 public class GameReview {
 
     private final Integer gameId;
 
-    private Integer id;
+    private static Integer id = 0;
     private List<Review> reviews;
     private Double avgRating;
 
-    public GameReview(Integer gameId, Integer id, List<Review> reviews, Double avgRating) {
+    public GameReview(Integer gameId, List<Review> reviews) {
+        id++;
         this.gameId = gameId;
-        this.id = id;
         this.reviews = reviews;
-        this.avgRating = avgRating;
     }
 
     public Integer getGameId() {
@@ -24,10 +22,6 @@ public class GameReview {
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public List<Review> getReviews() {
@@ -42,15 +36,16 @@ public class GameReview {
         return avgRating;
     }
 
-    public void setAvgRating() {
+    public GameReview setAvgRating() {
         this.avgRating = calculateAvgUserExperience();
+        return this;
     }
 
     private Double calculateAvgUserExperience() {
         return reviews.stream()
-                .flatMapToInt(review -> IntStream.of(review.getRating()))
+                .mapToDouble(Review::getRating)
                 .average()
-                .orElse(0);
+                .orElse(0.0);
     }
 }
 

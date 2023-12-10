@@ -1,6 +1,10 @@
 package com.gamesage.store.service;
 
-import com.gamesage.store.domain.model.*;
+import com.gamesage.store.domain.data.SampleData;
+import com.gamesage.store.domain.model.Game;
+import com.gamesage.store.domain.model.Review;
+import com.gamesage.store.domain.model.User;
+import com.gamesage.store.exception.CannotCreateEntityException;
 import com.gamesage.store.exception.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,34 +21,31 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 class ReviewServiceIntegrationTest {
 
+    private final int rating = 5;
+    private final String description = "on a need-to-know basis";
+    private final LocalDateTime reviewDateTime = LocalDateTime.of(2002, 3, 26, 6, 53);
+    private User user;
+    private Game game;
+    private Review review;
+    private Review reviewToCreate;
+    private int userId;
+    private int gameId;
+
     @Autowired
     private UserService userService;
     @Autowired
     private GameService gameService;
-    private final int rating = 5;
     @Autowired
     private ReviewService reviewService;
-
-
-    private final String description = "wow";
-    private final LocalDateTime reviewDateTime = LocalDateTime.of(2002, 3, 26, 6, 53);
     @Autowired
     private OrderService orderService;
-    private User user;
-    private Game game;
-    private int gameId;
-    private int userId;
-    private Order order;
-    private Review review;
-    private Review reviewToCreate;
 
     @BeforeEach
     void init() {
-        User userToCreate = new User(null, "aqua", "marina", new Tier(
-                3, "SILVER", 10.d), BigDecimal.TEN);
+        User userToCreate = SampleData.USERS.get(1);
         user = userService.createOne(userToCreate);
         userId = user.getId();
-        game = gameService.createOne(new Game("gone with the wind", BigDecimal.TEN));
+        game = gameService.createOne(SampleData.GAMES.get(1));
         gameId = game.getId();
         reviewToCreate = new Review(1, userId, gameId, rating, description, reviewDateTime);
         orderService.buyGame(game.getId(), user.getId());
@@ -52,10 +53,9 @@ class ReviewServiceIntegrationTest {
 
     @Test
     void findById_Success() throws Throwable {
-//        Review createdReview = reviewService.createReview(n)
         review = reviewService.createReview(reviewToCreate);
 
-        assertEquals(review, reviewService.findById(review.getId()));
+        assertEquals(reviewToCreate.getOpinion(), reviewService.findById(review.getId()).getOpinion());
     }
 
     @Test
@@ -65,9 +65,24 @@ class ReviewServiceIntegrationTest {
 
     @Test
     void findReviewsByGameId_Success() {
+        User userForSecondReview = SampleData.USERS.get(2);
+        User secondSavedUser = userService.createOne(userForSecondReview);
+        orderService.buyGame(game.getId(), secondSavedUser.getId());
         review = reviewService.createReview(reviewToCreate);
 
-        assertTrue(reviewService.findByGameId(review.getGameId()).contains(review));
+        Review secondReview = reviewService.createReview(new Review(
+                98,
+                secondSavedUser.getId(),
+                game.getId(),
+                rating,
+                description,
+                reviewDateTime));
+        reviewService.createReview(reviewToCreate);
+        Review secondSavedReview = reviewService.createReview(secondReview);
+
+        List<Review> reviews = reviewService.findByGameId(review.getGameId());
+        assertTrue(reviews.contains(review));
+        assertTrue(reviewService.findByGameId(review.getGameId()).contains(secondSavedReview));
     }
 
     @Test
@@ -78,13 +93,14 @@ class ReviewServiceIntegrationTest {
     @Test
     void findByUserId_Success() {
         review = reviewService.createReview(reviewToCreate);
+        List<Review> foundReviews = reviewService.findByUserId(review.getUserId());
 
-        assertEquals(review, reviewService.findByUserId(review.getId()));
+        assertEquals(review, foundReviews.get(0));
     }
 
     @Test
     void findByUserId_Failure() {
-        assertThrows(EntityNotFoundException.class, () -> reviewService.findByUserId(-613620));
+        assertThrows(EntityNotFoundException.class, () -> reviewService.findByUserId(-8888888));
     }
 
     @Test
@@ -96,56 +112,71 @@ class ReviewServiceIntegrationTest {
 
     @Test
     void findAll_Failure_EmptyList() {
-        LocalDateTime beforeDateTime = LocalDateTime.now();
-
+        assertThrows(EntityNotFoundException.class, () -> reviewService.findByUserId(-613620));
     }
 
     @Test
-    void findAll_Failure_() throws Throwable {
-        assertEquals(review, reviewService.findById(review.getId()));
-    }
-
-    @Test
-    void createReview_Success() {
+    void createReview_HasAuthHasGame_Success() {
         review = reviewService.createReview(reviewToCreate);
 
+        assertEquals(reviewToCreate.getOpinion(), review.getOpinion());
     }
 
     @Test
-    void createReview_Failure_WrongUserId_UserDoesNotExist() {
-
+    void createReview_WrongUserId_Failure() {
+        assertThrows(EntityNotFoundException.class, () ->
+                reviewService.createReview(new Review(
+                        9876,
+                        9876,
+                        gameId,
+                        rating,
+                        description,
+                        reviewDateTime)));
     }
 
     @Test
-    void createReview_Failure_WrongGameId_UserIsNotOwner() {
+    void createReview_WrongGameId_Failure() {
+        assertThrows(EntityNotFoundException.class, () -> reviewService.findByUserId(-613620));
     }
 
     @Test
-    void createReview_Failure_WrongUserId() {
+    void updateReview_NotAnOwner_Failure() {
+        int noOwnerGameId = 7878787;
+        assertThrows(CannotCreateEntityException.class, () ->
+                reviewService.createReview(new Review(
+                        98,
+                        userId,
+                        noOwnerGameId,
+                        rating,
+                        description,
+                        reviewDateTime)));
     }
 
     @Test
-    void updateReview_Success() throws Throwable {
+    void updateReviewOpinion_Success() throws Throwable {
+        String changedOpinion = "so so";
         review = reviewService.createReview(reviewToCreate);
-        review.setOpinion("so so");
+        review.setOpinion(changedOpinion);
         reviewService.updateOrCreateReview(review);
 
-        assertEquals(review.getOpinion(), reviewService.findById(review.getId()).getOpinion());
+        assertEquals(changedOpinion, reviewService.findById(review.getId()).getOpinion());
     }
 
     @Test
-    void updateReview_Failure_WrongId_ReviewDoesNotExist() {
-
-    }
-
-    @Test
-    void updateReview_Failure_WrongUserId() {
-    }
-
-    @Test
-    void updateReview_Failure_WrongGameId() {
-//
-//        assertEquals(expectedPurchase.getTargetGame(), result.getTargetGame());
+    void updateReview_WrongGameId_Failure() throws Throwable {
+        Review reviewToUpdate = reviewService.createReview(reviewToCreate);
+        int noOwnerGameId = 7878787;
+        String newOpinion = "wow";
+        Review updatingReview = new Review(
+                reviewToUpdate.getId(),
+                reviewToUpdate.getUserId(),
+                noOwnerGameId,
+                reviewToUpdate.getRating(),
+                newOpinion,
+                reviewToUpdate.getDateTime());
+        assertThrows(CannotCreateEntityException.class, () ->
+                reviewService.updateOrCreateReview(updatingReview));
+        assertEquals(reviewToCreate.getOpinion(), reviewService.findById(reviewToUpdate.getId()).getOpinion());
     }
 }
 

@@ -1,5 +1,6 @@
 package com.gamesage.store.controller;
 
+import com.gamesage.store.domain.model.GameReview;
 import com.gamesage.store.domain.model.Review;
 import com.gamesage.store.service.ReviewService;
 import org.springframework.web.bind.annotation.*;
@@ -21,12 +22,12 @@ public class ReviewController {
         return reviewService.findById(id);
     }
 
-    @GetMapping("/game/{id}")
-    public List<Review> findReviewByGameId(@PathVariable Integer id) {
-        return reviewService.findByGameId(id);
+    @GetMapping("/games/{id}")
+    public GameReview findReviewByGameId(@PathVariable Integer id) {
+        return reviewService.prepareGameReview(id);
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/users/{id}")
     public List<Review> findReviewByUserId(@PathVariable Integer id) {
         return reviewService.findByUserId(id);
     }
@@ -37,12 +38,12 @@ public class ReviewController {
     }
 
     @PostMapping
-    public Review createReview(@RequestBody Review review) {
+    public Review createReview(@RequestBody Review review) throws Throwable {
         return reviewService.updateOrCreateReview(review);
     }
 
     @PostMapping("/{id}")
-    public Review updateReview(@RequestBody Review review) {
+    public Review updateReview(@RequestBody Review review) throws Throwable {
         return reviewService.updateOrCreateReview(review);
     }
 }
