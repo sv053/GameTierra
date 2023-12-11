@@ -6,22 +6,16 @@ public class GameReview {
 
     private final Integer gameId;
 
-    private static Integer id = 0;
     private List<Review> reviews;
     private Double avgRating;
 
     public GameReview(Integer gameId, List<Review> reviews) {
-        id++;
         this.gameId = gameId;
         this.reviews = reviews;
     }
 
     public Integer getGameId() {
         return gameId;
-    }
-
-    public Integer getId() {
-        return id;
     }
 
     public List<Review> getReviews() {
