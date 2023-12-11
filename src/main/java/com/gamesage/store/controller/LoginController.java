@@ -1,5 +1,6 @@
 package com.gamesage.store.controller;
 
+import com.gamesage.store.domain.model.AuthToken;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.security.auth.HeaderName;
 import com.gamesage.store.security.service.AuthService;
@@ -21,9 +22,9 @@ public class LoginController {
 
     @PostMapping
     public ResponseEntity<User> login(@RequestBody User user) {
-        String token = authService.authenticateUser(user).getValue();
+        AuthToken authToken = authService.authenticateUser(user);
         return ResponseEntity.ok()
-                .header(HeaderName.TOKEN_HEADER, token)
+                .header(HeaderName.TOKEN_HEADER, authToken.getValue())
                 .body(user);
     }
 }

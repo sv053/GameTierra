@@ -49,7 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PreAuthenticationFilter preAuthenticationFilter() {
-        PreAuthenticationFilter filter = new PreAuthenticationFilter();
+        PreAuthenticationFilter filter = new PreAuthenticationFilter(tokenService, encoder);
         filter.setAuthenticationManager(authenticationManagerBean());
         return filter;
     }
@@ -66,7 +66,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/login").anonymous()
                 .antMatchers(HttpMethod.GET, "/users", "/cart", "/users/**", "/cart/**").authenticated()
-                .antMatchers(HttpMethod.POST, "/cart/**", "/reviews", "/reviews/**").authenticated()
+                .antMatchers(HttpMethod.POST, "/cart/**").authenticated()
                 .and()
                 .addFilter(preAuthenticationFilter())
                 .addFilterBefore(exceptionHandler, LogoutFilter.class)

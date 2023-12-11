@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -25,7 +24,7 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
     private static final String API_ORDER_ENDPOINT = "/cart";
     private static final String ORDER_ID_ENDPOINT = "/cart/{id}";
     private static final String ORDER_BUY_ENDPOINT = "/cart/{gameId}/{userId}";
-    private static final String WRONG_TOKEN_HEADER = "unknownTokenValue";
+    private static final String WRONG_TOKEN_HEADER = "111111&unknownTokenValue";
     private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
 
     private String userJson;
@@ -48,16 +47,16 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
     }
 
     @Test
-    void givenWrongCreds_shouldNotFindOrderByIdAndReturn401() throws Exception {
+    void givenWrongCreds_shouldNotFindOrderById() throws Exception {
         int wrongId = -15;
         mockMvc.perform(get(ORDER_ID_ENDPOINT, wrongId)
                         .header(TOKEN_HEADER_TITLE, WRONG_TOKEN_HEADER)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    void givenUnknownUser_shouldNotFindOrderByIdAndReturn403() throws Exception {
+    void givenUnknownUser_shouldNotFindOrderById() throws Exception {
         int wrongId = -15;
         mockMvc.perform(get(ORDER_ID_ENDPOINT, wrongId)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -73,9 +72,10 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
                         .header(TOKEN_HEADER_TITLE, token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.*.game.name", containsInAnyOrder(
-                        game.getName(), savedGames.get(1).getName())))
-                .andExpect(jsonPath("$.*.user.login").isNotEmpty());
+                .andExpect(jsonPath("$[0].user.login").value(user.getLogin()))
+                .andExpect(jsonPath("$[0].user.id").value(user.getId()))
+                .andExpect(jsonPath("$[0].game.name").value(game.getName()))
+                .andExpect(jsonPath("$[0].game.id").value(game.getId()));
     }
 
     @Test
@@ -113,7 +113,16 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
                         .header(TOKEN_HEADER_TITLE, WRONG_TOKEN_HEADER)
                         .content(userJson)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void givenEmptyToken_shouldNotBuyGame() throws Exception {
+        mockMvc.perform(post(ORDER_BUY_ENDPOINT, game.getId(), user.getId())
+                        .header(TOKEN_HEADER_TITLE, "")
+                        .content(userJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 }
 
