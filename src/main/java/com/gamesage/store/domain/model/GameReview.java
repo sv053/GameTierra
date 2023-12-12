@@ -6,12 +6,39 @@ public class GameReview {
 
     private final Integer gameId;
 
-    private List<Review> reviews;
+    private final List<Review> reviews;
     private Double avgRating;
+    private Double avgPositiveRating;
+    private Integer positiveRatingCount;
+    private Integer negativeRatingCount;
 
     public GameReview(Integer gameId, List<Review> reviews) {
         this.gameId = gameId;
         this.reviews = reviews;
+    }
+
+    public Double getAvgPositiveRating() {
+        return avgPositiveRating;
+    }
+
+    public void setAvgPositiveRating() {
+        this.avgPositiveRating = calculateAvgPositiveUserExperience();
+    }
+
+    public Integer getPositiveRatingCount() {
+        return positiveRatingCount;
+    }
+
+    public void setPositiveRatingCount() {
+        this.positiveRatingCount = calculatePositiveUserExperience();
+    }
+
+    public Integer getNegativeRatingCount() {
+        return negativeRatingCount;
+    }
+
+    public void setNegativeRatingCount() {
+        this.negativeRatingCount = calculateNegativeUserExperience();
     }
 
     public Integer getGameId() {
@@ -20,10 +47,6 @@ public class GameReview {
 
     public List<Review> getReviews() {
         return reviews;
-    }
-
-    public void setReviews(List<Review> reviews) {
-        this.reviews = reviews;
     }
 
     public Double getAvgRating() {
@@ -40,6 +63,20 @@ public class GameReview {
                 .mapToDouble(Review::getRating)
                 .average()
                 .orElse(0.0);
+    }
+
+    public Integer calculatePositiveUserExperience() {
+        return reviews.stream()
+                .mapToInt(Review::getRating)
+                .sum();
+    }
+
+    public Double calculateAvgPositiveUserExperience() {
+        return calculateAvgUserExperience() / reviews.size() * 100;
+    }
+
+    public Integer calculateNegativeUserExperience() {
+        return reviews.size() - calculatePositiveUserExperience();
     }
 }
 
