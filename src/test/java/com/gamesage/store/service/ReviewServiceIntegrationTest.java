@@ -82,27 +82,27 @@ class ReviewServiceIntegrationTest {
         reviewService.createReview(reviewToCreate);
         Review secondSavedReview = reviewService.createReview(secondReview);
 
-        List<Review> reviews = reviewService.findByGameId(review.getGameId());
+        List<Review> reviews = reviewService.findByGameId(review.getGameId(), 1, 10);
         assertTrue(reviews.contains(review));
-        assertTrue(reviewService.findByGameId(review.getGameId()).contains(secondSavedReview));
+        assertTrue(reviewService.findByGameId(review.getGameId(), 1, 10).contains(secondSavedReview));
     }
 
     @Test
     void findByGameId_Failure() {
-        assertThrows(EntityNotFoundException.class, () -> reviewService.findByGameId(99999999));
+        assertThrows(EntityNotFoundException.class, () -> reviewService.findByGameId(99999999, 1, 1));
     }
 
     @Test
     void findByUserId_Success() {
         review = reviewService.createReview(reviewToCreate);
-        List<Review> foundReviews = reviewService.findByUserId(review.getUserId());
+        List<Review> foundReviews = reviewService.findByUserId(review.getUserId(), 1, 10);
 
         assertEquals(review, foundReviews.get(0));
     }
 
     @Test
     void findByUserId_Failure() {
-        assertThrows(EntityNotFoundException.class, () -> reviewService.findByUserId(-8888888));
+        assertThrows(EntityNotFoundException.class, () -> reviewService.findByUserId(-8888888, 1, 1));
     }
 
     @Test
@@ -114,7 +114,7 @@ class ReviewServiceIntegrationTest {
 
     @Test
     void findAll_Failure_EmptyList() {
-        assertThrows(EntityNotFoundException.class, () -> reviewService.findByUserId(-613620));
+        assertThrows(EntityNotFoundException.class, () -> reviewService.findByUserId(-613620, 1, 1));
     }
 
     @Test
@@ -138,7 +138,7 @@ class ReviewServiceIntegrationTest {
 
     @Test
     void createReview_WrongGameId_Failure() {
-        assertThrows(EntityNotFoundException.class, () -> reviewService.findByUserId(-613620));
+        assertThrows(EntityNotFoundException.class, () -> reviewService.findByUserId(-613620, 1, 1));
     }
 
     @Test

@@ -16,49 +16,53 @@ public class ReviewService {
 
     private final ReviewRepository<Review, Integer> repository;
     private final UserService userService;
-    private final GameService gameService;
 
     public ReviewService(ReviewRepository<Review, Integer> repository,
-                         UserService userService, GameService gameService) {
+                         UserService userService) {
         this.repository = repository;
         this.userService = userService;
-        this.gameService = gameService;
     }
 
     public Review findById(int id) throws Throwable {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
     }
 
-    public List<Review> findByUserId(int id) {
+    public List<Review> findByUserId(int id, int page, int size) {
         List<Review> foundReviews = repository.findByUserId(id);
         if (foundReviews.isEmpty()) {
             throw new EntityNotFoundException(id, Review.class.getSimpleName());
         }
-        return foundReviews;
+        int fromIndex = (page - 1) * size;
+        int toIndex = Math.min(fromIndex + size, foundReviews.size());
+        return foundReviews.subList(fromIndex, toIndex);
     }
 
-    public List<Review> findByGameId(int id) {
+    public List<Review> findByGameId(int id, int page, int size) {
         List<Review> foundReviews = repository.findByGameId(id);
         if (foundReviews.isEmpty()) {
             throw new EntityNotFoundException(id, Review.class.getSimpleName());
         }
-        return foundReviews;
+        int fromIndex = (page - 1) * size;
+        int toIndex = Math.min(fromIndex + size, foundReviews.size());
+        return foundReviews.subList(fromIndex, toIndex);
     }
 
     public GameReview createGameReview(List<Review> reviews, int gameId) {
         return new GameReview(gameId, reviews).setAvgRating();
     }
 
-    public GameReview prepareGameReview(int gameId) {
-        return createGameReview(findByGameId(gameId), gameId);
+    public GameReview prepareGameReview(int gameId, int page, int size) {
+        return createGameReview(findByGameId(gameId, page, size), gameId);
     }
 
-    public List<Review> findAll() {
+    public List<Review> findAll(int page, int size) {
         List<Review> foundReviews = repository.findAll();
         if (foundReviews.isEmpty()) {
             throw new EntityNotFoundException(Review.class.getSimpleName());
         }
-        return foundReviews;
+        int fromIndex = (page - 1) * size;
+        int toIndex = Math.min(fromIndex + size, foundReviews.size());
+        return foundReviews.subList(fromIndex, toIndex);
     }
 
     private boolean existsReview(Review review) {

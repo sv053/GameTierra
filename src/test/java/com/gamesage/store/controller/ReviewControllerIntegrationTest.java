@@ -25,10 +25,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
 
-    private static final String REVIEW_ENDPOINT = "/reviews";
+    private static final String REVIEW_ENDPOINT = "/reviews/{page}/{size}";
+    private static final String POST_REVIEW_ENDPOINT = "/reviews";
     private static final String REVIEW_ID_ENDPOINT = "/reviews/{id}";
-    private static final String REVIEW_GAMEID_ENDPOINT = "/reviews/games/{gameid}";
-    private static final String REVIEW_USERID_ENDPOINT = "/reviews/users/{userid}";
+    private static final String REVIEW_GAMEID_ENDPOINT = "/reviews/games/{gameid}/{page}/{size}";
+    private static final String REVIEW_USERID_ENDPOINT = "/reviews/users/{userid}/{page}/{size}";
     private static final String WRONG_TOKEN_HEADER = "unknownTokenValue";
     private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
 
@@ -76,7 +77,7 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
     @Test
     void findReviewById_givenWrongCreds_Failure() throws Exception {
         int wrongId = -15;
-        mockMvc.perform(get(REVIEW_ID_ENDPOINT, wrongId)
+        mockMvc.perform(get(REVIEW_ID_ENDPOINT, wrongId, 1, 1)
                         .header(TOKEN_HEADER_TITLE, WRONG_TOKEN_HEADER)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
@@ -85,7 +86,7 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
     @Test
     void findReviewById_givenUnknownUser_Failure() throws Exception {
         int wrongId = -15;
-        mockMvc.perform(get(REVIEW_ID_ENDPOINT, wrongId)
+        mockMvc.perform(get(REVIEW_ID_ENDPOINT, wrongId, 1, 10)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -104,7 +105,7 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
                 description,
                 reviewDateTime));
 
-        mockMvc.perform(get(REVIEW_USERID_ENDPOINT, user.getId())
+        mockMvc.perform(get(REVIEW_USERID_ENDPOINT, user.getId(), 1, 3)
                         .header(TOKEN_HEADER_TITLE, token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -132,7 +133,7 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
                 reviewDateTime));
         GameReview gameReview = new GameReview(game.getId(), List.of(review, secondReview)).setAvgRating();
 
-        mockMvc.perform(get(REVIEW_GAMEID_ENDPOINT, game.getId())
+        mockMvc.perform(get(REVIEW_GAMEID_ENDPOINT, game.getId(), 1, 2)
                         .header(TOKEN_HEADER_TITLE, token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -147,7 +148,7 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
     void writeReview_givenRightCredsAndHasGame_Success() throws Exception {
         orderService.buyGame(game.getId(), user.getId());
 
-        mockMvc.perform(post(REVIEW_ENDPOINT)
+        mockMvc.perform(post(POST_REVIEW_ENDPOINT)
                         .header(TOKEN_HEADER_TITLE, token)
                         .content(objectMapper.writeValueAsString(reviewToCreate))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -194,7 +195,7 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
 
     @Test
     void writeReview_hasNoGame_Failure() throws Exception {
-        mockMvc.perform(post(REVIEW_ENDPOINT)
+        mockMvc.perform(post(POST_REVIEW_ENDPOINT)
                         .header(TOKEN_HEADER_TITLE, token)
                         .content(objectMapper.writeValueAsString(reviewToCreate))
                         .contentType(MediaType.APPLICATION_JSON))
