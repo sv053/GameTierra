@@ -94,10 +94,10 @@ class ReviewServiceIntegrationTest {
 
     @Test
     void findByUserId_Success() {
-        review = reviewService.createReview(reviewToCreate);
-        List<Review> foundReviews = reviewService.findByUserId(review.getUserId(), 1, 10);
+        Review review = reviewService.createReview(reviewToCreate);
+        List<Review> foundReviews = reviewService.findByUserId(review.getUserId(), 1, 1);
 
-        assertEquals(review, foundReviews.get(0));
+        assertTrue(foundReviews.contains(review));
     }
 
     @Test

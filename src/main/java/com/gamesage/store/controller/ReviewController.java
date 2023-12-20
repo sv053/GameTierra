@@ -22,19 +22,14 @@ public class ReviewController {
         return reviewService.findById(id);
     }
 
-    @GetMapping("/games/{id}")
-    public GameReview findReviewByGameId(@PathVariable Integer id) {
-        return reviewService.prepareGameReview(id);
+    @GetMapping("/games/{id}/{page}/{size}")
+    public GameReview findReviewByGameId(@PathVariable Integer id, @PathVariable Integer page, @PathVariable Integer size) {
+        return reviewService.prepareGameReview(id, page, size);
     }
 
-    @GetMapping("/users/{id}")
-    public List<Review> findReviewByUserId(@PathVariable Integer id) {
-        return reviewService.findByUserId(id);
-    }
-
-    @GetMapping
-    public List<Review> findAllReviews() {
-        return reviewService.findAll();
+    @GetMapping("/users/{id}/{page}/{size}")
+    public List<Review> findReviewByUserId(@PathVariable Integer id, @PathVariable Integer page, @PathVariable Integer size) {
+        return reviewService.findByUserId(id, page, size);
     }
 
     @PostMapping

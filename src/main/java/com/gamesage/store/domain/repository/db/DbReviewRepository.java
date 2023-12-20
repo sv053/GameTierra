@@ -20,22 +20,23 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
     private static final String INSERT_REVIEW =
             "INSERT INTO review (user_id, game_id, rating, opinion, review_datetime) " +
                     "VALUES (?, ?, ?, ?, ?) ";
-    private static final String SELECT_REVIEWS_BY_USER_QUERY =
+    private static final String SELECT_REVIEWS_RANGE_BY_USER_QUERY =
             "SELECT id, user_id, game_id, rating, opinion, review_datetime " +
                     " FROM review " +
-                    " WHERE user_id = ?";
-    private static final String SELECT_REVIEWS_BY_GAME_QUERY =
+                    " WHERE user_id = ? " +
+                    " LIMIT ? " +
+                    " OFFSET ? ";
+    private static final String SELECT_REVIEWS_RANGE_BY_GAME_QUERY =
             "SELECT id, user_id, game_id, rating as average_rating, opinion, review_datetime " +
                     " FROM review " +
                     " WHERE game_id = ? " +
-                    " group by id, user_id, review_datetime, opinion";
+                    " group by id, user_id, review_datetime, opinion  " +
+                    "LIMIT ? " +
+                    "OFFSET ? ";
     private static final String SELECT_REVIEW_QUERY =
             "SELECT id, user_id, game_id, rating, opinion, review_datetime " +
                     " FROM review " +
                     " WHERE id = ? ";
-    private static final String SELECT_REVIEWS_QUERY =
-            "SELECT id, user_id, game_id, rating, opinion, review_datetime " +
-                    " FROM review ";
     private static final String UPDATE_REVIEW_QUERY =
             "UPDATE review SET rating = ?, opinion = ? " +
                     "WHERE id = ?";
@@ -93,18 +94,17 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
     }
 
     @Override
-    public List<Review> findByUserId(Integer id) {
-        return jdbcTemplate.query(SELECT_REVIEWS_BY_USER_QUERY, reviewRowMapper, id);
+    public List<Review> findByUserId(Integer id, Integer page, Integer size) {
+        int startIndex = size * page - page;
+        return jdbcTemplate.query(SELECT_REVIEWS_RANGE_BY_USER_QUERY,
+                new Object[]{id, size, startIndex}, reviewRowMapper);
     }
 
     @Override
-    public List<Review> findByGameId(Integer id) {
-        return jdbcTemplate.query(SELECT_REVIEWS_BY_GAME_QUERY, reviewRowMapper, id);
-    }
-
-    @Override
-    public List<Review> findAll() {
-        return jdbcTemplate.query(SELECT_REVIEWS_QUERY, reviewRowMapper);
+    public List<Review> findByGameId(Integer id, Integer page, Integer size) {
+        int startIndex = size * page - size;
+        return jdbcTemplate.query(SELECT_REVIEWS_RANGE_BY_GAME_QUERY,
+                new Object[]{id, size, startIndex}, reviewRowMapper);
     }
 
     @Override

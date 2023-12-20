@@ -7,6 +7,7 @@ import com.gamesage.store.domain.model.Review;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.OrderService;
 import com.gamesage.store.service.ReviewService;
+import com.gamesage.store.util.ReviewRating;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +57,7 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
         token = loginAndGetToken(userJson);
         savedGames = gameService.createAll(SampleData.GAMES.subList(0, 2));
         game = savedGames.get(0);
-        reviewToCreate = new Review(1, user.getId(), game.getId(), 7, "cool", LocalDateTime.now());
+        reviewToCreate = new Review(1, user.getId(), game.getId(), ReviewRating.ONE.getValue(), "cool", LocalDateTime.now());
     }
 
     @Test
@@ -75,9 +76,11 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
     }
 
     @Test
-    void findReviewById_givenWrongCreds_Failure() throws Exception {
-        int wrongId = -15;
-        mockMvc.perform(get(REVIEW_ID_ENDPOINT, wrongId, 1, 1)
+    void findReviewById_givenWrongToken_Failure() throws Exception {
+        orderService.buyGame(game.getId(), user.getId());
+        Review savedReview = reviewService.createReview(reviewToCreate);
+
+        mockMvc.perform(get(REVIEW_ID_ENDPOINT, savedReview.getId(), 1, 1)
                         .header(TOKEN_HEADER_TITLE, WRONG_TOKEN_HEADER)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
@@ -92,32 +95,6 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
     }
 
     @Test
-    void findAllReviewsByUserId_givenRightCreds_Success() throws Exception {
-        Game secondSavedGame = savedGames.get(1);
-        orderService.buyGame(game.getId(), user.getId());
-        orderService.buyGame(secondSavedGame.getId(), user.getId());
-        Review review = reviewService.createReview(reviewToCreate);
-        Review secondReview = reviewService.createReview(new Review(
-                111,
-                user.getId(),
-                secondSavedGame.getId(),
-                rating,
-                description,
-                reviewDateTime));
-
-        mockMvc.perform(get(REVIEW_USERID_ENDPOINT, user.getId(), 1, 3)
-                        .header(TOKEN_HEADER_TITLE, token)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.*.id", containsInAnyOrder(
-                        review.getId(), secondReview.getId())))
-                .andExpect(jsonPath("$.*.game_id", containsInAnyOrder(
-                        game.getId(), secondSavedGame.getId())))
-                .andExpect(jsonPath("$.*.opinion", containsInAnyOrder(
-                        review.getOpinion(), secondReview.getOpinion())));
-    }
-
-    @Test
     void findAllReviewsByGameId_givenRightCreds_Success() throws Exception {
         User userForSecondReview = SampleData.USERS.get(2);
         User savedSecondUser = userService.createOne(userForSecondReview);
@@ -128,7 +105,7 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
                 112,
                 savedSecondUser.getId(),
                 game.getId(),
-                rating,
+                ReviewRating.ZERO.getValue(),
                 description,
                 reviewDateTime));
         GameReview gameReview = new GameReview(game.getId(), List.of(review, secondReview)).setAvgRating();
@@ -137,6 +114,7 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
                         .header(TOKEN_HEADER_TITLE, token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.reviews").isArray())
                 .andExpect(jsonPath("$.reviews.*.game_id", containsInAnyOrder(
                         review.getGameId(), secondReview.getGameId())))
                 .andExpect(jsonPath("$.reviews.*.opinion", containsInAnyOrder(

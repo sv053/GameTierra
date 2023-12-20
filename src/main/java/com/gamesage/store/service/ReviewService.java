@@ -28,23 +28,20 @@ public class ReviewService {
     }
 
     public List<Review> findByUserId(int id, int page, int size) {
-        List<Review> foundReviews = repository.findByUserId(id);
-        if (foundReviews.isEmpty()) {
-            throw new EntityNotFoundException(id, Review.class.getSimpleName());
-        }
-        int fromIndex = (page - 1) * size;
-        int toIndex = Math.min(fromIndex + size, foundReviews.size());
-        return foundReviews.subList(fromIndex, toIndex);
+        List<Review> foundReviews = repository.findByUserId(id, page, size);
+        return checkReviewsListNull(id, page, size, foundReviews);
     }
 
     public List<Review> findByGameId(int id, int page, int size) {
-        List<Review> foundReviews = repository.findByGameId(id);
+        List<Review> foundReviews = repository.findByGameId(id, page, size);
+        return checkReviewsListNull(id, page, size, foundReviews);
+    }
+
+    private List<Review> checkReviewsListNull(int id, int page, int size, List<Review> foundReviews) {
         if (foundReviews.isEmpty()) {
             throw new EntityNotFoundException(id, Review.class.getSimpleName());
         }
-        int fromIndex = (page - 1) * size;
-        int toIndex = Math.min(fromIndex + size, foundReviews.size());
-        return foundReviews.subList(fromIndex, toIndex);
+        return foundReviews;
     }
 
     public GameReview createGameReview(List<Review> reviews, int gameId) {
@@ -53,16 +50,6 @@ public class ReviewService {
 
     public GameReview prepareGameReview(int gameId, int page, int size) {
         return createGameReview(findByGameId(gameId, page, size), gameId);
-    }
-
-    public List<Review> findAll(int page, int size) {
-        List<Review> foundReviews = repository.findAll();
-        if (foundReviews.isEmpty()) {
-            throw new EntityNotFoundException(Review.class.getSimpleName());
-        }
-        int fromIndex = (page - 1) * size;
-        int toIndex = Math.min(fromIndex + size, foundReviews.size());
-        return foundReviews.subList(fromIndex, toIndex);
     }
 
     private boolean existsReview(Review review) {
