@@ -34,12 +34,12 @@ public class ReviewController {
 
     @PostMapping
     public Review createReview(@RequestBody Review review) throws Throwable {
-        return reviewService.updateOrCreateReview(review);
+        return reviewService.createReview(review);
     }
 
     @PutMapping("/{id}")
     public Review updateReview(@RequestBody Review review) throws Throwable {
-        return reviewService.updateOrCreateReview(review);
+        return reviewService.updateReview(review);
     }
 }
 

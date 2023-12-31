@@ -90,7 +90,7 @@ class ReviewServiceIntegrationTest {
     @Test
     void findByUserId_Success() {
         Review review = reviewService.createReview(reviewToCreate);
-        List<Review> foundReviews = reviewService.findByUserId(review.getUserId(), 1, 1);
+        List<Review> foundReviews = reviewService.findByUserId(review.getUserId(), 1, 10);
 
         assertTrue(foundReviews.contains(review));
     }
@@ -125,7 +125,7 @@ class ReviewServiceIntegrationTest {
     }
 
     @Test
-    void updateReview_NotAnOwner_Failure() {
+    void createReview_NotAnOwner_Failure() {
         int noOwnerGameId = 7878787;
         assertThrows(CannotCreateEntityException.class, () ->
                 reviewService.createReview(new Review(
@@ -142,7 +142,7 @@ class ReviewServiceIntegrationTest {
         String changedOpinion = "so so";
         review = reviewService.createReview(reviewToCreate);
         review.setOpinion(changedOpinion);
-        reviewService.updateOrCreateReview(review);
+        reviewService.updateReview(review);
 
         assertEquals(changedOpinion, reviewService.findById(review.getId()).getOpinion());
     }
@@ -159,8 +159,8 @@ class ReviewServiceIntegrationTest {
                 reviewToUpdate.getRating(),
                 newOpinion,
                 reviewToUpdate.getDateTime());
-        assertThrows(CannotCreateEntityException.class, () ->
-                reviewService.updateOrCreateReview(updatingReview));
+        assertThrows(EntityNotFoundException.class, () ->
+                reviewService.updateReview(updatingReview));
         assertEquals(reviewToCreate.getOpinion(), reviewService.findById(reviewToUpdate.getId()).getOpinion());
     }
 }
