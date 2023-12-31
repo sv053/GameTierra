@@ -2,6 +2,7 @@ package com.gamesage.store.service;
 
 import com.gamesage.store.domain.data.SampleData;
 import com.gamesage.store.domain.model.Game;
+import com.gamesage.store.domain.model.GameReview;
 import com.gamesage.store.domain.model.Review;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.exception.CannotCreateEntityException;
@@ -23,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestPropertySource("classpath:application-test.properties")
 class ReviewServiceIntegrationTest {
 
-    private final int rating = 5;
+    private final boolean rating = true;
     private final String description = "on a need-to-know basis";
     private final LocalDateTime reviewDateTime = LocalDateTime.of(2002, 3, 26, 6, 53);
     private User user;
@@ -49,7 +50,7 @@ class ReviewServiceIntegrationTest {
         userId = user.getId();
         game = gameService.createOne(SampleData.GAMES.get(1));
         gameId = game.getId();
-        reviewToCreate = new Review(1, userId, gameId, rating, description, reviewDateTime);
+        reviewToCreate = new Review(1, userId, gameId, true, description, reviewDateTime);
         orderService.buyGame(game.getId(), user.getId());
     }
 
@@ -79,17 +80,11 @@ class ReviewServiceIntegrationTest {
                 rating,
                 description,
                 reviewDateTime));
-        reviewService.createReview(reviewToCreate);
         Review secondSavedReview = reviewService.createReview(secondReview);
 
-        List<Review> reviews = reviewService.findByGameId(review.getGameId(), 1, 10);
-        assertTrue(reviews.contains(review));
-        assertTrue(reviewService.findByGameId(review.getGameId(), 1, 10).contains(secondSavedReview));
-    }
-
-    @Test
-    void findByGameId_Failure() {
-        assertThrows(EntityNotFoundException.class, () -> reviewService.findByGameId(99999999, 1, 1));
+        GameReview gameReview = reviewService.findByGameId(game.getId(), 1, 10);
+        assertTrue(gameReview.getReviews().contains(review));
+        assertTrue(reviewService.findByGameId(review.getGameId(), 1, 10).getReviews().contains(secondSavedReview));
     }
 
     @Test
@@ -103,18 +98,6 @@ class ReviewServiceIntegrationTest {
     @Test
     void findByUserId_Failure() {
         assertThrows(EntityNotFoundException.class, () -> reviewService.findByUserId(-8888888, 1, 1));
-    }
-
-    @Test
-    void findAll_Success() throws Throwable {
-        review = reviewService.createReview(reviewToCreate);
-
-        assertEquals(review, reviewService.findById(review.getId()));
-    }
-
-    @Test
-    void findAll_Failure_EmptyList() {
-        assertThrows(EntityNotFoundException.class, () -> reviewService.findByUserId(-613620, 1, 1));
     }
 
     @Test

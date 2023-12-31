@@ -5,40 +5,34 @@ import java.util.List;
 public class GameReview {
 
     private final Integer gameId;
-
     private final List<Review> reviews;
     private Double avgRating;
     private Double avgPositiveRating;
     private Integer positiveRatingCount;
     private Integer negativeRatingCount;
 
-    public GameReview(Integer gameId, List<Review> reviews) {
+    public GameReview(Integer gameId,
+                      List<Review> reviews,
+                      Double avgRating,
+                      Integer positiveRating,
+                      Integer negativeRating) {
         this.gameId = gameId;
         this.reviews = reviews;
+        this.avgRating = avgRating;
+        this.positiveRatingCount = positiveRating;
+        this.negativeRatingCount = negativeRating;
     }
 
     public Double getAvgPositiveRating() {
         return avgPositiveRating;
     }
 
-    public void setAvgPositiveRating() {
-        this.avgPositiveRating = calculateAvgPositiveUserExperience();
-    }
-
     public Integer getPositiveRatingCount() {
         return positiveRatingCount;
     }
 
-    public void setPositiveRatingCount() {
-        this.positiveRatingCount = calculatePositiveUserExperience();
-    }
-
     public Integer getNegativeRatingCount() {
         return negativeRatingCount;
-    }
-
-    public void setNegativeRatingCount() {
-        this.negativeRatingCount = calculateNegativeUserExperience();
     }
 
     public Integer getGameId() {
@@ -53,30 +47,32 @@ public class GameReview {
         return avgRating;
     }
 
-    public GameReview setAvgRating() {
-        this.avgRating = calculateAvgUserExperience();
-        return this;
+    public void setAvgRating(Double avgRating) {
+        this.avgRating = avgRating;
     }
 
-    private Double calculateAvgUserExperience() {
-        return reviews.stream()
-                .mapToDouble(Review::getRating)
-                .average()
-                .orElse(0.0);
+    public void setAvgPositiveRating(Double avgPositiveRating) {
+        this.avgPositiveRating = avgPositiveRating;
     }
 
-    public Integer calculatePositiveUserExperience() {
-        return reviews.stream()
-                .mapToInt(Review::getRating)
-                .sum();
+    public void setPositiveRatingCount(Integer positiveRatingCount) {
+        this.positiveRatingCount = positiveRatingCount;
     }
 
-    public Double calculateAvgPositiveUserExperience() {
-        return calculateAvgUserExperience() / reviews.size() * 100;
+    public void setNegativeRatingCount(Integer negativeRatingCount) {
+        this.negativeRatingCount = negativeRatingCount;
     }
 
-    public Integer calculateNegativeUserExperience() {
-        return reviews.size() - calculatePositiveUserExperience();
+    @Override
+    public String toString() {
+        return "GameReview{" +
+                "gameId=" + gameId +
+                ", reviews=" + reviews +
+                ", avgRating=" + avgRating +
+                ", avgPositiveRating=" + avgPositiveRating +
+                ", positiveRatingCount=" + positiveRatingCount +
+                ", negativeRatingCount=" + negativeRatingCount +
+                '}';
     }
 }
 

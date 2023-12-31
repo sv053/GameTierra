@@ -12,7 +12,7 @@ public class Review {
     private final Integer gameId;
     private LocalDateTime dateTime;
     private Integer id;
-    private Integer rating;
+    private Boolean rating;
     private String opinion;
 
     public Review(Integer userId, Integer gameId) {
@@ -32,7 +32,7 @@ public class Review {
     public Review(@JsonProperty("id") Integer id,
                   @JsonProperty("user_id") Integer userId,
                   @JsonProperty("game_id") Integer gameId,
-                  @JsonProperty("rating") Integer rating,
+                  @JsonProperty("rating") Boolean rating,
                   @JsonProperty("opinion") String opinion,
                   @JsonProperty("review_dateTime") LocalDateTime dateTime) {
         this.id = id;
@@ -59,11 +59,11 @@ public class Review {
         this.id = id;
     }
 
-    public Integer getRating() {
+    public Boolean getRating() {
         return rating;
     }
 
-    public void setRating(Integer rating) {
+    public void setRating(Boolean rating) {
         this.rating = rating;
     }
 

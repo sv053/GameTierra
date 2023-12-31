@@ -2,12 +2,10 @@ package com.gamesage.store.controller;
 
 import com.gamesage.store.domain.data.SampleData;
 import com.gamesage.store.domain.model.Game;
-import com.gamesage.store.domain.model.GameReview;
 import com.gamesage.store.domain.model.Review;
 import com.gamesage.store.domain.model.User;
 import com.gamesage.store.service.OrderService;
 import com.gamesage.store.service.ReviewService;
-import com.gamesage.store.util.ReviewRating;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +17,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
 
-    private static final String REVIEW_ENDPOINT = "/reviews/{page}/{size}";
     private static final String POST_REVIEW_ENDPOINT = "/reviews";
     private static final String REVIEW_ID_ENDPOINT = "/reviews/{id}";
     private static final String REVIEW_GAMEID_ENDPOINT = "/reviews/games/{gameid}/{page}/{size}";
@@ -34,7 +30,6 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
     private static final String WRONG_TOKEN_HEADER = "unknownTokenValue";
     private static final String TOKEN_HEADER_TITLE = "X-Auth-Token";
 
-    private final int rating = 3;
     private final String description = "not bad";
     private final LocalDateTime reviewDateTime = LocalDateTime.of(2002, 3, 26, 6, 53);
 
@@ -57,7 +52,7 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
         token = loginAndGetToken(userJson);
         savedGames = gameService.createAll(SampleData.GAMES.subList(0, 2));
         game = savedGames.get(0);
-        reviewToCreate = new Review(1, user.getId(), game.getId(), ReviewRating.ONE.getValue(), "cool", LocalDateTime.now());
+        reviewToCreate = new Review(1, user.getId(), game.getId(), true, "cool", LocalDateTime.now());
     }
 
     @Test
@@ -105,10 +100,12 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
                 112,
                 savedSecondUser.getId(),
                 game.getId(),
-                ReviewRating.ZERO.getValue(),
+                false,
                 description,
                 reviewDateTime));
-        GameReview gameReview = new GameReview(game.getId(), List.of(review, secondReview)).setAvgRating();
+        double avgRating = review.getRating() ? 1 : 0;
+        avgRating += secondReview.getRating() ? 1 : 0;
+        avgRating /= 2;
 
         mockMvc.perform(get(REVIEW_GAMEID_ENDPOINT, game.getId(), 1, 2)
                         .header(TOKEN_HEADER_TITLE, token)
@@ -117,9 +114,46 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
                 .andExpect(jsonPath("$.reviews").isArray())
                 .andExpect(jsonPath("$.reviews.*.game_id", containsInAnyOrder(
                         review.getGameId(), secondReview.getGameId())))
+                .andExpect(jsonPath("$.reviews.*.user_id", containsInAnyOrder(
+                        review.getUserId(), secondReview.getUserId())))
                 .andExpect(jsonPath("$.reviews.*.opinion", containsInAnyOrder(
                         review.getOpinion(), secondReview.getOpinion())))
-                .andExpect(jsonPath("$.avgRating").value(gameReview.getAvgRating()));
+                .andExpect(jsonPath("$.avgRating").value(avgRating));
+    }
+
+    @Test
+    void findAllReviewsByUserId_givenRightCreds_Success() throws Exception {
+        Game secondGame = savedGames.get(1);
+        orderService.buyGame(game.getId(), user.getId());
+        orderService.buyGame(secondGame.getId(), user.getId());
+        Review review = reviewService.createReview(reviewToCreate);
+        Review secondReview = reviewService.createReview(new Review(
+                112,
+                user.getId(),
+                secondGame.getId(),
+                false,
+                description,
+                reviewDateTime));
+
+        mockMvc.perform(get(REVIEW_USERID_ENDPOINT, user.getId(), 1, 2)
+                        .header(TOKEN_HEADER_TITLE, token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.*.game_id", containsInAnyOrder(
+                        game.getId(), secondGame.getId())))
+                .andExpect(jsonPath("$.*.user_id", containsInAnyOrder(
+                        review.getUserId(), secondReview.getUserId())))
+                .andExpect(jsonPath("$.*.opinion", containsInAnyOrder(
+                        review.getOpinion(), secondReview.getOpinion())));
+    }
+
+    @Test
+    void findReviewsByUserId_givenRightCreds_WringUserId_Exception() throws Exception {
+        mockMvc.perform(get(REVIEW_USERID_ENDPOINT, 888, 1, 2)
+                        .header(TOKEN_HEADER_TITLE, token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -142,10 +176,10 @@ class ReviewControllerIntegrationTest extends ControllerIntegrationTest {
     void updateReview_givenRightCredsAndHasGame_Success() throws Exception {
         orderService.buyGame(game.getId(), user.getId());
         Review reviewToUpdate = reviewService.createReview(reviewToCreate);
-        int newRating = 9;
+        boolean newRating = false;
         String newOpinion = "too good to go";
 
-        mockMvc.perform(post(REVIEW_ID_ENDPOINT, reviewToUpdate.getId())
+        mockMvc.perform(put(REVIEW_ID_ENDPOINT, reviewToUpdate.getId())
                         .header(TOKEN_HEADER_TITLE, token)
                         .content(objectMapper.writeValueAsString(
                                 new Review(

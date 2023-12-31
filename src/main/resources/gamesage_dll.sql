@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS 'review'
     'id'              INTEGER,
     'user_id'         INTEGER,
     'game_id'         INTEGER,
-    'rating'          INTEGER,
+    'rating'          BOOLEAN,
     'opinion'         TEXT,
     'review_datetime' DATETIME_INTERVAL_CODE,
     PRIMARY KEY ('id' AUTOINCREMENT),

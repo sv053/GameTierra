@@ -32,9 +32,8 @@ public class ReviewService {
         return checkReviewsListNull(id, page, size, foundReviews);
     }
 
-    public List<Review> findByGameId(int id, int page, int size) {
-        List<Review> foundReviews = repository.findByGameId(id, page, size);
-        return checkReviewsListNull(id, page, size, foundReviews);
+    public GameReview findByGameId(int id, int page, int size) {
+        return repository.findByGameId(id, page, size);
     }
 
     private List<Review> checkReviewsListNull(int id, int page, int size, List<Review> foundReviews) {
@@ -44,18 +43,9 @@ public class ReviewService {
         return foundReviews;
     }
 
-    public GameReview createGameReview(List<Review> reviews, int gameId) {
-        return new GameReview(gameId, reviews).setAvgRating();
-    }
-
-    public GameReview prepareGameReview(int gameId, int page, int size) {
-        return createGameReview(findByGameId(gameId, page, size), gameId);
-    }
-
     private boolean existsReview(Review review) {
         return repository.findById(review.getId()).isPresent();
     }
-
 
     public Review updateOrCreateReview(Review review) throws Throwable {
         if (existsReview(review)) {
@@ -79,10 +69,6 @@ public class ReviewService {
                 && existedReview.getUserId().equals(review.getUserId())) {
             return repository.updateReview(review);
         } else throw new CannotCreateEntityException();
-    }
-
-    public void deleteAll() {
-        repository.deleteAll();
     }
 }
 

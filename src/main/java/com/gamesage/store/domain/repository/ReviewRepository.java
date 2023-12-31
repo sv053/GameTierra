@@ -1,18 +1,18 @@
 package com.gamesage.store.domain.repository;
 
+import com.gamesage.store.domain.model.GameReview;
+
 import java.util.List;
 import java.util.Optional;
 
-public interface ReviewRepository<T, K> extends CreateOneRepository<T, K> {
+public interface ReviewRepository<Review, Integer> extends CreateOneRepository<Review, Integer> {
 
-    List<T> findByUserId(Integer userId, Integer page, Integer size);
+    List<Review> findByUserId(Integer userId, Integer page, Integer size);
 
-    List<T> findByGameId(Integer gameId, Integer page, Integer size);
+    GameReview findByGameId(Integer gameId, Integer page, Integer size);
 
-    Optional<T> findById(K id);
+    Optional<Review> findById(Integer id);
 
-    T updateReview(T review);
-
-    void deleteAll();
+    Review updateReview(Review review);
 }
 

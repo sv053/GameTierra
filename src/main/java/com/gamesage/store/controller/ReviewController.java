@@ -24,7 +24,7 @@ public class ReviewController {
 
     @GetMapping("/games/{id}/{page}/{size}")
     public GameReview findReviewByGameId(@PathVariable Integer id, @PathVariable Integer page, @PathVariable Integer size) {
-        return reviewService.prepareGameReview(id, page, size);
+        return reviewService.findByGameId(id, page, size);
     }
 
     @GetMapping("/users/{id}/{page}/{size}")
@@ -37,7 +37,7 @@ public class ReviewController {
         return reviewService.updateOrCreateReview(review);
     }
 
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     public Review updateReview(@RequestBody Review review) throws Throwable {
         return reviewService.updateOrCreateReview(review);
     }
