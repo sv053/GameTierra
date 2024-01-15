@@ -163,13 +163,15 @@ public class ReviewBenchmark {
     }
 
 
-    private void timeReviews(int repetitionsNumber, List<Double> results) {
-        System.out.println(repetitionsNumber + " reviews - ");
-        long currentTimeMillis = System.currentTimeMillis();
-        findByGameId(games.get(0).getId(), repetitionsNumber);
-        double timingResult = (double) (System.currentTimeMillis() - currentTimeMillis);
-        System.out.println(timingResult);
-        results.add(timingResult);
+    private void timeReviews(int reviewsNumber, List<Double> results) {
+        for (int i = 0; i < 5; i++) {
+            System.out.println(reviewsNumber + " reviews - ");
+            long currentTimeMillis = System.currentTimeMillis();
+            findByGameId(games.get(0).getId(), reviewsNumber);
+            double timingResult = (double) (System.currentTimeMillis() - currentTimeMillis);
+            System.out.println(timingResult);
+            results.add(timingResult);
+        }
     }
 
     @TearDown
