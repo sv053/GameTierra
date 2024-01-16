@@ -36,7 +36,7 @@ class LoginControllerIntegrationTest extends ControllerIntegrationTest {
     }
 
     @Test
-    void givenCorrectCreds_shouldLoginAndReturn200() throws Exception {
+    void givenCorrectCreds_shouldLogin() throws Exception {
         User savedUser = userService.createOne(user);
         String actualToken = loginAndGetToken(userJson);
         String tokenWithoutUserId = TokenParser.findTokenValue(actualToken);
@@ -50,7 +50,7 @@ class LoginControllerIntegrationTest extends ControllerIntegrationTest {
     }
 
     @Test
-    void givenUserCredsDoNotExist_shouldNotLoginAndReturn401() throws Exception {
+    void givenUserCredsDoNotExist_shouldNotLogin() throws Exception {
         mockMvc.perform(post(LOGIN_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(user)))
