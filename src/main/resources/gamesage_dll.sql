@@ -61,6 +61,15 @@ CREATE TABLE IF NOT EXISTS 'review'
     CONSTRAINT 'game_fk' FOREIGN KEY ('game_id') REFERENCES 'game' ('id')
 );
 
+CREATE TABLE IF NOT EXISTS 'game_rating'
+(
+    'id'             INTEGER,
+    'game_id'        INTEGER,
+    'rating'         INTEGER,
+    'ratings_amount' INTEGER,
+    PRIMARY KEY ('id' AUTOINCREMENT),
+    CONSTRAINT 'game_fk' FOREIGN KEY ('game_id') REFERENCES 'game' ('id')
+);
 
 COMMIT;
 

@@ -12,9 +12,11 @@ import java.util.List;
 public class GameService {
 
     private final FindAllDependentRepository<Game, Integer> repository;
+    private final GameRatingService ratingService;
 
-    public GameService(@Qualifier("dbGameRepository") FindAllDependentRepository<Game, Integer> repository) {
+    public GameService(@Qualifier("dbGameRepository") FindAllDependentRepository<Game, Integer> repository, GameRatingService ratingService) {
         this.repository = repository;
+        this.ratingService = ratingService;
     }
 
     public Game findById(int id) {
@@ -30,11 +32,23 @@ public class GameService {
     }
 
     public List<Game> createAll(List<Game> gamesToAdd) {
-        return repository.create(gamesToAdd);
+        List<Game> gamesWithIds = repository.create(gamesToAdd);
+        gamesWithIds.stream()
+                .map(Game::getId)
+                .map(this::addGameToRatingTable)
+                .forEach(ignore -> {
+                });
+        return gamesWithIds;
     }
 
     public Game createOne(Game gameToAdd) {
-        return repository.createOne(gameToAdd);
+        Game game = repository.createOne(gameToAdd);
+        addGameToRatingTable(game.getId());
+        return game;
+    }
+
+    public Integer addGameToRatingTable(Integer gameIdToAdd) {
+        return ratingService.createGame(gameIdToAdd);
     }
 
     public void deleteAll() {

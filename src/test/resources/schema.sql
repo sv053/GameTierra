@@ -52,3 +52,13 @@ CREATE TABLE IF NOT EXISTS review
     FOREIGN KEY (user_id) REFERENCES user (id),
     FOREIGN KEY (game_id) REFERENCES game (id)
 );
+
+CREATE TABLE IF NOT EXISTS game_rating
+(
+    id             INTEGER PRIMARY KEY AUTO_INCREMENT,
+    game_id        INTEGER,
+    rating         INTEGER,
+    ratings_amount INTEGER,
+    FOREIGN KEY (game_id) REFERENCES game (id)
+);
+

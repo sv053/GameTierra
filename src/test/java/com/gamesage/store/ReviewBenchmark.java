@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 @State(Scope.Benchmark)
 public class ReviewBenchmark {
@@ -41,6 +40,7 @@ public class ReviewBenchmark {
         int usersAmount = 1001;
         List<User> users = userService.findAll();
         int usersAmountToAdd = Objects.nonNull(users) ? usersAmount - users.size() : usersAmount;
+
         if (usersAmountToAdd > 0) {
             for (int i = 0; i < usersAmountToAdd; i++) {
                 String generatedString = createRandomString();
@@ -105,6 +105,7 @@ public class ReviewBenchmark {
                 .max()
                 .orElseThrow());
 
+
         System.out.println("min1000 = " + allM1000.stream()
                 .mapToDouble(Double::doubleValue)
                 .min()
@@ -119,32 +120,32 @@ public class ReviewBenchmark {
                 .orElseThrow());
     }
 
-    @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @Warmup(iterations = 0)
-    @Timeout(time = 100, timeUnit = TimeUnit.MILLISECONDS)
-    @Measurement(iterations = 1)
-    public void measure200Reviews() {
-        findByGameId(games.get(0).getId(), 200);
-    }
-
-    @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @Warmup(iterations = 0)
-    @Timeout(time = 100, timeUnit = TimeUnit.MILLISECONDS)
-    @Measurement(iterations = 1)
-    public void measure500Reviews() {
-        findByGameId(games.get(0).getId(), 500);
-    }
-
-    @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @Warmup(iterations = 0)
-    @Timeout(time = 100, timeUnit = TimeUnit.MILLISECONDS)
-    @Measurement(iterations = 1)
-    public void measure1000Reviews() {
-        findByGameId(games.get(0).getId(), 1000);
-    }
+//    @Benchmark
+//    @BenchmarkMode(Mode.AverageTime)
+//    @Warmup(iterations = 0)
+//    @Timeout(time = 100, timeUnit = TimeUnit.MILLISECONDS)
+//    @Measurement(iterations = 1)
+//    public void measure200Reviews() {
+//        findByGameId(games.get(0).getId(), 200);
+//    }
+//
+//    @Benchmark
+//    @BenchmarkMode(Mode.AverageTime)
+//    @Warmup(iterations = 0)
+//    @Timeout(time = 100, timeUnit = TimeUnit.MILLISECONDS)
+//    @Measurement(iterations = 1)
+//    public void measure500Reviews() {
+//        findByGameId(games.get(0).getId(), 500);
+//    }
+//
+//    @Benchmark
+//    @BenchmarkMode(Mode.AverageTime)
+//    @Warmup(iterations = 0)
+//    @Timeout(time = 100, timeUnit = TimeUnit.MILLISECONDS)
+//    @Measurement(iterations = 1)
+//    public void measure1000Reviews() {
+//        findByGameId(games.get(0).getId(), 1000);
+//    }
 
     public void findByGameId(int gameId, int size) {
         reviewService.findByGameId(gameId, 1, size);

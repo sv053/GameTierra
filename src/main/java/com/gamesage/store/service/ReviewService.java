@@ -15,11 +15,13 @@ public class ReviewService {
 
     private final ReviewRepository<Review, Integer> repository;
     private final UserService userService;
+    private final GameRatingService ratingService;
 
     public ReviewService(ReviewRepository<Review, Integer> repository,
-                         UserService userService) {
+                         UserService userService, GameRatingService ratingService) {
         this.repository = repository;
         this.userService = userService;
+        this.ratingService = ratingService;
     }
 
     public Review findById(int id) throws Throwable {
@@ -42,24 +44,24 @@ public class ReviewService {
         return foundReviews;
     }
 
-    private boolean existsReview(Review review) {
-        return repository.findById(review.getId()).isPresent();
-    }
-
     public Review createReview(Review review) {
         User user = userService.findById(review.getUserId());
-        if (!user.hasGame(review.getGameId())) {
+        Integer gameId = review.getGameId();
+        if (!user.hasGame(gameId)) {
             throw new CannotCreateEntityException("User is not an owner");
         }
+        ratingService.addRating(gameId, review.getRating());
         return repository.createOne(review);
     }
 
     public Review updateReview(Review review) throws Throwable {
         Review existedReview = findById(review.getId());
+        Integer gameId = review.getGameId();
         if (!(existedReview.getGameId().equals(review.getGameId())
                 && existedReview.getUserId().equals(review.getUserId()))) {
             throw new EntityNotFoundException(review.getId(), Review.class.getSimpleName());
         }
+        ratingService.updateRating(gameId, review.getRating());
         return repository.updateReview(review);
     }
 }

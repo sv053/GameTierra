@@ -30,16 +30,14 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
                     " LIMIT ? " +
                     " OFFSET ? ";
     private static final String SELECT_REVIEWS_RANGE_BY_GAME_QUERY =
-            " SELECT r1.game_id, r2.id, r2.user_id, r2.rating, r2.opinion, r2.review_datetime, " +
-                    "(SELECT AVG(CAST(rating AS DOUBLE)) FROM review WHERE game_id = r1.game_id) AS overall_average_rating, " +
-                    "(SELECT SUM(CASE WHEN rating THEN 1 ELSE 0 END) FROM review WHERE game_id = r1.game_id) AS overall_positive_rating, " +
-                    "(SELECT SUM(CASE WHEN NOT rating THEN 1 ELSE 0 END) FROM review WHERE game_id = r1.game_id) AS overall_negative_rating " +
-                    "FROM review r1 " +
-                    "INNER JOIN review r2 ON r1.game_id = r2.game_id " +
-                    "WHERE r1.game_id = ? " +
-                    "GROUP BY r1.game_id, r2.id, r2.user_id, r2.rating, r2.opinion, r2.review_datetime " +
+            " SELECT rvw.game_id, rvw.id, rvw.user_id, rvw.opinion, rvw.review_datetime, rvw.rating, rt.rating as rating_sum, rt.ratings_amount as amount " +
+                    "FROM review rvw " +
+                    "INNER JOIN game_rating rt ON rvw.game_id = rt.game_id " +
+                    "WHERE rvw.game_id = ? " +
+                    "GROUP BY rvw.game_id, rvw.id, rvw.user_id, rvw.opinion, rvw.review_datetime " +
                     "LIMIT ? OFFSET ?";
 
+    private static final String SELECT_RATING_QUERY = "SELECT ratings_amount FROM game_rating WHERE game_id = ? ";
     private static final String SELECT_REVIEW_QUERY =
             "SELECT id, user_id, game_id, rating, opinion, review_datetime " +
                     " FROM review " +
@@ -112,7 +110,8 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
     @Override
     public GameReview findByGameId(Integer id, Integer page, Integer size) {
         int startIndex = size * page - size;
-        return jdbcTemplate.queryForObject(SELECT_REVIEWS_RANGE_BY_GAME_QUERY, gameReviewRowMapper, id, size, startIndex);
+        var gameReview = jdbcTemplate.queryForObject(SELECT_REVIEWS_RANGE_BY_GAME_QUERY, gameReviewRowMapper, id, size, startIndex);
+        return gameReview;
     }
 
     @Component
@@ -139,9 +138,9 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
             @Override
             public GameReview mapRow(ResultSet rs, int rowNum) throws SQLException {
                 int gameId = rs.getInt("game_id");
-                Double avgRating = rs.getDouble("overall_average_rating");
-                int positiveRating = rs.getInt("overall_positive_rating");
-                int negativeRating = rs.getInt("overall_negative_rating");
+                Double avgRating = 1d * rs.getInt("rating_sum") / rs.getInt("amount");
+                int positiveRating = rs.getInt("amount") - rs.getInt("rating_sum");
+                int negativeRating = rs.getInt("amount");
 
                 List<Review> reviews = new ArrayList<>();
                 do {
