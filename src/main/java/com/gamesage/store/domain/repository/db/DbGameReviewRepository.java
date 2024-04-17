@@ -11,34 +11,34 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 
 @Repository
-public class DbGameRatingRepository implements RatingRepository {
+public class DbGameReviewRepository implements RatingRepository {
 
     private static final String SELECT_RATING_QUERY =
             " SELECT rating " +
-                    "FROM game_rating " +
+                    "FROM game_review " +
                     "WHERE game_id = ? ";
 
     private static final String SELECT_RATINGS_AMOUNT_QUERY =
             " SELECT ratings_amount " +
-                    "FROM game_rating " +
+                    "FROM game_review " +
                     "WHERE game_id = ? ";
 
     private static final String INSERT_NEW_GAME_QUERY =
-            "INSERT INTO game_rating (game_id, rating, ratings_amount) " +
+            "INSERT INTO game_review (game_id, rating, ratings_amount) " +
                     "VALUES (?, ?, ?) ";
 
     private static final String UPDATE_RATING_QUERY = "" +
-            "UPDATE game_rating " +
+            "UPDATE game_review " +
             "SET rating = rating + ? " +
             "WHERE game_id = ?";
 
     private static final String ADD_RATING_QUERY = "" +
-            "UPDATE game_rating " +
+            "UPDATE game_review " +
             "SET rating = rating + ? , ratings_amount = ratings_amount + 1 " +
             "WHERE game_id = ?";
     private final JdbcTemplate jdbcTemplate;
 
-    public DbGameRatingRepository(JdbcTemplate jdbcTemplate) {
+    public DbGameReviewRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

@@ -15,10 +15,10 @@ public class ReviewService {
 
     private final ReviewRepository<Review, Integer> repository;
     private final UserService userService;
-    private final GameRatingService ratingService;
+    private final GameReviewService ratingService;
 
     public ReviewService(ReviewRepository<Review, Integer> repository,
-                         UserService userService, GameRatingService ratingService) {
+                         UserService userService, GameReviewService ratingService) {
         this.repository = repository;
         this.userService = userService;
         this.ratingService = ratingService;

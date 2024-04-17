@@ -61,14 +61,14 @@ CREATE TABLE IF NOT EXISTS 'review'
     CONSTRAINT 'game_fk' FOREIGN KEY ('game_id') REFERENCES 'game' ('id')
 );
 
-CREATE TABLE IF NOT EXISTS 'game_rating'
+CREATE TABLE IF NOT EXISTS 'game_review'
 (
     'id'             INTEGER,
     'game_id'        INTEGER,
     'rating'         INTEGER,
     'ratings_amount' INTEGER,
     PRIMARY KEY ('id' AUTOINCREMENT),
-    CONSTRAINT 'game_fk' FOREIGN KEY ('game_id') REFERENCES 'game' ('id')
+    CONSTRAINT 'game_fk' FOREIGN KEY ('game_id') REFERENCES 'game' ('id') ON DELETE CASCADE
 );
 
 COMMIT;

@@ -12,9 +12,9 @@ import java.util.List;
 public class GameService {
 
     private final FindAllDependentRepository<Game, Integer> repository;
-    private final GameRatingService ratingService;
+    private final GameReviewService ratingService;
 
-    public GameService(@Qualifier("dbGameRepository") FindAllDependentRepository<Game, Integer> repository, GameRatingService ratingService) {
+    public GameService(@Qualifier("dbGameRepository") FindAllDependentRepository<Game, Integer> repository, GameReviewService ratingService) {
         this.repository = repository;
         this.ratingService = ratingService;
     }
