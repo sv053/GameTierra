@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class GameRatingService {
+public class GameReviewService {
 
     private final RatingRepository repository;
 
-    public GameRatingService(RatingRepository repository) {
+    public GameReviewService(RatingRepository repository) {
         this.repository = repository;
     }
 

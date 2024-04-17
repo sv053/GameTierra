@@ -32,12 +32,12 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
     private static final String SELECT_REVIEWS_RANGE_BY_GAME_QUERY =
             " SELECT rvw.game_id, rvw.id, rvw.user_id, rvw.opinion, rvw.review_datetime, rvw.rating, rt.rating as rating_sum, rt.ratings_amount as amount " +
                     "FROM review rvw " +
-                    "INNER JOIN game_rating rt ON rvw.game_id = rt.game_id " +
+                    "INNER JOIN game_review rt ON rvw.game_id = rt.game_id " +
                     "WHERE rvw.game_id = ? " +
                     "GROUP BY rvw.game_id, rvw.id, rvw.user_id, rvw.opinion, rvw.review_datetime " +
                     "LIMIT ? OFFSET ?";
 
-    private static final String SELECT_RATING_QUERY = "SELECT ratings_amount FROM game_rating WHERE game_id = ? ";
+    private static final String SELECT_RATING_QUERY = "SELECT ratings_amount FROM game_review WHERE game_id = ? ";
     private static final String SELECT_REVIEW_QUERY =
             "SELECT id, user_id, game_id, rating, opinion, review_datetime " +
                     " FROM review " +

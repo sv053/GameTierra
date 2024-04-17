@@ -30,11 +30,11 @@ public class Review {
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public Review(@JsonProperty("id") Integer id,
-                  @JsonProperty("user_id") Integer userId,
-                  @JsonProperty("game_id") Integer gameId,
+                  @JsonProperty("userId") Integer userId,
+                  @JsonProperty("gameId") Integer gameId,
                   @JsonProperty("rating") Boolean rating,
                   @JsonProperty("opinion") String opinion,
-                  @JsonProperty("review_dateTime") LocalDateTime dateTime) {
+                  @JsonProperty("reviewDateTime") LocalDateTime dateTime) {
         this.id = id;
         this.userId = userId;
         this.gameId = gameId;

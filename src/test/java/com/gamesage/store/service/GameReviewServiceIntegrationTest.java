@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @Transactional
 @TestPropertySource("classpath:application-test.properties")
-class GameRatingServiceIntegrationTest {
+class GameReviewServiceIntegrationTest {
 
     private final boolean rating = true;
     private final String description = "on a need-to-know basis";
@@ -40,7 +40,7 @@ class GameRatingServiceIntegrationTest {
     @Autowired
     private OrderService orderService;
     @Autowired
-    private GameRatingService ratingService;
+    private GameReviewService ratingService;
 
     @BeforeEach
     void init() {
@@ -89,7 +89,6 @@ class GameRatingServiceIntegrationTest {
 
         assertEquals(0, ratingService.findRating(gameId));
 
-        Review review = reviewService.updateReview(reviewToCreate);
         Review updatedReview = reviewService.updateReview(new Review(
                 review.getId(),
                 review.getUserId(),
