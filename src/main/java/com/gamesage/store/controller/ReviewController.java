@@ -1,11 +1,18 @@
 package com.gamesage.store.controller;
 
+import java.util.List;
+
 import com.gamesage.store.domain.model.GameReview;
 import com.gamesage.store.domain.model.Review;
 import com.gamesage.store.service.ReviewService;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/reviews")
@@ -22,13 +29,17 @@ public class ReviewController {
         return reviewService.findById(id);
     }
 
-    @GetMapping("/games/{id}/{page}/{size}")
-    public GameReview findReviewByGameId(@PathVariable Integer id, @PathVariable Integer page, @PathVariable Integer size) {
+    @GetMapping("/games/{id}")
+    public GameReview findReviewByGameId(@PathVariable Integer id,
+                                                                    @RequestParam(defaultValue = "0") Integer page,
+                                                                    @RequestParam(defaultValue = "10") Integer size) {
         return reviewService.findByGameId(id, page, size);
     }
 
-    @GetMapping("/users/{id}/{page}/{size}")
-    public List<Review> findReviewByUserId(@PathVariable Integer id, @PathVariable Integer page, @PathVariable Integer size) {
+    @GetMapping("/users/{id}")
+    public List<Review> findReviewByUserId(@PathVariable Integer id,
+                                                                    @RequestParam(defaultValue = "0") Integer page,
+                                                                    @RequestParam(defaultValue = "10") Integer size) {
         return reviewService.findByUserId(id, page, size);
     }
 
