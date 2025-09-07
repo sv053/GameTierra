@@ -38,9 +38,9 @@ public class ReviewService {
     }
 
     private List<Review> checkReviewsListNull(int id, List<Review> foundReviews) {
-        if (foundReviews.isEmpty()) {
-            throw new EntityNotFoundException(id, Review.class.getSimpleName());
-        }
+//        if (foundReviews.isEmpty()) {
+//            throw new EntityNotFoundException(id, Review.class.getSimpleName());
+//        }
         return foundReviews;
     }
 
