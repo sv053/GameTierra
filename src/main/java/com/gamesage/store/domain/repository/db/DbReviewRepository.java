@@ -139,8 +139,8 @@ public class DbReviewRepository implements ReviewRepository<Review, Integer> {
             public GameReview mapRow(ResultSet rs, int rowNum) throws SQLException {
                 int gameId = rs.getInt("game_id");
                 Double avgRating = 1d * rs.getInt("rating_sum") / rs.getInt("amount");
-                int positiveRating = rs.getInt("amount") - rs.getInt("rating_sum");
-                int negativeRating = rs.getInt("amount");
+                int positiveRating = rs.getInt("rating_sum");
+                int negativeRating = rs.getInt("amount") - rs.getInt("rating_sum");
 
                 List<Review> reviews = new ArrayList<>();
                 do {

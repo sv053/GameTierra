@@ -8,7 +8,9 @@ import com.gamesage.store.exception.CannotCreateEntityException;
 import com.gamesage.store.exception.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReviewService {
@@ -29,19 +31,13 @@ public class ReviewService {
     }
 
     public List<Review> findByUserId(int id, int page, int size) {
-        List<Review> foundReviews = repository.findByUserId(id, page, size);
-        return checkReviewsListNull(id, foundReviews);
+        return Optional.ofNullable(repository.findByUserId(id, page, size))
+                .filter(list -> !list.isEmpty())
+                .orElse(Collections.emptyList());
     }
 
     public GameReview findByGameId(int id, int page, int size) {
         return repository.findByGameId(id, page, size);
-    }
-
-    private List<Review> checkReviewsListNull(int id, List<Review> foundReviews) {
-//        if (foundReviews.isEmpty()) {
-//            throw new EntityNotFoundException(id, Review.class.getSimpleName());
-//        }
-        return foundReviews;
     }
 
     public Review createReview(Review review) {
