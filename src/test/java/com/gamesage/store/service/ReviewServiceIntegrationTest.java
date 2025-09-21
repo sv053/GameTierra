@@ -16,8 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @SpringBootTest
 @Transactional
@@ -97,7 +100,10 @@ class ReviewServiceIntegrationTest {
 
     @Test
     void findByUserId_Failure() {
-        assertThrows(EntityNotFoundException.class, () -> reviewService.findByUserId(-8888888, 1, 1));
+        List<Review> foundReviews = reviewService.findByUserId(-8888888, 0, 10);
+
+        assertNotNull(foundReviews);
+        assertTrue(foundReviews.isEmpty());
     }
 
     @Test
@@ -162,6 +168,102 @@ class ReviewServiceIntegrationTest {
         assertThrows(EntityNotFoundException.class, () ->
                 reviewService.updateReview(updatingReview));
         assertEquals(reviewToCreate.getOpinion(), reviewService.findById(reviewToUpdate.getId()).getOpinion());
+    }
+
+    @Test
+    void findByUserId_Pagination_MultiplePages() {
+        assumeTrue(SampleData.GAMES.size() >= 7, "Not enough sample games for pagination test");
+
+        int totalReviews = 5;
+        int pageSize = 2;
+
+        for (int i = 2; i < 2 + totalReviews; i++) {
+            Game extraGame = gameService.createOne(SampleData.GAMES.get(i));
+            orderService.buyGame(extraGame.getId(), user.getId());
+
+            Review r = new Review(
+                    10_000 + i,
+                    user.getId(),
+                    extraGame.getId(),
+                    rating,
+                    description + " #" + i,
+                    reviewDateTime.plusMinutes(i)
+            );
+            reviewService.createReview(r);
+        }
+
+        List<Review> p0 = reviewService.findByUserId(user.getId(), 0, pageSize);
+        List<Review> p1 = reviewService.findByUserId(user.getId(), 1, pageSize);
+        List<Review> p2 = reviewService.findByUserId(user.getId(), 2, pageSize);
+        List<Review> p3 = reviewService.findByUserId(user.getId(), 3, pageSize); // за пределами
+
+        assertEquals(pageSize, p0.size());
+        assertEquals(pageSize, p1.size());
+        assertEquals(1, p2.size());
+        assertTrue(p3.isEmpty());
+
+        // empty pages crossing
+        Set<Integer> s0 = p0.stream().map(Review::getId).collect(Collectors.toSet());
+        Set<Integer> s1 = p1.stream().map(Review::getId).collect(Collectors.toSet());
+        Set<Integer> s2 = p2.stream().map(Review::getId).collect(Collectors.toSet());
+
+        assertTrue(s0.stream().noneMatch(s1::contains));
+        assertTrue(s0.stream().noneMatch(s2::contains));
+        assertTrue(s1.stream().noneMatch(s2::contains));
+    }
+
+    @Test
+    void findReviewsByGameId_Pagination_MultiplePages() {
+        assumeTrue(SampleData.USERS.size() >= 7, "Not enough sample users for pagination test");
+
+        int total = 5;
+        int pageSize = 2;
+
+        for (int i = 2; i < 2 + total; i++) {
+            User u = userService.createOne(SampleData.USERS.get(i));
+            orderService.buyGame(game.getId(), u.getId());
+
+            Review r = new Review(
+                    20_000 + i,
+                    u.getId(),
+                    game.getId(),
+                    rating,
+                    description + " U#" + i,
+                    reviewDateTime.plusMinutes(i)
+            );
+            reviewService.createReview(r);
+        }
+
+        GameReview g0 = reviewService.findByGameId(game.getId(), 0, pageSize);
+        GameReview g1 = reviewService.findByGameId(game.getId(), 1, pageSize);
+        GameReview g2 = reviewService.findByGameId(game.getId(), 2, pageSize);
+
+        assertNotNull(g0);
+        assertNotNull(g1);
+        assertNotNull(g2);
+
+        assertEquals(pageSize, g0.getReviews().size());
+        assertEquals(pageSize, g1.getReviews().size());
+        assertEquals(1, g2.getReviews().size());
+
+        Set<Integer> s0 = g0.getReviews().stream().map(Review::getId).collect(Collectors.toSet());
+        Set<Integer> s1 = g1.getReviews().stream().map(Review::getId).collect(Collectors.toSet());
+        Set<Integer> s2 = g2.getReviews().stream().map(Review::getId).collect(Collectors.toSet());
+
+        assertTrue(s0.stream().noneMatch(s1::contains));
+        assertTrue(s0.stream().noneMatch(s2::contains));
+        assertTrue(s1.stream().noneMatch(s2::contains));
+    }
+
+    @Test
+    void findReviewsByGameId_PageOutOfRange_ReturnsEmptyList() {
+        review = reviewService.createReview(reviewToCreate);
+
+        int pageSize = 10;
+        GameReview g = reviewService.findByGameId(game.getId(), 999, pageSize);
+
+        assertNotNull(g);
+        assertTrue(g.getReviews().isEmpty());
     }
 }
 
