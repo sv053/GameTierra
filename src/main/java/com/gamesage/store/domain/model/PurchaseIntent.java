@@ -119,5 +119,16 @@ public class PurchaseIntent {
             return new PurchaseIntent(this);
         }
     }
+
+    @Override
+    public String toString() {
+        return "PurchaseIntent{" +
+                "isBought=" + isBought +
+                ", targetGame=" + targetGame +
+                ", buyer=" + buyer +
+                ", orderDateTime=" + orderDateTime +
+                ", purchaseMessage=" + purchaseMessage +
+                '}';
+    }
 }
 

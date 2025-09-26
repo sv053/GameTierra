@@ -44,7 +44,7 @@ public class UserService implements UserDetailsService, AuthenticationUserDetail
     }
 
     public User findById(int id) {
-        User retrievedUser = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+        User retrievedUser = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id, User.class.getSimpleName()));
         List<Game> userGames = gameService.findAllGamesByUserId(retrievedUser.getId());
         retrievedUser.addGames(userGames);
         return retrievedUser;

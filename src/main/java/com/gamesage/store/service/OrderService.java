@@ -44,7 +44,7 @@ public class OrderService {
         Game game = gameService.findById(gameId);
         User user = userService.findById(userId);
         boolean canPay = user.canPay(game.getPrice());
-        boolean hasGame = user.hasGame(game);
+        boolean hasGame = user.hasGame(gameId);
         boolean canBuy = canBuy(canPay, hasGame);
         PurchaseMessage purchaseMessage = preparePurchaseMessage(canPay, hasGame);
         Order order = null;

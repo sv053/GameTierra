@@ -94,6 +94,10 @@ public class User {
         return games.contains(game);
     }
 
+    public boolean hasGame(Integer gameId) {
+        return games.stream().anyMatch(game -> game.getId() == gameId);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -113,7 +117,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "\nUser{"
+        return "User{"
                 + "id=" + id
                 + ", login=" + login
                 + ", tier=" + tier

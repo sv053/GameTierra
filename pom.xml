@@ -15,6 +15,13 @@
     <artifactId>age-of-games</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <!--    <repositories>-->
+    <!--        <repository>-->
+    <!--            <id>jcenter</id>-->
+    <!--            <url>https://jcenter.bintray.com/</url>-->
+    <!--        </repository>-->
+    <!--    </repositories>-->
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -78,6 +85,31 @@
             <version>4.2.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>1.37</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>1.37</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--        <dependency>-->
+        <!--            <groupId>pw.krejci</groupId>-->
+        <!--            <artifactId>jmh-maven-plugin</artifactId>-->
+        <!--            <version>0.2.2</version>-->
+        <!--        </dependency>-->
+
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.maven.plugin-testing</groupId>-->
+        <!--            <artifactId>maven-plugin-testing-harness</artifactId>-->
+        <!--            <version>3.3.0</version>-->
+        <!--            <scope>test</scope>-->
+        <!--        </dependency>-->
 
     </dependencies>
 
@@ -86,6 +118,55 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <!--            <plugin>-->
+            <!--                <groupId>org.openjdk.jmh</groupId>-->
+            <!--                <artifactId>jmh-maven-plugin</artifactId>-->
+            <!--                    <version>1.37</version>-->
+
+            <!--                <configuration>-->
+            <!--                    <forks>1</forks>-->
+            <!--                    <iterations>5</iterations>-->
+            <!--                </configuration>-->
+            <!--                <executions>-->
+            <!--                    <execution>-->
+            <!--                        <id>run-benchmarks</id>-->
+            <!--                        <goals>-->
+            <!--                            <goal>generate-sources</goal>-->
+            <!--                            <goal>compile</goal>-->
+            <!--                            <goal>generate-reports</goal>-->
+            <!--                        </goals>-->
+            <!--                    </execution>-->
+            <!--                </executions>-->
+            <!--            </plugin>-->
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>build-classpath</id>
+                        <goals>
+                            <goal>build-classpath</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>runtime</includeScope>
+                            <outputProperty>depClasspath</outputProperty>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>my.Benchmark</mainClass>
+                    <systemProperties>
+                        <systemProperty>
+                            <key>java.class.path</key>
+                            <value>${project.build.outputDirectory}${path.separator}${depClasspath}</value>
+                        </systemProperty>
+                    </systemProperties>
+                </configuration>
             </plugin>
         </plugins>
     </build>

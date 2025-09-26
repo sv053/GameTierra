@@ -41,3 +41,24 @@ CREATE TABLE IF NOT EXISTS token
     FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS review
+(
+    id              INTEGER PRIMARY KEY AUTO_INCREMENT,
+    user_id         INTEGER,
+    game_id         INTEGER,
+    rating          INTEGER,
+    opinion         TEXT,
+    review_datetime DATETIME,
+    FOREIGN KEY (user_id) REFERENCES user (id),
+    FOREIGN KEY (game_id) REFERENCES game (id)
+);
+
+CREATE TABLE IF NOT EXISTS game_review
+(
+    id             INTEGER PRIMARY KEY AUTO_INCREMENT,
+    game_id        INTEGER,
+    rating         INTEGER,
+    ratings_amount INTEGER,
+    FOREIGN KEY (game_id) REFERENCES game (id) ON DELETE CASCADE
+);
+
